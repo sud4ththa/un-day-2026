@@ -1,10 +1,10 @@
-export function Header({ title, subtitle, onSignOut, onBack, children }) {
+export function Header({ title, subtitle, onSignOut, onBack, backLabel = 'All stalls', children }) {
   return (
     <header className="top">
       <p className="kicker">The British School in Colombo · Parent Collective · UN Day 2026</p>
       {onBack ? (
         <button type="button" className="back" onClick={onBack}>
-          All stalls
+          {backLabel}
         </button>
       ) : null}
       <div className="top-row">

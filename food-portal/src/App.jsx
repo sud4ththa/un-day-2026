@@ -1,15 +1,21 @@
 import { useEffect, useState } from 'react'
+import { DemoApp } from './DemoApp.jsx'
 import { Header } from './components/Header.jsx'
-import { configError, supabase } from './lib/supabase.js'
-import { AdminDashboard } from './screens/AdminDashboard.jsx'
-import { PlanEditor } from './screens/PlanEditor.jsx'
+import { configError, isDemo, supabase } from './lib/supabase.js'
+import { Portal } from './Portal.jsx'
 import { SignIn } from './screens/SignIn.jsx'
 
 export default function App() {
+  if (isDemo) return <DemoApp />
+  return <LiveApp />
+}
+
+function LiveApp() {
   const [session, setSession] = useState(undefined)
   const [profile, setProfile] = useState(undefined)
   const [gateMessage, setGateMessage] = useState('')
   const [stallId, setStallId] = useState(null)
+  const [preview, setPreview] = useState(null)
 
   useEffect(() => {
     if (!supabase) return undefined
@@ -38,6 +44,7 @@ export default function App() {
           setGateMessage('This email is not on the list yet. Ask the PTC to add you.')
           setProfile(null)
           setStallId(null)
+          setPreview(null)
           await supabase.auth.signOut()
           return
         }
@@ -53,6 +60,7 @@ export default function App() {
   async function signOut() {
     if (supabase) await supabase.auth.signOut()
     setStallId(null)
+    setPreview(null)
   }
 
   if (configError) {
@@ -87,21 +95,13 @@ export default function App() {
     )
   }
 
-  if (profile.role === 'admin' && !stallId) {
-    return (
-      <AdminDashboard
-        profile={profile}
-        onOpen={setStallId}
-        onSignOut={signOut}
-      />
-    )
-  }
-
   return (
-    <PlanEditor
+    <Portal
       profile={profile}
       stallId={stallId}
-      onBack={profile.role === 'admin' ? () => setStallId(null) : null}
+      setStallId={setStallId}
+      preview={preview}
+      setPreview={setPreview}
       onSignOut={signOut}
     />
   )

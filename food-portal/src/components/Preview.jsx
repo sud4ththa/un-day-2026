@@ -1,3 +1,4 @@
+import { bankPreviewLines } from '../lib/bankDetails.js'
 import { allergenList, dietLabel, spiceLabel, tasteLabel } from '../lib/format.js'
 
 function moneyBlock(stall) {
@@ -9,11 +10,12 @@ function moneyBlock(stall) {
   return lines
 }
 
-export function Preview({ stall, dishes }) {
+export function Preview({ stall, dishes, allowBankDetails = false }) {
   const showFood = stall.support_type === 'food' || stall.support_type === 'both'
   const showMoney = stall.support_type === 'money' || stall.support_type === 'both'
   const named = dishes.filter((dish) => dish.name.trim())
   const pay = showMoney ? moneyBlock(stall) : null
+  const bank = showMoney ? bankPreviewLines(stall, allowBankDetails) : []
   const contact = [stall.food_coordinator_name.trim(), stall.food_coordinator_phone.trim()]
     .filter(Boolean)
     .join(', ')
@@ -37,6 +39,12 @@ export function Preview({ stall, dishes }) {
         <div>
           <h4>Payment</h4>
           {pay.length ? pay.map((line) => <p key={line}>{line}</p>) : <p className="muted">Payment details are not filled in yet.</p>}
+          {bank.length ? (
+            <>
+              <h4>Bank details</h4>
+              {bank.map((line) => <p key={line}>{line}</p>)}
+            </>
+          ) : null}
         </div>
       ) : null}
       {showFood ? (

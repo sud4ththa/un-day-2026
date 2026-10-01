@@ -21,6 +21,11 @@ create table public.stalls (
   dropoff_instructions text not null default '',
   packaging_note text not null default 'No single-use plastic.',
   halal_note text not null default '',
+  bank_account_name text not null default '',
+  bank_name text not null default '',
+  bank_branch text not null default '',
+  bank_account_number text not null default '',
+  bank_reference text not null default '',
   status text not null default 'not_started' check (status in ('not_started', 'draft', 'submitted', 'locked')),
   locked_at timestamptz,
   locked_by uuid,
@@ -68,9 +73,19 @@ create table public.allowlist (
 comment on table public.allowlist is
   'Who may sign in. Admins have no stall. Leads have exactly one stall.';
 
+create table public.portal_settings (
+  id text primary key,
+  allow_bank_details boolean not null default false,
+  constraint portal_settings_one_row check (id = 'portal')
+);
+
+comment on table public.portal_settings is
+  'Site-wide switches. Bank details stay off until the PTC and the school approve them.';
+
 alter table public.stalls enable row level security;
 alter table public.dishes enable row level security;
 alter table public.allowlist enable row level security;
+alter table public.portal_settings enable row level security;
 
 -- Helpers read the allowlist as the table owner so policies cannot recurse.
 create or replace function public.is_admin()
@@ -225,6 +240,15 @@ begin
     end if;
   end if;
 
+  if current_user = 'authenticated'
+     and not coalesce((select allow_bank_details from public.portal_settings where id = 'portal'), false) then
+    new.bank_account_name := old.bank_account_name;
+    new.bank_name := old.bank_name;
+    new.bank_branch := old.bank_branch;
+    new.bank_account_number := old.bank_account_number;
+    new.bank_reference := old.bank_reference;
+  end if;
+
   new.updated_at := now();
   new.updated_by := auth.uid();
   new.updated_by_email := nullif(lower(coalesce(auth.jwt() ->> 'email', '')), '');
@@ -372,6 +396,15 @@ create policy allowlist_delete on public.allowlist
   for delete to authenticated
   using (public.is_admin());
 
+create policy portal_settings_select on public.portal_settings
+  for select to authenticated
+  using (public.is_admin() or public.my_stall_id() is not null);
+
+create policy portal_settings_update on public.portal_settings
+  for update to authenticated
+  using (public.is_admin())
+  with check (public.is_admin());
+
 revoke all on function public.is_admin() from public, anon, authenticated;
 revoke all on function public.my_stall_id() from public, anon, authenticated;
 revoke all on function public.dish_name_index() from public, anon, authenticated;
@@ -394,29 +427,32 @@ grant usage on schema public to anon, authenticated, supabase_auth_admin;
 grant select, insert, update, delete on public.stalls to authenticated;
 grant select, insert, update, delete on public.dishes to authenticated;
 grant select, insert, update, delete on public.allowlist to authenticated;
+grant select, update on public.portal_settings to authenticated;
 revoke all on public.stalls from anon;
 revoke all on public.dishes from anon;
 revoke all on public.allowlist from anon;
+revoke all on public.portal_settings from anon;
 
 
 
 insert into public.stalls (
   id, name, sort_order, year_groups, support_type, amount_per_family, how_to_pay,
   payment_deadline, contribution_mode, food_coordinator_name, food_coordinator_phone,
-  dropoff_instructions, packaging_note, halal_note
+  dropoff_instructions, packaging_note, halal_note,
+  bank_account_name, bank_name, bank_branch, bank_account_number, bank_reference
 ) values
-('japan', 'Japan', 1, 'Year 5', 'food', '', '', '', null, '', '', '', 'No single-use plastic.', 'Any meat provided should be halal please.'),
-('india', 'India', 2, 'Year 10', 'both', 'LKR 5,000', 'Last year''s details, please confirm. Account name: L C Kumari. Bank: BOC, Rajagiriya branch. Account number: 5464113. WhatsApp the receipt to Chandi on 0773824465, with your child''s name and class.', '', 'either', '', '', '', 'No single-use plastic.', ''),
-('usa-canada', 'USA/Canada', 3, 'Year 4', 'food', '', '', '', null, '', '', 'Please drop the food on the morning of Friday 16 October 2026, labelled with the stall name and your child''s name and class.', 'No single-use plastic. Please use cardboard or another recyclable container.', ''),
-('singapore-malaysia-thailand', 'Singapore/Malaysia/Thailand', 4, 'Year 2', 'food', '', '', '', null, '', '', '', 'No single-use plastic.', 'Any meat provided should be halal please.'),
-('sri-lanka', 'Sri Lanka', 5, 'Nursery and Year 1', 'food', '', '', '', null, '', '', '', 'No single-use plastic.', ''),
-('europe', 'Europe', 6, 'Playgroup and Reception', 'food', '', '', '', null, '', '', '', 'No single-use plastic.', 'Any meat provided should be halal please.'),
-('middle-east', 'Middle East', 7, 'Year 12', 'food', '', '', '', null, '', '', '', 'No single-use plastic.', 'Any meat should be halal please.'),
-('china', 'China', 8, 'Year 6', 'food', '', '', '', null, '', '', '', 'No single-use plastic.', 'Any meat provided should be halal please.'),
-('maldives', 'Maldives', 9, 'Year 11', 'food', '', '', '', null, '', '', '', 'No single-use plastic.', ''),
-('australia-nz-philippines-indonesia', 'Australia/NZ/Philippines/Indonesia', 10, 'Year 3', 'food', '', '', '', null, '', '', '', 'No single-use plastic.', 'Any meat provided should be halal please.'),
-('palestine-un-zone', 'Palestine and UN Zone', 11, 'Year 9 and Year 13', 'both', '', 'Last year''s details, please confirm. Account name: Shyam Jobanputra. Account number: 1220044952. Bank: Commercial Bank, Narahenpita branch.', '', 'either', '', '', '', 'No single-use plastic.', 'Any meat provided should be halal please.'),
-('eco-warriors', 'Eco Warriors', 12, 'Year 8', 'food', '', '', '', null, '', '', '', 'No single-use plastic.', '');
+('japan', 'Japan', 1, 'Year 5', 'food', '', '', '', null, '', '', '', 'No single-use plastic.', 'Any meat provided should be halal please.', '', '', '', '', ''),
+('india', 'India', 2, 'Year 10', 'both', 'LKR 5,000', 'Last year''s details, please confirm. WhatsApp the receipt to Chandi on 0773824465, with your child''s name and class.', '', 'either', '', '', '', 'No single-use plastic.', '', 'L C Kumari', 'BOC', 'Rajagiriya', '5464113', 'Child''s name and class'),
+('usa-canada', 'USA/Canada', 3, 'Year 4', 'food', '', '', '', null, '', '', 'Please drop the food on the morning of Friday 16 October 2026, labelled with the stall name and your child''s name and class.', 'No single-use plastic. Please use cardboard or another recyclable container.', '', '', '', '', '', ''),
+('singapore-malaysia-thailand', 'Singapore/Malaysia/Thailand', 4, 'Year 2', 'food', '', '', '', null, '', '', '', 'No single-use plastic.', 'Any meat provided should be halal please.', '', '', '', '', ''),
+('sri-lanka', 'Sri Lanka', 5, 'Nursery and Year 1', 'food', '', '', '', null, '', '', '', 'No single-use plastic.', '', '', '', '', '', ''),
+('europe', 'Europe', 6, 'Playgroup and Reception', 'food', '', '', '', null, '', '', '', 'No single-use plastic.', 'Any meat provided should be halal please.', '', '', '', '', ''),
+('middle-east', 'Middle East', 7, 'Year 12', 'food', '', '', '', null, '', '', '', 'No single-use plastic.', 'Any meat should be halal please.', '', '', '', '', ''),
+('china', 'China', 8, 'Year 6', 'food', '', '', '', null, '', '', '', 'No single-use plastic.', 'Any meat provided should be halal please.', '', '', '', '', ''),
+('maldives', 'Maldives', 9, 'Year 11', 'food', '', '', '', null, '', '', '', 'No single-use plastic.', '', '', '', '', '', ''),
+('australia-nz-philippines-indonesia', 'Australia/NZ/Philippines/Indonesia', 10, 'Year 3', 'food', '', '', '', null, '', '', '', 'No single-use plastic.', 'Any meat provided should be halal please.', '', '', '', '', ''),
+('palestine-un-zone', 'Palestine and UN Zone', 11, 'Year 9 and Year 13', 'both', '', 'Last year''s details, please confirm.', '', 'either', '', '', '', 'No single-use plastic.', 'Any meat provided should be halal please.', 'Shyam Jobanputra', 'Commercial Bank', 'Narahenpita', '1220044952', ''),
+('eco-warriors', 'Eco Warriors', 12, 'Year 8', 'food', '', '', '', null, '', '', '', 'No single-use plastic.', '', '', '', '', '', '');
 
 insert into public.dishes (
   stall_id, name, diet, allergens, allergen_other, spice, taste, made_by,
@@ -544,5 +580,7 @@ insert into public.dishes (
 ('palestine-un-zone', 'Grilled Chicken Skewers', 'non_veg', '{}'::text[], '', null, 'savoury', 'home', '', '', null, 'Suggested vendor from last year: Dolce Falasteen, Azra 774612999.', 6),
 ('palestine-un-zone', 'Falafel & Hummus', 'veg', '{}'::text[], '', null, 'savoury', 'home', '', '', null, 'Suggested vendor from last year: Dolce Falasteen, Azra 774612999.', 7),
 ('palestine-un-zone', 'Mini Shawarma', 'non_veg', '{}'::text[], '', null, 'savoury', 'home', '', '', null, 'Suggested vendor from last year: Dolce Falasteen, Azra 774612999.', 8);
+
+insert into public.portal_settings (id, allow_bank_details) values ('portal', false);
 
 commit;

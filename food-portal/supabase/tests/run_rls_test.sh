@@ -13,5 +13,7 @@ fi
 "${PSQL[@]}" -d postgres -c "DROP DATABASE IF EXISTS food_portal_rls;"
 "${PSQL[@]}" -d postgres -c "CREATE DATABASE food_portal_rls;"
 "${PSQL[@]}" -d food_portal_rls -f tests/harness.sql
-"${PSQL[@]}" -d food_portal_rls -f migrations/20261001120000_init.sql
+for file in migrations/*.sql; do
+  "${PSQL[@]}" -d food_portal_rls -f "$file"
+done
 "${PSQL[@]}" -d food_portal_rls -f tests/rls_test.sql

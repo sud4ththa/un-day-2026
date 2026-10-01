@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { Header } from '../components/Header.jsx'
 import { friendlySendError, friendlyVerifyError } from '../lib/format.js'
+import { otpConfig, whatsAppNotReady } from '../lib/otp.js'
 import { supabase } from '../lib/supabase.js'
 
 export function SignIn({ message }) {
@@ -18,6 +19,10 @@ export function SignIn({ message }) {
   async function sendCode(event) {
     event.preventDefault()
     setError('')
+    if (otpConfig.provider === 'whatsapp') {
+      setError(whatsAppNotReady)
+      return
+    }
     setPending(true)
     const { error: sendError } = await supabase.auth.signInWithOtp({
       email: email.trim(),

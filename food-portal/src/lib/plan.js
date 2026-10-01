@@ -111,8 +111,8 @@ export function nextStatus(current, { submit }) {
   return 'draft'
 }
 
-export function stallPayload(stall, { submit }) {
-  return {
+export function stallPayload(stall, { submit, allowBankDetails = false }) {
+  const payload = {
     year_groups: stall.year_groups.trim(),
     support_type: stall.support_type,
     amount_per_family: stall.amount_per_family.trim(),
@@ -126,6 +126,14 @@ export function stallPayload(stall, { submit }) {
     halal_note: stall.halal_note.trim(),
     status: nextStatus(stall.status, { submit }),
   }
+  if (allowBankDetails) {
+    payload.bank_account_name = (stall.bank_account_name || '').trim()
+    payload.bank_name = (stall.bank_name || '').trim()
+    payload.bank_branch = (stall.bank_branch || '').trim()
+    payload.bank_account_number = (stall.bank_account_number || '').trim()
+    payload.bank_reference = (stall.bank_reference || '').trim()
+  }
+  return payload
 }
 
 export function submitGaps(stall, dishes) {

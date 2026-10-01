@@ -302,6 +302,91 @@ end $$;
 reset role;
 
 do $$
+declare
+  number text;
+  pay text;
+  flag boolean;
+begin
+  select bank_account_number, how_to_pay into number, pay from public.stalls where id = 'india';
+  if number is distinct from '5464113' then
+    raise exception 'FAIL: India account number is %', number;
+  end if;
+  if pay like '%5464113%' then
+    raise exception 'FAIL: India account number is still in how to pay';
+  end if;
+  select allow_bank_details into flag from public.portal_settings where id = 'portal';
+  if flag then
+    raise exception 'FAIL: bank details started on';
+  end if;
+end $$;
+
+select set_config(
+  'request.jwt.claims',
+  '{"sub":"22222222-2222-4222-8222-222222222222","email":"lead.india@example.com","role":"authenticated"}',
+  false
+);
+set role authenticated;
+
+do $$
+declare
+  n int;
+  number text;
+  flag boolean;
+begin
+  select allow_bank_details into flag from public.portal_settings where id = 'portal';
+  if flag is distinct from false then
+    raise exception 'FAIL: India lead cannot read the bank switch';
+  end if;
+
+  update public.portal_settings set allow_bank_details = true where id = 'portal';
+  get diagnostics n = row_count;
+  if n <> 0 then
+    raise exception 'FAIL: lead changed the bank switch';
+  end if;
+
+  update public.stalls set bank_account_number = '99999999' where id = 'india';
+  select bank_account_number into number from public.stalls where id = 'india';
+  if number is distinct from '5464113' then
+    raise exception 'FAIL: lead changed bank details while they are closed (%)', number;
+  end if;
+  raise notice 'OK: bank details stay closed for a lead';
+end $$;
+
+reset role;
+
+select set_config(
+  'request.jwt.claims',
+  '{"sub":"33333333-3333-4333-8333-333333333333","email":"admin@example.com","role":"authenticated"}',
+  false
+);
+set role authenticated;
+
+update public.portal_settings set allow_bank_details = true where id = 'portal';
+
+reset role;
+
+select set_config(
+  'request.jwt.claims',
+  '{"sub":"22222222-2222-4222-8222-222222222222","email":"lead.india@example.com","role":"authenticated"}',
+  false
+);
+set role authenticated;
+
+do $$
+declare
+  number text;
+begin
+  update public.stalls set bank_account_number = '11111111' where id = 'india';
+  select bank_account_number into number from public.stalls where id = 'india';
+  if number is distinct from '11111111' then
+    raise exception 'FAIL: lead could not edit bank details after approval (%)', number;
+  end if;
+  raise notice 'OK: bank details open after the PTC allows them';
+end $$;
+
+reset role;
+
+do $$
 begin
   if exists (select 1 from public.allowlist where email = 'admin@example.com') then
     raise notice 'ALL RLS CHECKS PASSED';

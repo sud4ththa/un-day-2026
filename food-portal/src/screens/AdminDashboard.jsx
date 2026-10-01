@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Header } from '../components/Header.jsx'
 import { download, toCsv, toJson } from '../lib/export.js'
+import { BANK_APPROVAL_NOTE } from '../lib/bankDetails.js'
 import { formatWhen, friendlySaveError } from '../lib/format.js'
 import { STATUS_LABEL } from '../lib/plan.js'
 import { clusterDuplicates } from '../lib/similarity.js'
@@ -12,7 +13,7 @@ function personName(email, people) {
   return person?.display_name || email
 }
 
-export function AdminDashboard({ profile, onOpen, onSignOut }) {
+export function AdminDashboard({ profile, onOpen, onViewAsLead, onSignOut }) {
   const [stalls, setStalls] = useState(null)
   const [dishes, setDishes] = useState([])
   const [people, setPeople] = useState([])
@@ -20,6 +21,8 @@ export function AdminDashboard({ profile, onOpen, onSignOut }) {
   const [notice, setNotice] = useState('')
   const [lockId, setLockId] = useState(null)
   const [removeId, setRemoveId] = useState(null)
+  const [allowBank, setAllowBank] = useState(false)
+  const [bankBusy, setBankBusy] = useState(false)
   const [form, setForm] = useState({
     email: '',
     display_name: '',
@@ -29,18 +32,20 @@ export function AdminDashboard({ profile, onOpen, onSignOut }) {
 
   async function load() {
     setError('')
-    const [stallRes, dishRes, peopleRes] = await Promise.all([
+    const [stallRes, dishRes, peopleRes, settingsRes] = await Promise.all([
       supabase.from('stalls').select('*').order('sort_order'),
       supabase.from('dishes').select('*').order('sort_order'),
       supabase.from('allowlist').select('*').order('email'),
+      supabase.from('portal_settings').select('allow_bank_details').eq('id', 'portal').maybeSingle(),
     ])
-    if (stallRes.error || dishRes.error || peopleRes.error) {
+    if (stallRes.error || dishRes.error || peopleRes.error || settingsRes.error) {
       setError('The stalls could not be loaded.')
       return
     }
     setStalls(stallRes.data)
     setDishes(dishRes.data)
     setPeople(peopleRes.data)
+    setAllowBank(Boolean(settingsRes.data?.allow_bank_details))
     if (!form.stall_id && stallRes.data[0]) {
       setForm((current) => ({ ...current, stall_id: current.stall_id || stallRes.data[0].id }))
     }
@@ -69,6 +74,21 @@ export function AdminDashboard({ profile, onOpen, onSignOut }) {
         })),
     )
   }, [stalls, dishes])
+
+  async function toggleBank(next) {
+    setBankBusy(true)
+    setError('')
+    const { error: updateError } = await supabase
+      .from('portal_settings')
+      .update({ allow_bank_details: next })
+      .eq('id', 'portal')
+    setBankBusy(false)
+    if (updateError) {
+      setError(friendlySaveError(updateError))
+      return
+    }
+    setAllowBank(next)
+  }
 
   async function setLocked(stall, locked) {
     const status = locked
@@ -187,6 +207,24 @@ export function AdminDashboard({ profile, onOpen, onSignOut }) {
             <a href="#people">Who can sign in</a>
           </nav>
 
+          <section className="block" id="bank-details">
+            <h2>Bank details</h2>
+            <label className="toggle">
+              <input
+                type="checkbox"
+                checked={allowBank}
+                disabled={bankBusy}
+                onChange={(event) => toggleBank(event.target.checked)}
+              />
+              Allow bank details
+            </label>
+            <p className="hint">
+              {allowBank
+                ? 'Leads can enter an account name, bank, branch, account number, and the reference parents should use.'
+                : BANK_APPROVAL_NOTE}
+            </p>
+          </section>
+
           <section className="block" id="stalls">
             <h2>Stalls</h2>
             <ol className="register">
@@ -215,6 +253,9 @@ export function AdminDashboard({ profile, onOpen, onSignOut }) {
                     <div className="inline-actions">
                       <button type="button" className="btn" onClick={() => onOpen(stall.id)}>
                         Open
+                      </button>
+                      <button type="button" className="btn" onClick={() => onViewAsLead(stall.id)}>
+                        View as lead
                       </button>
                       {lockId === stall.id ? (
                         <>

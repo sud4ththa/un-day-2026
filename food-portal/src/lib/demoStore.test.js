@@ -1,0 +1,89 @@
+import test from 'node:test'
+import assert from 'node:assert/strict'
+import { createDemoClient, createMemoryStorage, freshDemoState } from './demoStore.js'
+
+const seed = {
+  stalls: [
+    {
+      id: 'japan',
+      name: 'Japan',
+      sort_order: 1,
+      status: 'not_started',
+      year_groups: 'Year 5',
+      support_type: 'food',
+      how_to_pay: '',
+      bank_account_number: '',
+      updated_by_email: null,
+    },
+    {
+      id: 'india',
+      name: 'India',
+      sort_order: 2,
+      status: 'not_started',
+      year_groups: 'Year 10',
+      support_type: 'both',
+      how_to_pay: 'WhatsApp Chandi',
+      bank_account_name: 'L C Kumari',
+      bank_account_number: '5464113',
+      updated_by_email: null,
+    },
+  ],
+  dishes: [
+    { id: 'india-1', stall_id: 'india', name: 'Samosa', sort_order: 1 },
+    { id: 'japan-1', stall_id: 'japan', name: 'Sushi', sort_order: 1 },
+  ],
+}
+
+const admin = { email: 'ptc@demo.local', role: 'admin', display_name: 'PTC admin', stall_id: null }
+const japanLead = { email: 'japan@demo.local', role: 'lead', display_name: 'Japan lead', stall_id: 'japan' }
+
+function clientAs(actor) {
+  let current = actor
+  const storage = createMemoryStorage()
+  const client = createDemoClient({
+    storage,
+    seed,
+    getActor: () => current,
+  })
+  return {
+    client,
+    setActor(next) {
+      current = next
+    },
+  }
+}
+
+test('bank details start off and a lead cannot turn them on', async () => {
+  const { client, setActor } = clientAs(admin)
+  const first = await client.from('portal_settings').select('*').single()
+  assert.equal(first.data.allow_bank_details, false)
+  setActor(japanLead)
+  const blocked = await client.from('portal_settings').update({ allow_bank_details: true }).eq('id', 'portal')
+  assert.match(blocked.error.message, /row-level security/)
+  const still = await client.from('portal_settings').select('allow_bank_details').single()
+  assert.equal(still.data.allow_bank_details, false)
+})
+
+test('a lead cannot read or write another stall, and an admin edit is attributed to the admin', async () => {
+  const { client, setActor } = clientAs(japanLead)
+  const stalls = await client.from('stalls').select('*')
+  assert.deepEqual(stalls.data.map((stall) => stall.id), ['japan'])
+  const hidden = await client.from('dishes').select('*').eq('stall_id', 'india')
+  assert.equal(hidden.data.length, 0)
+  const blocked = await client.from('stalls').update({ year_groups: 'Hacked' }).eq('id', 'india')
+  assert.ok(blocked.error)
+
+  const own = await client.from('stalls').update({ year_groups: 'Year 5' }).eq('id', 'japan').select('updated_by_email, status').single()
+  assert.equal(own.error, null)
+  assert.equal(own.data.updated_by_email, 'japan@demo.local')
+  assert.equal(own.data.status, 'draft')
+
+  const frozen = await client.from('stalls').update({ bank_account_number: '9999999' }).eq('id', 'japan').select('bank_account_number').single()
+  assert.equal(frozen.data.bank_account_number, '')
+
+  setActor(admin)
+  const saved = await client.from('stalls').update({ dropoff_instructions: 'Gate' }).eq('id', 'india').select('updated_by_email').single()
+  assert.equal(saved.data.updated_by_email, 'ptc@demo.local')
+  const india = freshDemoState(seed).stalls[1]
+  assert.equal(india.bank_account_number, '5464113')
+})

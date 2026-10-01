@@ -3,7 +3,9 @@ import { DishCard } from '../components/DishCard.jsx'
 import { Choice, Field } from '../components/Fields.jsx'
 import { Header } from '../components/Header.jsx'
 import { Preview } from '../components/Preview.jsx'
+import { accountNumberFields, BANK_APPROVAL_NOTE } from '../lib/bankDetails.js'
 import { formatWhen, friendlySaveError } from '../lib/format.js'
+import { leadPreviewBanner, leadPreviewState } from '../lib/leadPreview.js'
 import {
   blankDish,
   dishFromDb,
@@ -19,7 +21,14 @@ import { supabase } from '../lib/supabase.js'
 
 const AUDIT_KEYS = ['status', 'updated_at', 'updated_by_email', 'submitted_at', 'locked_at']
 
-export function PlanEditor({ profile, stallId, onBack, onSignOut }) {
+export function PlanEditor({
+  profile,
+  stallId,
+  onBack,
+  onSignOut,
+  leadPreview = null,
+  onLeadPreviewEditing,
+}) {
   const [stall, setStall] = useState(null)
   const [dishes, setDishes] = useState([])
   const [index, setIndex] = useState([])
@@ -33,6 +42,7 @@ export function PlanEditor({ profile, stallId, onBack, onSignOut }) {
   const [saveError, setSaveError] = useState('')
   const [confirm, setConfirm] = useState(null)
   const [showPreview, setShowPreview] = useState(false)
+  const [allowBankDetails, setAllowBankDetails] = useState(false)
 
   const version = useRef(0)
   const latest = useRef({ stall: null, dishes: [], removed: [] })
@@ -41,8 +51,13 @@ export function PlanEditor({ profile, stallId, onBack, onSignOut }) {
   const pause = useRef(false)
 
   latest.current = { stall, dishes, removed }
-  const isAdmin = profile.role === 'admin'
-  const readOnly = Boolean(stall && stall.status === 'locked' && !isAdmin)
+  const previewMode = leadPreviewState(leadPreview)
+  const isAdmin = profile.role === 'admin' && !previewMode.active
+  const readOnly = previewMode.active
+    ? !previewMode.editing
+    : Boolean(stall && stall.status === 'locked' && profile.role !== 'admin')
+  const allowRef = useRef(false)
+  allowRef.current = allowBankDetails
 
   function bump() {
     version.current += 1
@@ -70,9 +85,10 @@ export function PlanEditor({ profile, stallId, onBack, onSignOut }) {
     setReady(false)
     setLoadError('')
     ;(async () => {
-      const [stallRes, dishRes] = await Promise.all([
+      const [stallRes, dishRes, settingsRes] = await Promise.all([
         supabase.from('stalls').select('*').eq('id', stallId).single(),
         supabase.from('dishes').select('*').eq('stall_id', stallId).order('sort_order'),
+        supabase.from('portal_settings').select('allow_bank_details').eq('id', 'portal').maybeSingle(),
       ])
       if (stop) return
       if (stallRes.error || !stallRes.data) {
@@ -91,7 +107,13 @@ export function PlanEditor({ profile, stallId, onBack, onSignOut }) {
         dropoff_instructions: stallRes.data.dropoff_instructions || '',
         packaging_note: stallRes.data.packaging_note || '',
         halal_note: stallRes.data.halal_note || '',
+        bank_account_name: stallRes.data.bank_account_name || '',
+        bank_name: stallRes.data.bank_name || '',
+        bank_branch: stallRes.data.bank_branch || '',
+        bank_account_number: stallRes.data.bank_account_number || '',
+        bank_reference: stallRes.data.bank_reference || '',
       })
+      setAllowBankDetails(Boolean(settingsRes.data?.allow_bank_details))
       setDishes((dishRes.data || []).map(dishFromDb))
       setRemoved([])
       setDirty(false)
@@ -143,7 +165,10 @@ export function PlanEditor({ profile, stallId, onBack, onSignOut }) {
     setSaveState('saving')
     setSaveError('')
     try {
-      const payload = stallPayload(snap.stall, { submit: reason === 'submit' })
+      const payload = stallPayload(snap.stall, {
+        submit: reason === 'submit',
+        allowBankDetails: allowRef.current,
+      })
       const stallRes = await supabase
         .from('stalls')
         .update(payload)
@@ -249,11 +274,15 @@ export function PlanEditor({ profile, stallId, onBack, onSignOut }) {
       ? 'you'
       : stall.updated_by_email
   const savedLine = who ? `Last saved ${formatWhen(stall.updated_at)} by ${who}` : ''
-  const saveLabel = saveError
+  const saveLabel = previewMode.active && previewMode.readOnly
+    ? 'Preview only'
+    : saveError
     || (saveState === 'saving' ? 'Saving…' : null)
     || (dirty ? 'Unsaved changes' : null)
     || (saveState === 'submitted' || stall.status === 'submitted' ? 'Submitted' : null)
     || (saveState === 'saved' ? 'All changes saved' : 'Not saved yet')
+  const accountHits = allowBankDetails ? [] : accountNumberFields(stall, dishes)
+  const showBank = stall.support_type === 'money' || stall.support_type === 'both'
 
   return (
     <div className="wrap">
@@ -261,6 +290,7 @@ export function PlanEditor({ profile, stallId, onBack, onSignOut }) {
         title={stall.name}
         onBack={onBack}
         onSignOut={onSignOut}
+        backLabel={previewMode.active ? 'Exit' : 'All stalls'}
       >
         <p className="status-line">
           <span className={`pill pill-${stall.status}`}>{STATUS_LABEL[stall.status] || stall.status}</span>
@@ -277,6 +307,31 @@ export function PlanEditor({ profile, stallId, onBack, onSignOut }) {
         ) : null}
         {stall.status === 'submitted' ? (
           <p className="deadline">Submitted. You can still edit until the PTC locks the stall.</p>
+        ) : null}
+        {previewMode.active ? (
+          <div className="banner" role="status">
+            <p>{leadPreviewBanner(stall.name)}</p>
+            <p className="hint">
+              {previewMode.editing
+                ? `Any edit is saved as ${profile.display_name || profile.email}.`
+                : 'Read only, the way a lead sees it.'}
+            </p>
+            <div className="inline-actions">
+              <button
+                type="button"
+                className="btn"
+                onClick={() => {
+                  if (previewMode.editing && dirty) void persist('save')
+                  onLeadPreviewEditing?.(!previewMode.editing)
+                }}
+              >
+                {previewMode.editing ? 'Stop editing' : 'Edit this plan'}
+              </button>
+              <button type="button" className="btn btn-quiet" onClick={onBack}>
+                Exit
+              </button>
+            </div>
+          </div>
         ) : null}
         {isAdmin ? (
           <div className="inline-actions">
@@ -347,6 +402,54 @@ export function PlanEditor({ profile, stallId, onBack, onSignOut }) {
         ) : null}
         {stall.support_type === 'money' ? (
           <p className="hint">The parent form will not list dishes while this stall is money only. Dishes you add are kept if you switch back.</p>
+        ) : null}
+        {accountHits.length ? (
+          <p className="warn" role="status">
+            This looks like an account number ({accountHits.join('; ')}). {BANK_APPROVAL_NOTE} Take it out of the written notes.
+          </p>
+        ) : null}
+        {showBank ? (
+          <div className="bank-block">
+            <h3>Bank details</h3>
+            {allowBankDetails ? (
+              <p className="hint">Parents will see these on the form.</p>
+            ) : (
+              <p className="banner">{BANK_APPROVAL_NOTE}</p>
+            )}
+            <fieldset className={allowBankDetails ? 'bank-fields' : 'bank-fields is-off'} disabled={!allowBankDetails || readOnly}>
+              <Field label="Account name">
+                <input
+                  value={stall.bank_account_name}
+                  onChange={(event) => patchStall({ bank_account_name: event.target.value })}
+                />
+              </Field>
+              <Field label="Bank">
+                <input
+                  value={stall.bank_name}
+                  onChange={(event) => patchStall({ bank_name: event.target.value })}
+                />
+              </Field>
+              <Field label="Branch">
+                <input
+                  value={stall.bank_branch}
+                  onChange={(event) => patchStall({ bank_branch: event.target.value })}
+                />
+              </Field>
+              <Field label="Account number">
+                <input
+                  value={stall.bank_account_number}
+                  onChange={(event) => patchStall({ bank_account_number: event.target.value })}
+                  inputMode="numeric"
+                />
+              </Field>
+              <Field label="Reference to use" hint="For example, the child’s name and class.">
+                <input
+                  value={stall.bank_reference}
+                  onChange={(event) => patchStall({ bank_reference: event.target.value })}
+                />
+              </Field>
+            </fieldset>
+          </div>
         ) : null}
       </section>
 
@@ -479,7 +582,7 @@ export function PlanEditor({ profile, stallId, onBack, onSignOut }) {
         <button type="button" className="btn" onClick={() => setShowPreview((value) => !value)}>
           {showPreview ? 'Hide preview' : 'Preview the parent form'}
         </button>
-        {showPreview ? <Preview stall={stall} dishes={dishes} /> : null}
+        {showPreview ? <Preview stall={stall} dishes={dishes} allowBankDetails={allowBankDetails} /> : null}
       </section>
 
       <div className="savebar">
@@ -500,7 +603,7 @@ export function PlanEditor({ profile, stallId, onBack, onSignOut }) {
             )}
           </div>
         ) : (
-          <p className="hint">Locked</p>
+          <p className="hint">{previewMode.active ? 'Preview only' : 'Locked'}</p>
         )}
       </div>
 
