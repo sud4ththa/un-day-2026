@@ -1,0 +1,20 @@
+# BSC Parent Collective · UN Day 2026 (Fri 16 Oct) · Stall WhatsApp group links
+#
+# One stall per line:   Stall Name | https://chat.whatsapp.com/XXXXXXXX
+# - Paste the group's invite link after the "|". Leave it blank if you don't have it yet.
+# - Lines starting with # are comments and are ignored.
+# - Keep the stall names as they are (they pick the flags). Order here = order on the page.
+# - Only https:// links are accepted.
+
+Sri Lanka |
+India | https://chat.whatsapp.com/K1xBMtqTLFw05Iwdk0i9Dz?s=sh&p=i&mlu=4&ilr=4
+USA/Canada | https://chat.whatsapp.com/KWaxmjcDM4QIngcfELLXXr?mode=gi_t
+Europe |
+Japan | https://chat.whatsapp.com/LF62bwb86EGC9MF6Y4R4Rn?mode=gi_t
+Singapore/Malaysia/Thailand | https://chat.whatsapp.com/DCZH1uvHCsCJ80OztdbTuG?mode=gi_t
+Middle East |
+China |
+Africa |
+Australia/NZ/Philippines/Indonesia |
+Palestine and UN Zone |
+Maldives |
