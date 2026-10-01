@@ -20,7 +20,7 @@
     "Singapore/Malaysia/Thailand": [["sg", "Singapore"], ["my", "Malaysia"], ["th", "Thailand"]],
     "Middle East": [["ae", "United Arab Emirates"], ["sa", "Saudi Arabia"], ["jo", "Jordan"], ["om", "Oman"]],
     "China": [["cn", "China"]],
-    "Africa": [["african-union", "African Union"]],
+    "Eco Warriors": [["eco", "Eco Warriors", "Green leaf"]],
     "Australia/NZ/Philippines/Indonesia": [["au", "Australia"], ["nz", "New Zealand"], ["ph", "Philippines"], ["id", "Indonesia"]],
     "Palestine and UN Zone": [["ps", "Palestine"], ["un", "United Nations"]],
     "Maldives": [["mv", "Maldives"]]
@@ -84,7 +84,7 @@
     flags.forEach(function (f) {
       var img = el("img");
       img.src = "flags/" + f[0] + ".svg";
-      img.alt = f[1] + " flag";
+      img.alt = f.length > 2 ? f[2] : f[1] + " flag";
       img.width = 640; img.height = 480;
       img.decoding = "async";
       box.appendChild(img);

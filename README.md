@@ -71,10 +71,7 @@ volunteer group. You can reset a WhatsApp invite link from the group's settings 
 - Country flags plus the EU and UN flags: **flag-icons** by Panayiotis Lipiridis,
   https://github.com/lipis/flag-icons (4x3 SVGs), **MIT licence**.
   Files: lk, in, us, ca, eu, jp, sg, my, th, ae, sa, jo, om, cn, au, nz, ph, id, ps, un, mv.
-- African Union flag (`flags/african-union.svg`): Wikimedia Commons,
-  https://commons.wikimedia.org/wiki/File:Flag_of_the_African_Union.svg – **public domain**
-  (numeric precision reduced to make the file smaller; no visible change).
-- `flags/globe.svg` (fallback icon): made for this page.
+- `flags/eco.svg` (Eco Warriors stall, a leaf) and `flags/globe.svg` (fallback icon): made for this page.
 
 Middle East stall uses a neutral cluster of UAE, Saudi Arabia, Jordan and Oman flags.
 Flags are trademarks/emblems of their respective states and organisations; used here only
