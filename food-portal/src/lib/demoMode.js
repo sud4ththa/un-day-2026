@@ -15,6 +15,7 @@ export function demoActor(id, stalls) {
       role: 'parent',
       display_name: 'Parent',
       stall_id: null,
+      user_id: 'demo-parent',
     }
   }
   const stall = stalls.find((item) => item.id === id)

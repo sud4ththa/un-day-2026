@@ -169,6 +169,14 @@ export function DishCard({
               inputMode="numeric"
             />
           </Field>
+          <Field label="Limit" hint="The most parents can pledge. Leave blank to use the target.">
+            <input
+              value={dish.max_quantity}
+              onChange={(event) => patch({ max_quantity: event.target.value })}
+              disabled={readOnly}
+              inputMode="numeric"
+            />
+          </Field>
           <Field label="Notes">
             <textarea
               rows={3}

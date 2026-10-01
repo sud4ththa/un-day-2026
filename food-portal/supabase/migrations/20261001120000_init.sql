@@ -135,7 +135,9 @@ as $$
   order by s.sort_order, d.sort_order;
 $$;
 
--- Runs before Supabase creates a login. Rejects emails that are not on the list.
+-- Runs before Supabase creates a login.
+-- Leads and admins must be on the allowlist.
+-- Parents are not on that list. Their sign-in sends purpose = parent.
 -- security definer: the auth hook role cannot read allowlist through RLS.
 create or replace function public.hook_before_user_created(event jsonb)
 returns jsonb
@@ -145,19 +147,28 @@ set search_path = public
 as $$
 declare
   user_email text;
+  purpose text;
 begin
   user_email := lower(trim(coalesce(event->'user'->>'email', '')));
-  if user_email = '' or not exists (
+  purpose := coalesce(
+    event->'user'->'raw_user_meta_data'->>'purpose',
+    event->'user'->'user_metadata'->>'purpose',
+    ''
+  );
+  if user_email <> '' and exists (
     select 1 from public.allowlist where email = user_email
   ) then
-    return jsonb_build_object(
-      'error', jsonb_build_object(
-        'message', 'This email is not on the UN Day food list. Ask the PTC to add you.',
-        'http_code', 403
-      )
-    );
+    return '{}'::jsonb;
   end if;
-  return '{}'::jsonb;
+  if user_email <> '' and purpose = 'parent' then
+    return '{}'::jsonb;
+  end if;
+  return jsonb_build_object(
+    'error', jsonb_build_object(
+      'message', 'This email is not on the UN Day food list. Ask the PTC to add you.',
+      'http_code', 403
+    )
+  );
 end;
 $$;
 

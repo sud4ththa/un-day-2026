@@ -3,6 +3,7 @@ import { DishCard } from '../components/DishCard.jsx'
 import { Choice, Field } from '../components/Fields.jsx'
 import { Header } from '../components/Header.jsx'
 import { Preview } from '../components/Preview.jsx'
+import { StallPledges } from './StallPledges.jsx'
 import { accountNumberFields, BANK_APPROVAL_NOTE } from '../lib/bankDetails.js'
 import { formatWhen, friendlySaveError } from '../lib/format.js'
 import { leadPreviewBanner, leadPreviewState } from '../lib/leadPreview.js'
@@ -112,6 +113,8 @@ export function PlanEditor({
         bank_branch: stallRes.data.bank_branch || '',
         bank_account_number: stallRes.data.bank_account_number || '',
         bank_reference: stallRes.data.bank_reference || '',
+        published_to_parents: Boolean(stallRes.data.published_to_parents),
+        pledge_deadline: stallRes.data.pledge_deadline ? String(stallRes.data.pledge_deadline).slice(0, 10) : '',
       })
       setAllowBankDetails(Boolean(settingsRes.data?.allow_bank_details))
       setDishes((dishRes.data || []).map(dishFromDb))
@@ -577,12 +580,30 @@ export function PlanEditor({
         </button>
       </section>
 
-      <section className="block">
+      <section className="block" id="parent-pledges">
         <h2>Parent form</h2>
+        <label className="toggle">
+          <input
+            type="checkbox"
+            checked={Boolean(stall.published_to_parents)}
+            disabled={readOnly}
+            onChange={(event) => patchStall({ published_to_parents: event.target.checked })}
+          />
+          Published to parents
+        </label>
+        <Field label="Pledge deadline" hint="Parents can change a pledge until this date. Leave blank to keep pledges open.">
+          <input
+            type="date"
+            value={stall.pledge_deadline || ''}
+            disabled={readOnly}
+            onChange={(event) => patchStall({ pledge_deadline: event.target.value })}
+          />
+        </Field>
         <button type="button" className="btn" onClick={() => setShowPreview((value) => !value)}>
           {showPreview ? 'Hide preview' : 'Preview the parent form'}
         </button>
         {showPreview ? <Preview stall={stall} dishes={dishes} allowBankDetails={allowBankDetails} /> : null}
+        <StallPledges stallId={stall.id} />
       </section>
 
       <div className="savebar">

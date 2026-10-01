@@ -57,6 +57,7 @@ export function blankDish(stallId) {
     caterer_name: '',
     caterer_contact: '',
     target_pieces: '',
+    max_quantity: '',
     notes: '',
     sort_order: 0,
   }
@@ -76,6 +77,7 @@ export function dishFromDb(row) {
     caterer_name: row.caterer_name || '',
     caterer_contact: row.caterer_contact || '',
     target_pieces: row.target_pieces == null ? '' : String(row.target_pieces),
+    max_quantity: row.max_quantity == null ? '' : String(row.max_quantity),
     notes: row.notes || '',
     sort_order: row.sort_order,
   }
@@ -85,6 +87,9 @@ export function dishToDb(dish, index) {
   const raw = String(dish.target_pieces ?? '').trim()
   const pieces = raw === '' ? null : Number(raw)
   const target = Number.isInteger(pieces) && pieces >= 0 && pieces <= 100000 ? pieces : null
+  const maxRaw = String(dish.max_quantity ?? '').trim()
+  const maxParsed = maxRaw === '' ? null : Number(maxRaw)
+  const maxQuantity = Number.isInteger(maxParsed) && maxParsed >= 0 && maxParsed <= 100000 ? maxParsed : null
   const allergens = Array.isArray(dish.allergens) ? dish.allergens : []
   const caterer = dish.made_by === 'caterer'
   return {
@@ -100,6 +105,7 @@ export function dishToDb(dish, index) {
     caterer_name: caterer ? dish.caterer_name.trim() : '',
     caterer_contact: caterer ? dish.caterer_contact.trim() : '',
     target_pieces: target,
+    max_quantity: maxQuantity,
     notes: dish.notes.trim(),
     sort_order: index + 1,
   }
@@ -124,6 +130,8 @@ export function stallPayload(stall, { submit, allowBankDetails = false }) {
     dropoff_instructions: stall.dropoff_instructions.trim(),
     packaging_note: stall.packaging_note.trim(),
     halal_note: stall.halal_note.trim(),
+    published_to_parents: Boolean(stall.published_to_parents),
+    pledge_deadline: stall.pledge_deadline ? String(stall.pledge_deadline).slice(0, 10) : null,
     status: nextStatus(stall.status, { submit }),
   }
   if (allowBankDetails) {

@@ -46,6 +46,15 @@ export function friendlySaveError(error) {
   if (/at least one admin/i.test(msg)) return 'The list needs at least one admin.'
   if (error?.code === '23505') return 'That email is already on the list.'
   if (/must be assigned/i.test(msg)) return 'Choose a stall for this lead.'
+  if (/still needed/i.test(msg)) return msg.replace(/^.*?(Only \d+ still needed).*$/i, '$1')
+  if (/^full$/i.test(msg.trim()) || /\bfull\b/i.test(msg) && /pledge|dish/i.test(msg)) return 'That dish is full.'
+  if (msg.trim() === 'Full') return 'That dish is full.'
+  if (/deadline has passed/i.test(msg)) return 'The pledge deadline has passed.'
+  if (/not open for pledges/i.test(msg)) return 'This stall is not open for pledges yet.'
+  if (/no limit yet/i.test(msg)) return 'This dish has no limit yet.'
+  if (/not collecting money/i.test(msg)) return 'This stall is not collecting money.'
+  if (/reason is required/i.test(msg)) return 'Add a reason.'
+  if (/only the ptc can remove/i.test(msg)) return 'Only the PTC can remove a pledge.'
   return 'Could not save. Check your connection and try again.'
 }
 

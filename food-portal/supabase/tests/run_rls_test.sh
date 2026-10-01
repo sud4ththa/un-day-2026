@@ -17,3 +17,4 @@ for file in migrations/*.sql; do
   "${PSQL[@]}" -d food_portal_rls -f "$file"
 done
 "${PSQL[@]}" -d food_portal_rls -f tests/rls_test.sql
+"${PSQL[@]}" -d food_portal_rls -f tests/pledge_rls.sql

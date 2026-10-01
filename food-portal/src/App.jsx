@@ -1,13 +1,62 @@
 import { useEffect, useState } from 'react'
 import { DemoApp } from './DemoApp.jsx'
 import { Header } from './components/Header.jsx'
+import { routePath } from './lib/route.js'
 import { configError, isDemo, supabase } from './lib/supabase.js'
 import { Portal } from './Portal.jsx'
+import { ParentPledge } from './screens/ParentPledge.jsx'
 import { SignIn } from './screens/SignIn.jsx'
 
 export default function App() {
-  if (isDemo) return <DemoApp />
+  if (isDemo) return <DemoApp initialActor={routePath() === '/pledge' ? 'parent' : 'admin'} />
+  if (routePath() === '/pledge') return <ParentApp />
   return <LiveApp />
+}
+
+function ParentApp() {
+  const [session, setSession] = useState(undefined)
+
+  useEffect(() => {
+    if (!supabase) return undefined
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, next) => {
+      setSession(next ?? null)
+    })
+    return () => subscription.unsubscribe()
+  }, [])
+
+  async function signOut() {
+    if (supabase) await supabase.auth.signOut()
+  }
+
+  if (configError) {
+    return (
+      <div className="wrap narrow">
+        <Header title="Pledge" />
+        <p className="banner" role="alert">{configError}</p>
+      </div>
+    )
+  }
+
+  if (session === undefined) {
+    return (
+      <div className="wrap narrow">
+        <Header title="Pledge" />
+        <p role="status">Loading…</p>
+      </div>
+    )
+  }
+
+  if (!session) return <SignIn mode="parent" />
+
+  const profile = {
+    role: 'parent',
+    email: (session.user.email || '').toLowerCase(),
+    user_id: session.user.id,
+    display_name: '',
+    stall_id: null,
+  }
+
+  return <ParentPledge profile={profile} onSignOut={signOut} />
 }
 
 function LiveApp() {

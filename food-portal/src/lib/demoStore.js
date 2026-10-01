@@ -1,6 +1,7 @@
 import { BANK_KEYS } from './bankDetails.js'
+import { deadlineOpen, dishLimit, pledgeAllowed } from './pledges.js'
 
-export const DEMO_STORAGE_KEY = 'un-day-2026-food-demo-v1'
+export const DEMO_STORAGE_KEY = 'un-day-2026-food-demo-v2'
 
 export const DEMO_PEOPLE = [
   {
@@ -53,12 +54,49 @@ function clone(value) {
 }
 
 export function freshDemoState(seed) {
+  const stalls = clone(seed.stalls).map((stall) => {
+    const published = stall.id === 'india' || stall.id === 'japan'
+    const next = {
+      ...stall,
+      published_to_parents: stall.published_to_parents ?? published,
+      pledge_deadline: stall.pledge_deadline ?? (published ? '2026-10-13' : null),
+    }
+    if (stall.id === 'india' && !next.food_coordinator_name) {
+      next.food_coordinator_name = 'Chandi'
+      next.food_coordinator_phone = next.food_coordinator_phone || '0773824465'
+    }
+    return next
+  })
+  const dishes = clone(seed.dishes).map((dish) => {
+    const next = { ...dish }
+    if (next.stall_id === 'india' || next.stall_id === 'japan') {
+      if (next.max_quantity == null && next.target_pieces == null) {
+        next.max_quantity = 40
+        next.target_pieces = 40
+      } else if (next.max_quantity == null) {
+        next.max_quantity = next.target_pieces
+      }
+    }
+    return next
+  })
   return {
-    version: 1,
-    stalls: clone(seed.stalls),
-    dishes: clone(seed.dishes),
+    version: 2,
+    stalls,
+    dishes,
     allowlist: clone(DEMO_PEOPLE),
     portal_settings: [{ id: 'portal', allow_bank_details: false }],
+    parents: [
+      {
+        id: 'demo-parent',
+        user_id: 'demo-parent',
+        email: 'parent@demo.local',
+        parent_name: '',
+        child_name: '',
+        year_group: '',
+        phone: '',
+      },
+    ],
+    pledges: [],
   }
 }
 
@@ -80,7 +118,7 @@ export function createDemoClient({ storage, getActor, seed }) {
     }
     try {
       const parsed = JSON.parse(raw)
-      if (parsed?.version !== 1 || !parsed.stalls || !parsed.portal_settings) {
+      if (parsed?.version !== 2 || !parsed.stalls || !parsed.portal_settings || !parsed.pledges) {
         const state = freshDemoState(seed)
         storage.setItem(DEMO_STORAGE_KEY, JSON.stringify(state))
         return state
@@ -148,13 +186,23 @@ export function createDemoClient({ storage, getActor, seed }) {
     return { row: next }
   }
 
+  function parentFor(state, actor) {
+    const email = (actor.email || '').toLowerCase()
+    return state.parents.find((parent) => parent.user_id === actor.user_id || parent.email === email) || null
+  }
+
   function visibleRows(state, table, actor) {
     if (table === 'stalls') {
       if (actor.role === 'lead') return state.stalls.filter((stall) => stall.id === actor.stall_id)
+      if (actor.role === 'parent') return state.stalls.filter((stall) => stall.published_to_parents)
       return state.stalls
     }
     if (table === 'dishes') {
       if (actor.role === 'lead') return state.dishes.filter((dish) => dish.stall_id === actor.stall_id)
+      if (actor.role === 'parent') {
+        const open = new Set(state.stalls.filter((stall) => stall.published_to_parents).map((stall) => stall.id))
+        return state.dishes.filter((dish) => open.has(dish.stall_id))
+      }
       return state.dishes
     }
     if (table === 'allowlist') {
@@ -162,7 +210,57 @@ export function createDemoClient({ storage, getActor, seed }) {
       return state.allowlist.filter((person) => person.email === (actor.email || '').toLowerCase())
     }
     if (table === 'portal_settings') return state.portal_settings
+    if (table === 'parents') {
+      if (actor.role === 'admin') return state.parents
+      if (actor.role === 'lead') {
+        const ids = new Set(
+          state.pledges
+            .filter((pledge) => pledge.stall_id === actor.stall_id && pledge.status !== 'removed')
+            .map((pledge) => pledge.parent_id),
+        )
+        return state.parents.filter((parent) => ids.has(parent.id))
+      }
+      const parent = parentFor(state, actor)
+      return parent ? [parent] : []
+    }
+    if (table === 'pledges') {
+      if (actor.role === 'admin') return state.pledges
+      if (actor.role === 'lead') {
+        return state.pledges.filter((pledge) => pledge.stall_id === actor.stall_id && pledge.status !== 'removed')
+      }
+      const parent = parentFor(state, actor)
+      return parent ? state.pledges.filter((pledge) => pledge.parent_id === parent.id) : []
+    }
     return []
+  }
+
+  function pledgeError(state, actor, row) {
+    const stall = state.stalls.find((item) => item.id === row.stall_id)
+    if (!stall) return 'Stall not found'
+    if (row.status === 'removed') {
+      if (actor.role !== 'admin') return 'Only the PTC can remove a pledge'
+      if (!String(row.removed_reason || '').trim()) return 'A reason is required'
+      return ''
+    }
+    if (actor.role !== 'admin') {
+      if (!stall.published_to_parents) return 'This stall is not open for pledges'
+      if (!deadlineOpen(stall.pledge_deadline)) return 'The pledge deadline has passed'
+    }
+    if (row.kind === 'food' && row.status === 'active') {
+      const dish = state.dishes.find((item) => item.id === row.dish_id)
+      if (!dish || dish.stall_id !== row.stall_id) return 'That dish is not on this stall'
+      const used = state.pledges
+        .filter((pledge) => pledge.dish_id === row.dish_id && pledge.kind === 'food' && pledge.status === 'active' && pledge.id !== row.id)
+        .reduce((sum, pledge) => sum + Number(pledge.quantity || 0), 0)
+      const check = pledgeAllowed({ limit: dishLimit(dish), pledgedByOthers: used, quantity: row.quantity })
+      if (!check.ok) return check.message
+    }
+    if (row.kind === 'money' && row.status === 'active') {
+      if (stall.support_type !== 'money' && stall.support_type !== 'both') return 'This stall is not collecting money'
+      const amount = Number(row.money_lkr)
+      if (!Number.isInteger(amount) || amount < 1) return 'Enter an amount'
+    }
+    return ''
   }
 
   function run(stateSpec) {
@@ -273,6 +371,86 @@ export function createDemoClient({ storage, getActor, seed }) {
       return ok(null)
     }
 
+    if (stateSpec.table === 'parents' && stateSpec.op === 'insert') {
+      if (actor.role !== 'parent' && actor.role !== 'admin') return denied()
+      const email = (actor.role === 'parent' ? actor.email : stateSpec.payload.email || '').toLowerCase()
+      const userId = actor.role === 'parent' ? (actor.user_id || email) : stateSpec.payload.user_id
+      if (state.parents.some((parent) => parent.user_id === userId || parent.email === email)) {
+        return deniedObject('23505', 'That parent already exists.')
+      }
+      const row = {
+        id: stateSpec.payload.id || randomId(),
+        user_id: userId,
+        email,
+        parent_name: String(stateSpec.payload.parent_name || '').trim(),
+        child_name: String(stateSpec.payload.child_name || '').trim(),
+        year_group: String(stateSpec.payload.year_group || '').trim(),
+        phone: String(stateSpec.payload.phone || '').trim(),
+      }
+      state.parents.push(row)
+      save(state)
+      return finish([row])
+    }
+
+    if (stateSpec.table === 'parents' && stateSpec.op === 'update') {
+      const targets = state.parents.filter((parent) => match(parent) && rows().some((row) => row.id === parent.id))
+      if (!targets.length) return denied('row-level security')
+      const nextRows = []
+      for (const parent of targets) {
+        const next = {
+          ...parent,
+          ...stateSpec.payload,
+          id: parent.id,
+          user_id: parent.user_id,
+          email: parent.email,
+        }
+        const index = state.parents.findIndex((item) => item.id === parent.id)
+        state.parents[index] = next
+        nextRows.push(next)
+      }
+      save(state)
+      return finish(nextRows)
+    }
+
+    if (stateSpec.table === 'pledges' && stateSpec.op === 'insert') {
+      if (actor.role !== 'parent') return denied('row-level security')
+      const parent = parentFor(state, actor)
+      if (!parent) return denied('Save your name before pledging')
+      const row = {
+        ...stateSpec.payload,
+        id: stateSpec.payload.id || randomId(),
+        parent_id: parent.id,
+        status: 'active',
+        removed_reason: null,
+        removed_by: null,
+      }
+      const problem = pledgeError(state, actor, row)
+      if (problem) return denied(problem)
+      state.pledges.push(row)
+      save(state)
+      return finish([row])
+    }
+
+    if (stateSpec.table === 'pledges' && stateSpec.op === 'update') {
+      const targets = state.pledges.filter((pledge) => match(pledge) && rows().some((row) => row.id === pledge.id))
+      if (!targets.length) return denied('row-level security')
+      const nextRows = []
+      for (const pledge of targets) {
+        const next = { ...pledge, ...stateSpec.payload, id: pledge.id, parent_id: pledge.parent_id }
+        if (actor.role !== 'admin') {
+          next.removed_reason = pledge.removed_reason
+          next.removed_by = pledge.removed_by
+        }
+        const problem = pledgeError(state, actor, next)
+        if (problem) return denied(problem)
+        const index = state.pledges.findIndex((item) => item.id === pledge.id)
+        state.pledges[index] = next
+        nextRows.push(next)
+      }
+      save(state)
+      return finish(nextRows)
+    }
+
     if (stateSpec.table === 'allowlist' && stateSpec.op === 'delete') {
       if (actor.role !== 'admin') return denied()
       const doomed = state.allowlist.filter(match)
@@ -354,6 +532,27 @@ export function createDemoClient({ storage, getActor, seed }) {
   return {
     from,
     rpc(name) {
+      if (name === 'dish_remaining') {
+        const actor = getActor()
+        if (!actor) return Promise.resolve(ok([]))
+        const state = load()
+        const open = new Set(state.stalls.filter((stall) => stall.published_to_parents).map((stall) => stall.id))
+        return Promise.resolve(ok(
+          state.dishes.filter((dish) => open.has(dish.stall_id)).map((dish) => {
+            const cap = dishLimit(dish)
+            const pledged = state.pledges
+              .filter((pledge) => pledge.dish_id === dish.id && pledge.kind === 'food' && pledge.status === 'active')
+              .reduce((sum, pledge) => sum + Number(pledge.quantity || 0), 0)
+            return {
+              dish_id: dish.id,
+              stall_id: dish.stall_id,
+              cap,
+              pledged,
+              remaining: cap == null ? null : Math.max(0, cap - pledged),
+            }
+          }),
+        ))
+      }
       if (name !== 'dish_name_index') return Promise.resolve(denied('Unknown call'))
       const actor = getActor()
       if (!actor || actor.role === 'parent') return Promise.resolve(ok([]))
@@ -412,4 +611,8 @@ function normalizePerson(input) {
 
 function deniedObject(code, message) {
   return { data: null, error: { message, code } }
+}
+
+function randomId() {
+  return globalThis.crypto?.randomUUID?.() || `id-${Date.now()}-${Math.random().toString(16).slice(2)}`
 }

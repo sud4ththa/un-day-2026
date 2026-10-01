@@ -6,6 +6,7 @@ import { formatWhen, friendlySaveError } from '../lib/format.js'
 import { STATUS_LABEL } from '../lib/plan.js'
 import { clusterDuplicates } from '../lib/similarity.js'
 import { supabase } from '../lib/supabase.js'
+import { AdminPledges } from './AdminPledges.jsx'
 
 function personName(email, people) {
   if (!email) return ''
@@ -202,6 +203,7 @@ export function AdminDashboard({ profile, onOpen, onViewAsLead, onSignOut }) {
             {counts.not_started} not started · {counts.draft} draft · {counts.submitted} submitted · {counts.locked} locked
           </p>
           <nav className="jump">
+            <a href="#pledge-totals">Pledges</a>
             <a href="#stalls">Stalls</a>
             <a href="#duplicates">Duplicates</a>
             <a href="#people">Who can sign in</a>
@@ -224,6 +226,8 @@ export function AdminDashboard({ profile, onOpen, onViewAsLead, onSignOut }) {
                 : BANK_APPROVAL_NOTE}
             </p>
           </section>
+
+          <AdminPledges profile={profile} />
 
           <section className="block" id="stalls">
             <h2>Stalls</h2>

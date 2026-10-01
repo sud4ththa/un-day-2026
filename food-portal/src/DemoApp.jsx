@@ -4,8 +4,8 @@ import { DEMO_BANNER, demoActor, demoActorOptions } from './lib/demoMode.js'
 import { demoSeed } from './lib/demoSeed.js'
 import { Portal } from './Portal.jsx'
 
-export function DemoApp() {
-  const [actorId, setActorId] = useState('admin')
+export function DemoApp({ initialActor = 'admin' }) {
+  const [actorId, setActorId] = useState(initialActor)
   const [stallId, setStallId] = useState(null)
   const [preview, setPreview] = useState(null)
   const actor = demoActor(actorId, demoSeed.stalls)

@@ -2,9 +2,10 @@ import { useEffect, useRef, useState } from 'react'
 import { Header } from '../components/Header.jsx'
 import { friendlySendError, friendlyVerifyError } from '../lib/format.js'
 import { otpConfig, whatsAppNotReady } from '../lib/otp.js'
+import { routeHref } from '../lib/route.js'
 import { supabase } from '../lib/supabase.js'
 
-export function SignIn({ message }) {
+export function SignIn({ message, mode = 'lead' }) {
   const [step, setStep] = useState('email')
   const [email, setEmail] = useState('')
   const [code, setCode] = useState('')
@@ -26,7 +27,9 @@ export function SignIn({ message }) {
     setPending(true)
     const { error: sendError } = await supabase.auth.signInWithOtp({
       email: email.trim(),
-      options: { shouldCreateUser: true },
+      options: mode === 'parent'
+        ? { shouldCreateUser: true, data: { purpose: 'parent' } }
+        : { shouldCreateUser: true },
     })
     setPending(false)
     if (sendError) {
@@ -58,7 +61,12 @@ export function SignIn({ message }) {
 
   return (
     <div className="wrap narrow">
-      <Header title="Food list" subtitle="Country leads send their stall plan here. The deadline is Tuesday 6 October 2026." />
+      <Header
+        title={mode === 'parent' ? 'Pledge' : 'Food list'}
+        subtitle={mode === 'parent'
+          ? 'Parents pledge food or money for a stall. Anyone with an email can sign in.'
+          : 'Country leads send their stall plan here. The deadline is Tuesday 6 October 2026.'}
+      />
       {step === 'email' ? (
         <form className="stack" onSubmit={sendCode}>
           <label className="field">
@@ -76,7 +84,16 @@ export function SignIn({ message }) {
           <button className="btn btn-primary" type="submit" disabled={pending}>
             {pending ? 'Sending…' : 'Email me a code'}
           </button>
-          <p className="hint">A 6-digit code arrives by email. It is not a link. Only emails the PTC has added can sign in.</p>
+          <p className="hint">
+            {mode === 'parent'
+              ? 'A 6-digit code arrives by email. It is not a link. Any parent email can sign in.'
+              : 'A 6-digit code arrives by email. It is not a link. Only emails the PTC has added can sign in.'}
+          </p>
+          <p className="hint">
+            {mode === 'parent'
+              ? <a href={routeHref('/')}>Stall lead sign in</a>
+              : <a href={routeHref('/pledge')}>Parent pledge</a>}
+          </p>
         </form>
       ) : (
         <form

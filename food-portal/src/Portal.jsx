@@ -5,7 +5,7 @@ import { openLeadPreview, withPreviewEditing } from './lib/leadPreview.js'
 
 export function Portal({ profile, stallId, setStallId, preview, setPreview, onSignOut = null }) {
   if (profile.role === 'parent') {
-    return <ParentPledge onSignOut={onSignOut} />
+    return <ParentPledge profile={profile} onSignOut={onSignOut} />
   }
 
   const isAdmin = profile.role === 'admin'

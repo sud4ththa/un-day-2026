@@ -87,3 +87,39 @@ test('a lead cannot read or write another stall, and an admin edit is attributed
   const india = freshDemoState(seed).stalls[1]
   assert.equal(india.bank_account_number, '5464113')
 })
+
+test('two parents cannot pledge more than the dish still needs', async () => {
+  const { client, setActor } = clientAs({
+    email: 'parent@demo.local',
+    role: 'parent',
+    user_id: 'demo-parent',
+    stall_id: null,
+  })
+  const first = await client.from('pledges').insert({
+    stall_id: 'india',
+    dish_id: 'india-1',
+    quantity: 30,
+    kind: 'food',
+  }).select('id').single()
+  assert.equal(first.error, null)
+
+  setActor({ email: 'bea@parent.test', role: 'parent', user_id: 'parent-bea', stall_id: null })
+  const created = await client.from('parents').insert({
+    parent_name: 'Bea',
+    child_name: 'B',
+    year_group: 'Year 10',
+    phone: '0772222222',
+  }).select('id').single()
+  assert.equal(created.error, null)
+  const over = await client.from('pledges').insert({
+    stall_id: 'india',
+    dish_id: 'india-1',
+    quantity: 11,
+    kind: 'food',
+  })
+  assert.match(over.error.message, /Only 10 still needed/)
+  const own = await client.from('pledges').select('*')
+  assert.equal(own.data.length, 0)
+  const stalls = await client.from('stalls').select('id')
+  assert.deepEqual(stalls.data.map((stall) => stall.id).sort(), ['india', 'japan'])
+})

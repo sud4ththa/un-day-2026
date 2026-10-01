@@ -83,7 +83,7 @@ Replace the message body with:
 
 `{{ .Token }}` is the 6-digit code. Do not remove it, and do not put `{{ .ConfirmationURL }}` in this template. The portal does not use a link.
 
-WhatsApp codes through Twilio are not connected. Leave `VITE_OTP_PROVIDER` unset (or set it to `email`). Setting it to `whatsapp` only shows a notice on the sign-in page. It does not send a message.
+WhatsApp codes through Twilio are not connected. Leave `VITE_OTP_PROVIDER` unset (or set it to `email`). Setting it to `whatsapp` only shows a notice on the sign-in page. It does not send a message. Parent phone numbers are stored and not verified. `VITE_PHONE_AUTH=twilio-verify` is reserved for a later Supabase phone check through Twilio Verify. Leaving it unset does not call Twilio.
 
 5. Open **Authentication → URL Configuration**. Set **Site URL** to the Netlify address you get in step 8 (you can paste it after the first deploy). You do not need to add redirect URLs for the code.
 
@@ -164,6 +164,22 @@ Changes save on their own, and there is a **Save** button. **Submit** marks the 
 
 While they type, the page warns if the same or a similar dish is already on another stall, and it counts sweet dishes against savoury ones. **Preview the parent form** shows the wording parents would see.
 
+Each dish has a **Target** and a **Limit**. The limit is the most parents can pledge. If the limit is blank, the target is the cap. **Published to parents** shows the plan on the pledge page. **Pledge deadline** is the last day a parent can add, change, or cancel a pledge. **Pledges** lists the parent’s name, dish, quantity, and phone. **Download pledges CSV** saves that list.
+
+## How a parent pledges
+
+Parents use a separate page, `/pledge`. They sign in with an email code. They do not need to be on the lead list. The page asks for their name, their child’s name, year group or class, phone, and shows the email they signed in with.
+
+The phone number is stored for the stall lead. It is not checked. `VITE_PHONE_AUTH=twilio-verify` is a switch for later, if you connect Supabase phone sign-in and Twilio Verify. Leaving it unset does not call Twilio.
+
+The year group suggests a stall. The parent can choose another published stall. They see each dish with diet, allergen, and spice labels, how many pieces are still needed, and the food coordinator’s name and phone. A dish with nothing left shows **Full**. They can pledge a quantity, and a money amount when the stall collects money. Bank details stay hidden while **Allow bank details** is off.
+
+**My pledges** lists what they promised. They can change the quantity or cancel until the stall’s pledge deadline. Two parents cannot pledge more than the limit: the database checks the total and refuses the extra.
+
+## How an admin uses the pledges
+
+The admin list shows food pieces by stall and dish, money pledged by stall, and how many parents pledged. **Remove** soft-deletes a pledge and asks for a reason, such as Spam. The row stays in the database. **Download pledges CSV** includes every stall.
+
 ## How an admin uses it
 
 Admins see every stall: not started, draft, submitted, or locked, with the last save time and who saved it. They can open a stall, lock or unlock it, and download **CSV** or **JSON**.
@@ -180,8 +196,8 @@ Admins see every stall: not started, draft, submitted, or locked, with the last 
 
 Two checks run in the database, not only in the page:
 
-1. **Before a login is created**, `hook_before_user_created` refuses any email that is not on the allowlist. The browser asks Supabase to create the user on the first code (`shouldCreateUser: true`). The hook is what says no. You do not have to create each user by hand.
-2. **On every read and write**, row-level security checks the allowlist again. A lead’s queries only match their stall. Admins match every stall. A person who was removed no longer matches anything, so an old login cannot see or change plans. The page signs them out with the same short message.
+1. **Before a login is created**, `hook_before_user_created` refuses a lead or admin email that is not on the allowlist. The parent page sends `purpose: parent` with the code, and that sign-in is allowed. A stranger who uses the lead page, without that purpose, is still refused. The browser asks Supabase to create the user on the first code (`shouldCreateUser: true`). You do not have to create each user by hand.
+2. **On every read and write**, row-level security checks the allowlist again. A lead’s queries only match their stall. Admins match every stall. A person who was removed no longer matches anything, so an old login cannot see or change plans. The lead page signs them out with the same short message. Parents can read a stall only after it is published, and they can read only their own pledges. Remaining counts come from a separate call that does not include other parents’ names. A lead sees pledges for their stall. An admin sees every pledge. The quantity cap is checked in the database, including when two parents save at the same time.
 
 Locking a stall is also enforced there: a lead can still read a locked plan, and cannot change it. An admin can.
 
