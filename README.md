@@ -18,17 +18,21 @@ Edit **`links.txt`**. One stall per line:
 
 ```
 Stall Name | https://chat.whatsapp.com/XXXXXXXXXXXX
+Stall Name | https://chat.whatsapp.com/XXXXXXXXXXXX | full
 ```
 
-- Paste the WhatsApp invite link after the `|`. Leave it empty (`Sri Lanka |`) until you have it.
+- Paste the WhatsApp invite link after the first `|`. Leave it empty (`Sri Lanka |`) until you have it.
+- Optional third column: `full` (any case) marks the team as full. Example: `India | https://chat.whatsapp.com/XXXXXXXXXXXX | full`. The tile stays visible but is not a link, even when an invite URL is present.
 - Lines starting with `#` are comments; blank lines are ignored.
 - The order of lines is the order on the page.
 - Keep stall names as they are – they select the flags. (Matching ignores case, spaces and
   punctuation, so `usa / canada` also works.) A name app.js doesn't know shows a globe icon.
 - Only `https://` links are used; anything else is ignored (logged in the browser console).
 
-Stalls with a link show in full colour with "Join group ↗" and open the group in a new tab.
-Stalls without a link are greyed out, not tappable, and say "Link coming soon".
+A stall with a link shows in full colour with "Join group ↗" and opens the group in a new tab.
+A stall marked `full` keeps its flags in colour but dimmed, with a "TEAM FULL" ribbon, and says "Thank you! No more volunteers needed". It is not tappable.
+A stall without a link is greyed out, not tappable, and says "Link coming soon".
+The line under the header counts each state, for example `4 open · 1 full · 7 coming soon`.
 The page loads `links.txt` with `cache: no-cache`, so a refresh picks up edits once the host has
 the new file (GitHub Pages can take a minute or two to redeploy).
 

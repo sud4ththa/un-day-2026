@@ -1,20 +1,22 @@
 # BSC Parent Collective · UN Day 2026 (Fri 16 Oct) · Stall WhatsApp group links
 #
-# One stall per line:   Stall Name | https://chat.whatsapp.com/XXXXXXXX
-# - Paste the group's invite link after the "|". Leave it blank if you don't have it yet.
+# One stall per line:   Stall Name | https://chat.whatsapp.com/XXXXXXXX | full
+# - Paste the group's invite link after the first "|". Leave it blank if you don't have it yet.
+# - Optional third column: write "full" (any case) when that team is full. The tile stays
+#   on the page but is not a link, even if an invite URL is filled in.
 # - Lines starting with # are comments and are ignored.
 # - Keep the stall names as they are (they pick the flags). Order here = order on the page.
 # - Only https:// links are accepted.
 
-Sri Lanka |
+Sri Lanka | | full
 India | https://chat.whatsapp.com/K1xBMtqTLFw05Iwdk0i9Dz?s=sh&p=i&mlu=4&ilr=4
 USA/Canada | https://chat.whatsapp.com/KWaxmjcDM4QIngcfELLXXr?mode=gi_t
-Europe |
+Europe | | full
 Japan | https://chat.whatsapp.com/LF62bwb86EGC9MF6Y4R4Rn?mode=gi_t
 Singapore/Malaysia/Thailand | https://chat.whatsapp.com/DCZH1uvHCsCJ80OztdbTuG?mode=gi_t
 Middle East |
 China |
 Africa |
-Australia/NZ/Philippines/Indonesia |
-Palestine and UN Zone |
+Australia/NZ/Philippines/Indonesia | https://chat.whatsapp.com/CbXUISOv6OhEq7fbXCNwO7?mode=gi_t
+Palestine and UN Zone | https://chat.whatsapp.com/FXVk3FdHEiaGytuPcBY0sD
 Maldives |

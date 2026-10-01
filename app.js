@@ -1,5 +1,7 @@
 /* UN Day 2026 · Stall WhatsApp Groups
- * Reads links.txt ("Stall Name | https://chat.whatsapp.com/...") and builds the grid.
+ * Reads links.txt ("Stall Name | https://chat.whatsapp.com/... | full") and builds the grid.
+ * The third column is optional. "full" (any case) marks the team as full: the tile stays
+ * visible but is not a link, even when an invite URL is present.
  * To add a new stall's flags, add an entry to STALL_FLAGS below (key = stall name,
  * values = file names in flags/ without ".svg"). Unknown stall names get a globe icon.
  */
@@ -37,15 +39,17 @@
     text.replace(/^\uFEFF/, "").split(/\r?\n/).forEach(function (raw) {
       var line = raw.trim();
       if (!line || line.charAt(0) === "#") return;
-      var i = line.indexOf("|");
-      var name = (i === -1 ? line : line.slice(0, i)).trim();
-      var url = (i === -1 ? "" : line.slice(i + 1)).trim();
+      var parts = line.split("|");
+      var name = parts[0].trim();
+      var url = parts.length > 1 ? parts[1].trim() : "";
+      var mark = parts.length > 2 ? parts[2].trim() : "";
       if (!name) return;
+      var full = mark.toLowerCase() === "full";
       if (url && !/^https:\/\/\S+$/i.test(url)) {
         console.warn("links.txt: ignoring invalid link for \"" + name + "\": " + url);
         url = "";
       }
-      stalls.push({ name: name, url: url });
+      stalls.push({ name: name, url: url, full: full });
     });
     return stalls;
   }
@@ -60,7 +64,11 @@
   function tile(stall) {
     var flags = LOOKUP[norm(stall.name)] || GENERIC;
     var t;
-    if (stall.url) {
+    if (stall.full) {
+      t = el("div", "tile full");
+      t.setAttribute("aria-disabled", "true");
+      t.setAttribute("aria-label", stall.name + " – team full, no more volunteers needed");
+    } else if (stall.url) {
       t = el("a", "tile on");
       t.href = stall.url;
       t.target = "_blank";
@@ -82,9 +90,13 @@
       box.appendChild(img);
     });
     t.appendChild(box);
+    if (stall.full) t.appendChild(el("span", "ribbon", "TEAM FULL"));
     // Allow line breaks after "/" so "Singapore/Malaysia/Thailand" wraps cleanly.
     t.appendChild(el("div", "name", stall.name.replace(/\//g, "/\u200B")));
-    t.appendChild(el("div", "label", stall.url ? "Join group \u2197" : "Link coming soon"));
+    var label = stall.full
+      ? "Thank you! No more volunteers needed"
+      : (stall.url ? "Join group \u2197" : "Link coming soon");
+    t.appendChild(el("div", "label", label));
 
     var li = el("li");
     li.appendChild(t);
@@ -98,10 +110,15 @@
     var frag = document.createDocumentFragment();
     stalls.forEach(function (s) { frag.appendChild(tile(s)); });
     grid.appendChild(frag);
-    var open = stalls.filter(function (s) { return s.url; }).length;
+    var open = 0, full = 0, soon = 0;
+    stalls.forEach(function (s) {
+      if (s.full) full++;
+      else if (s.url) open++;
+      else soon++;
+    });
     status.className = "status";
     status.textContent = stalls.length
-      ? open + " of " + stalls.length + " stall groups open"
+      ? open + " open \u00b7 " + full + " full \u00b7 " + soon + " coming soon"
       : "No stalls listed yet.";
   }
 

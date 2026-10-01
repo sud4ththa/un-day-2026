@@ -116,6 +116,38 @@ a.tile:focus-visible { outline: 3px solid var(--un-blue); outline-offset: 2px; }
   box-shadow: none;
 }
 
+/* Team is full: flags stay in colour, dimmed; the tile is not a link */
+.tile.full {
+  position: relative;
+  overflow: hidden;
+  cursor: default;
+}
+.tile.full .flags { opacity: .6; }
+.tile.full .ribbon {
+  position: absolute;
+  z-index: 2;
+  top: 22px;
+  right: -46px;
+  width: 168px;
+  margin: 0;
+  padding: 5px 0;
+  background: #9f2d2d;
+  color: #fff;
+  text-align: center;
+  font-size: .68rem;
+  font-weight: 800;
+  letter-spacing: .08em;
+  line-height: 1.1;
+  transform: rotate(45deg);
+  box-shadow: 0 2px 6px rgba(16, 40, 64, .28);
+  pointer-events: none;
+}
+.tile.full .label {
+  color: #3d4c5c;
+  font-weight: 600;
+  line-height: 1.25;
+}
+
 /* Flag area: fixed 4:3 box; flags are arranged inside it */
 .flags {
   aspect-ratio: 4 / 3;
