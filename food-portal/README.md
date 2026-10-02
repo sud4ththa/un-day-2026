@@ -25,7 +25,7 @@ You do not need to install anything on your own computer if you follow the Supab
 ## 2. Create the tables
 
 1. In the project, open **SQL Editor** (the left sidebar) and choose **New query**.
-2. Open every file in `food-portal/supabase/migrations/`, in filename order. Copy each whole file into its own query and choose **Run**. Start with `20261001120000_init.sql`, then `20261001183000_bank_details.sql`.
+2. Open every file in `food-portal/supabase/migrations/`, in filename order. Copy each whole file into its own query and choose **Run**. The order is `20261001120000_init.sql`, then `20261001183000_bank_details.sql`, then `20261002120000_pledges.sql`, then `20261002180000_manage_leads.sql`.
 
 You should see a success message. The query creates the 12 stalls and last year’s dishes (Eco Warriors starts with none). It also turns on the access rules.
 
@@ -41,7 +41,11 @@ Nobody can sign in until their email is on the list. The first people have to be
    - Sudaththa: `sudaththa.ariyasena@pta.britishschool.lk`
 2. Paste the file into a new SQL Editor query and choose **Run**. Change an address first only if that person uses a different email.
 
-After that, those three people are admins. They can add and remove leads from the portal. You do not add leads in SQL.
+After that, those three people are admins. You do not add leads in SQL.
+
+Country leads are added in the portal, on **Manage leads**. Enter a name, an email, a phone if you have one, and the stall. That email is added to the sign-in list, so the lead can ask for an email code. A stall can have more than one lead. **Save** changes a name, email, phone, or moves the lead to another stall. **Remove** takes that email off the list, so that person can no longer sign in. The other lead on the same stall stays.
+
+On **All stalls**, and again on **Manage leads**, each stall has a **Year group** dropdown: Nursery, Reception, then Year 1 through Year 11. Only an admin can set it. The lead sees it at the top of their plan, and it is included in the CSV and JSON download. Leads still cannot change it.
 
 Emails are stored in lower case. `Name@School.org` and `name@school.org` are the same person.
 
@@ -115,7 +119,7 @@ The address `onboarding@resend.dev` only delivers to the inbox that owns the Res
 2. Copy the **Project URL** and the **anon public** key. You will paste both into Netlify.
 3. Do **not** copy the `service_role` key into the website. That key bypasses the access rules.
 
-Use one of the admin emails from step 3. After the site is deployed, ask for a code, type the 6 digits, and you should land on **All stalls**. From there, add a lead: their email, their name, the role **Lead**, and their stall.
+Use one of the admin emails from step 3. After the site is deployed, ask for a code, type the 6 digits, and you should land on **All stalls**. From there, open **Manage leads** and add a lead: their name, email, phone if you have it, and stall.
 
 An email that is not on the list should see: “This email is not on the list yet. Ask the PTC to add you.” No login is created for them.
 
@@ -146,7 +150,7 @@ A static demo, with no sign-in and no database, is published with the stall page
 
 https://sud4ththa.github.io/un-day-2026/food-demo/
 
-It goes live when the `food-demo/` folder is on the `main` branch. GitHub Pages deploys `main` from the repository root. The banner says “Demo: nothing is saved or sent.” Use **Try as** to open the admin list, any stall’s lead screen, or the parent pledge. Bank details stay closed until **Allow bank details** is turned on.
+It goes live when the `food-demo/` folder is on the `main` branch. GitHub Pages deploys `main` from the repository root. The banner says “Demo: nothing is saved or sent.” Use **Try as** to open the admin list, any stall’s lead screen, or the parent pledge. **Manage leads** works the same way as the real portal, saved only in that browser. India, Europe, Sri Lanka, China, USA/Canada, Singapore/Malaysia/Thailand, Japan, and Middle East already have a year group. The other stalls are unset. Bank details stay closed until **Allow bank details** is turned on.
 
 To rebuild it from this folder: `npm run build:demo`. That writes `food-demo/` at the repository root.
 
@@ -190,7 +194,7 @@ Admins see every stall: not started, draft, submitted, or locked, with the last 
 
 **Dishes on more than one stall** collects the overlap in one place.
 
-**Who can sign in** adds or removes leads and assigns each lead to a stall. A lead can only read and write that stall. Removing someone blocks them immediately, even if they had signed in before.
+**Manage leads** adds, edits, moves, and removes country leads. **Admins** on the same page adds or removes other PTC admins. A lead can only read and write the stall they are assigned to. Removing a lead blocks them immediately, even if they had signed in before. Two leads on the same stall both see that stall.
 
 ## How the lock works
 
@@ -217,5 +221,5 @@ The script prints `ALL RLS CHECKS PASSED` when a lead cannot read or write anoth
 - **The code never arrives.** You are probably still on the built-in limit of 2 emails an hour, or the Resend domain is not verified. Check **Authentication → Logs** in Supabase.
 - **“Too many codes were sent.”** Wait a few minutes. The same person can ask again after 60 seconds, and the project has an hourly cap.
 - **The code is rejected.** Confirm the OTP length is 6, and that the template still contains `{{ .Token }}`.
-- **A lead sees an empty page or “could not be opened”.** Their list entry has no stall, or the stall name was changed in SQL. Assign the stall again from **Who can sign in**.
+- **A lead sees an empty page or “could not be opened”.** Their list entry has no stall, or the stall name was changed in SQL. Assign the stall again from **Manage leads**.
 - **SQL says “already exists”.** The migration has already been run. Do not drop tables unless you mean to erase the plans.

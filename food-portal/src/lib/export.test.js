@@ -65,6 +65,7 @@ test('writes one row per dish and a summary row when a stall has none', () => {
   ])
   const lines = csv.replace(/^\uFEFF/, '').trim().split('\r\n')
   assert.equal(lines.length, 3)
+  assert.match(lines[0], /assigned_year_group/)
   assert.match(lines[1], /Eco Warriors/)
   assert.match(lines[2], /Say ""hello""/)
   assert.match(lines[2], /nuts\|dairy/)

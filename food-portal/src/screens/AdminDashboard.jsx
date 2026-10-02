@@ -4,6 +4,8 @@ import { download, toCsv, toJson } from '../lib/export.js'
 import { BANK_APPROVAL_NOTE } from '../lib/bankDetails.js'
 import { formatWhen, friendlySaveError } from '../lib/format.js'
 import { STATUS_LABEL } from '../lib/plan.js'
+import { ASSIGNED_YEAR_GROUPS } from '../lib/yearGroups.js'
+import { ManageLeads } from './ManageLeads.jsx'
 import { clusterDuplicates } from '../lib/similarity.js'
 import { supabase } from '../lib/supabase.js'
 import { AdminPledges } from './AdminPledges.jsx'
@@ -24,11 +26,10 @@ export function AdminDashboard({ profile, onOpen, onViewAsLead, onSignOut }) {
   const [removeId, setRemoveId] = useState(null)
   const [allowBank, setAllowBank] = useState(false)
   const [bankBusy, setBankBusy] = useState(false)
+  const [managing, setManaging] = useState(false)
   const [form, setForm] = useState({
     email: '',
     display_name: '',
-    role: 'lead',
-    stall_id: '',
   })
 
   async function load() {
@@ -47,9 +48,19 @@ export function AdminDashboard({ profile, onOpen, onViewAsLead, onSignOut }) {
     setDishes(dishRes.data)
     setPeople(peopleRes.data)
     setAllowBank(Boolean(settingsRes.data?.allow_bank_details))
-    if (!form.stall_id && stallRes.data[0]) {
-      setForm((current) => ({ ...current, stall_id: current.stall_id || stallRes.data[0].id }))
+  }
+
+  async function setYearGroup(stall, value) {
+    setError('')
+    const { error: updateError } = await supabase
+      .from('stalls')
+      .update({ assigned_year_group: value || null })
+      .eq('id', stall.id)
+    if (updateError) {
+      setError(friendlySaveError(updateError))
+      return
     }
+    await load()
   }
 
   useEffect(() => {
@@ -115,8 +126,9 @@ export function AdminDashboard({ profile, onOpen, onViewAsLead, onSignOut }) {
     const { error: insertError } = await supabase.from('allowlist').insert({
       email: form.email.trim(),
       display_name: form.display_name.trim(),
-      role: form.role,
-      stall_id: form.role === 'lead' ? form.stall_id : null,
+      role: 'admin',
+      stall_id: null,
+      phone: '',
     })
     if (insertError) {
       setError(friendlySaveError(insertError))
@@ -124,22 +136,6 @@ export function AdminDashboard({ profile, onOpen, onViewAsLead, onSignOut }) {
     }
     setForm((current) => ({ ...current, email: '', display_name: '' }))
     setNotice('Added.')
-    await load()
-  }
-
-  async function updatePerson(person, partial) {
-    setError('')
-    const next = { ...partial }
-    if (next.role === 'admin') next.stall_id = null
-    if (next.role === 'lead' && !next.stall_id && !person.stall_id) {
-      setError('Choose a stall for this lead.')
-      return
-    }
-    const { error: updateError } = await supabase.from('allowlist').update(next).eq('id', person.id)
-    if (updateError) {
-      setError(friendlySaveError(updateError))
-      return
-    }
     await load()
   }
 
@@ -154,7 +150,11 @@ export function AdminDashboard({ profile, onOpen, onViewAsLead, onSignOut }) {
     await load()
   }
 
-  const orderedPeople = [...people].sort((a, b) => {
+  if (managing) {
+    return <ManageLeads onBack={() => { setManaging(false); void load() }} />
+  }
+
+  const orderedPeople = [...people].filter((person) => person.role === 'admin').sort((a, b) => {
     if (a.role !== b.role) return a.role === 'admin' ? -1 : 1
     const order = new Map((stalls || []).map((stall) => [stall.id, stall.sort_order]))
     return (order.get(a.stall_id) || 99) - (order.get(b.stall_id) || 99)
@@ -203,10 +203,11 @@ export function AdminDashboard({ profile, onOpen, onViewAsLead, onSignOut }) {
             {counts.not_started} not started · {counts.draft} draft · {counts.submitted} submitted · {counts.locked} locked
           </p>
           <nav className="jump">
+            <button type="button" className="btn" onClick={() => setManaging(true)}>Manage leads</button>
             <a href="#pledge-totals">Pledges</a>
             <a href="#stalls">Stalls</a>
             <a href="#duplicates">Duplicates</a>
-            <a href="#people">Who can sign in</a>
+            <a href="#people">Admins</a>
           </nav>
 
           <section className="block" id="bank-details">
@@ -244,12 +245,25 @@ export function AdminDashboard({ profile, onOpen, onViewAsLead, onSignOut }) {
                         <span className={`pill pill-${stall.status}`}>{STATUS_LABEL[stall.status]}</span>
                       </h3>
                       <p>
-                        {stall.year_groups || 'Year group not set'}
+                        {stall.assigned_year_group || 'Year group not set'}
                         {' · '}
                         {dishCount} {dishCount === 1 ? 'dish' : 'dishes'}
                         {' · '}
                         {leads.length ? leads.map((lead) => lead.display_name || lead.email).join(', ') : 'No lead yet'}
                       </p>
+                      <label className="field slim">
+                        <span className="label">Year group</span>
+                        <select
+                          aria-label={`Year group for ${stall.name}`}
+                          value={stall.assigned_year_group || ''}
+                          onChange={(event) => setYearGroup(stall, event.target.value)}
+                        >
+                          <option value="">Not set</option>
+                          {ASSIGNED_YEAR_GROUPS.map((year) => (
+                            <option key={year} value={year}>{year}</option>
+                          ))}
+                        </select>
+                      </label>
                       <p className="hint">
                         {who ? `Last saved ${formatWhen(stall.updated_at)} by ${who}` : 'Not saved yet'}
                       </p>
@@ -303,8 +317,8 @@ export function AdminDashboard({ profile, onOpen, onViewAsLead, onSignOut }) {
           </section>
 
           <section className="block" id="people">
-            <h2>Who can sign in</h2>
-            <p className="hint">Admins see every stall. A lead can open only the stall you assign here.</p>
+            <h2>Admins</h2>
+            <p className="hint">Admins see every stall. Country leads are added on Manage leads.</p>
             <form className="people-form" onSubmit={addPerson}>
               <label className="field">
                 <span className="label">Email</span>
@@ -322,28 +336,7 @@ export function AdminDashboard({ profile, onOpen, onViewAsLead, onSignOut }) {
                   onChange={(event) => setForm({ ...form, display_name: event.target.value })}
                 />
               </label>
-              <label className="field">
-                <span className="label">Role</span>
-                <select value={form.role} onChange={(event) => setForm({ ...form, role: event.target.value })}>
-                  <option value="lead">Lead</option>
-                  <option value="admin">Admin</option>
-                </select>
-              </label>
-              {form.role === 'lead' ? (
-                <label className="field">
-                  <span className="label">Stall</span>
-                  <select
-                    required
-                    value={form.stall_id}
-                    onChange={(event) => setForm({ ...form, stall_id: event.target.value })}
-                  >
-                    {(stalls || []).map((stall) => (
-                      <option key={stall.id} value={stall.id}>{stall.name}</option>
-                    ))}
-                  </select>
-                </label>
-              ) : null}
-              <button className="btn btn-primary" type="submit">Add</button>
+              <button className="btn btn-primary" type="submit">Add admin</button>
             </form>
             {notice ? <p className="hint" role="status">{notice}</p> : null}
             <ul className="people">
@@ -355,33 +348,6 @@ export function AdminDashboard({ profile, onOpen, onViewAsLead, onSignOut }) {
                       <strong>{person.display_name || person.email}</strong>
                       <span className="hint">{person.email}{mine ? ' · you' : ''}</span>
                     </div>
-                    <label className="field slim">
-                      <span className="label">Role</span>
-                      <select
-                        value={person.role}
-                        disabled={mine}
-                        onChange={(event) => updatePerson(person, {
-                          role: event.target.value,
-                          stall_id: event.target.value === 'lead' ? (person.stall_id || stalls[0].id) : null,
-                        })}
-                      >
-                        <option value="lead">Lead</option>
-                        <option value="admin">Admin</option>
-                      </select>
-                    </label>
-                    {person.role === 'lead' ? (
-                      <label className="field slim">
-                        <span className="label">Stall</span>
-                        <select
-                          value={person.stall_id || ''}
-                          onChange={(event) => updatePerson(person, { stall_id: event.target.value })}
-                        >
-                          {(stalls || []).map((stall) => (
-                            <option key={stall.id} value={stall.id}>{stall.name}</option>
-                          ))}
-                        </select>
-                      </label>
-                    ) : <span />}
                     {mine ? (
                       <span className="hint">This is you</span>
                     ) : removeId === person.id ? (

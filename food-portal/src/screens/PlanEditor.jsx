@@ -297,6 +297,7 @@ export function PlanEditor({
       >
         <p className="status-line">
           <span className={`pill pill-${stall.status}`}>{STATUS_LABEL[stall.status] || stall.status}</span>
+          <span>Year group: {stall.assigned_year_group || 'Not set'}</span>
           {savedLine ? <span>{savedLine}</span> : <span>No one has saved this plan yet.</span>}
         </p>
         {stall.status === 'locked' && !isAdmin ? (

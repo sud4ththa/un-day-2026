@@ -1,7 +1,8 @@
 import { BANK_KEYS } from './bankDetails.js'
 import { deadlineOpen, dishLimit, pledgeAllowed } from './pledges.js'
+import { DEMO_ASSIGNED_YEAR_GROUPS } from './yearGroups.js'
 
-export const DEMO_STORAGE_KEY = 'un-day-2026-food-demo-v2'
+export const DEMO_STORAGE_KEY = 'un-day-2026-food-demo-v3'
 
 export const DEMO_PEOPLE = [
   {
@@ -60,6 +61,7 @@ export function freshDemoState(seed) {
       ...stall,
       published_to_parents: stall.published_to_parents ?? published,
       pledge_deadline: stall.pledge_deadline ?? (published ? '2026-10-13' : null),
+      assigned_year_group: DEMO_ASSIGNED_YEAR_GROUPS[stall.id] || null,
     }
     if (stall.id === 'india' && !next.food_coordinator_name) {
       next.food_coordinator_name = 'Chandi'
@@ -80,10 +82,10 @@ export function freshDemoState(seed) {
     return next
   })
   return {
-    version: 2,
+    version: 3,
     stalls,
     dishes,
-    allowlist: clone(DEMO_PEOPLE),
+    allowlist: clone(DEMO_PEOPLE).map((person) => ({ ...person, phone: person.phone || '' })),
     portal_settings: [{ id: 'portal', allow_bank_details: false }],
     parents: [
       {
@@ -118,7 +120,7 @@ export function createDemoClient({ storage, getActor, seed }) {
     }
     try {
       const parsed = JSON.parse(raw)
-      if (parsed?.version !== 2 || !parsed.stalls || !parsed.portal_settings || !parsed.pledges) {
+      if (parsed?.version !== 3 || !parsed.stalls || !parsed.portal_settings || !parsed.pledges) {
         const state = freshDemoState(seed)
         storage.setItem(DEMO_STORAGE_KEY, JSON.stringify(state))
         return state
@@ -162,6 +164,7 @@ export function createDemoClient({ storage, getActor, seed }) {
       next.sort_order = row.sort_order
       next.locked_at = row.locked_at
       next.locked_by = row.locked_by
+      next.assigned_year_group = row.assigned_year_group
       if (next.status === 'locked') return { error: 'Only the PTC can lock a stall' }
       if (row.status === 'submitted' || next.status === 'submitted') {
         next.status = 'submitted'
@@ -353,7 +356,7 @@ export function createDemoClient({ storage, getActor, seed }) {
       }
       state.allowlist.push(person.row)
       save(state)
-      return ok(null)
+      return finish([person.row])
     }
 
     if (stateSpec.table === 'allowlist' && stateSpec.op === 'update') {
@@ -605,6 +608,7 @@ function normalizePerson(input) {
       role,
       stall_id: stallId,
       display_name: String(input.display_name || '').trim(),
+      phone: String(input.phone || '').trim(),
     },
   }
 }

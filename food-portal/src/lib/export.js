@@ -3,6 +3,7 @@ const STALL_FIELDS = [
   ['stall_name', (stall) => stall.name],
   ['status', (stall) => stall.status],
   ['year_groups', (stall) => stall.year_groups],
+  ['assigned_year_group', (stall) => stall.assigned_year_group || ''],
   ['support_type', (stall) => stall.support_type],
   ['amount_per_family', (stall) => stall.amount_per_family],
   ['how_to_pay', (stall) => stall.how_to_pay],
