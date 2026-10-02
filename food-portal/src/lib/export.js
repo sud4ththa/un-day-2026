@@ -4,6 +4,12 @@ const STALL_FIELDS = [
   ['status', (stall) => stall.status],
   ['year_groups', (stall) => stall.year_groups],
   ['assigned_year_group', (stall) => stall.assigned_year_group || ''],
+  ['lead_name', (stall, people) => personField(stall, people, 'lead', 'display_name')],
+  ['lead_email', (stall, people) => personField(stall, people, 'lead', 'email')],
+  ['lead_phone', (stall, people) => personField(stall, people, 'lead', 'phone')],
+  ['coordinator_name', (stall, people) => personField(stall, people, 'food_coordinator', 'display_name')],
+  ['coordinator_email', (stall, people) => personField(stall, people, 'food_coordinator', 'email')],
+  ['coordinator_phone', (stall, people) => personField(stall, people, 'food_coordinator', 'phone')],
   ['support_type', (stall) => stall.support_type],
   ['amount_per_family', (stall) => stall.amount_per_family],
   ['how_to_pay', (stall) => stall.how_to_pay],
@@ -58,14 +64,19 @@ function dishesFor(stall, dishes) {
     .sort((a, b) => a.sort_order - b.sort_order)
 }
 
-export function toCsv(stalls, dishes) {
+function personField(stall, people, role, field) {
+  const person = (people || []).find((item) => item.stall_id === stall.id && item.role === role)
+  return person?.[field] || ''
+}
+
+export function toCsv(stalls, dishes, people = []) {
   const lines = [CSV_HEADERS.map(csvCell).join(',')]
   for (const stall of stalls) {
     const list = dishesFor(stall, dishes)
     const rows = list.length ? list : [null]
     for (const dish of rows) {
       const values = [
-        ...STALL_FIELDS.map(([, read]) => read(stall)),
+        ...STALL_FIELDS.map(([, read]) => read(stall, people)),
         ...DISH_FIELDS.map(([, read]) => read(dish)),
       ]
       lines.push(values.map(csvCell).join(','))
@@ -74,14 +85,14 @@ export function toCsv(stalls, dishes) {
   return `\uFEFF${lines.join('\r\n')}`
 }
 
-export function toJson(stalls, dishes) {
+export function toJson(stalls, dishes, people = []) {
   return {
     event: 'UN Day 2026',
     school: 'The British School in Colombo',
     group: 'Parent Collective',
     exported_at: new Date().toISOString(),
     stalls: stalls.map((stall) => {
-      const summary = Object.fromEntries(STALL_FIELDS.map(([name, read]) => [name, read(stall)]))
+      const summary = Object.fromEntries(STALL_FIELDS.map(([name, read]) => [name, read(stall, people)]))
       return {
         ...summary,
         dishes: dishesFor(stall, dishes).map((dish) =>

@@ -25,7 +25,7 @@ You do not need to install anything on your own computer if you follow the Supab
 ## 2. Create the tables
 
 1. In the project, open **SQL Editor** (the left sidebar) and choose **New query**.
-2. Open every file in `food-portal/supabase/migrations/`, in filename order. Copy each whole file into its own query and choose **Run**. The order is `20261001120000_init.sql`, then `20261001183000_bank_details.sql`, then `20261002120000_pledges.sql`, then `20261002180000_manage_leads.sql`.
+2. Open every file in `food-portal/supabase/migrations/`, in filename order. Copy each whole file into its own query and choose **Run**. The order is `20261001120000_init.sql`, then `20261001183000_bank_details.sql`, then `20261002120000_pledges.sql`, then `20261002180000_manage_leads.sql`, then `20261002210000_one_lead.sql`.
 
 You should see a success message. The query creates the 12 stalls and last year’s dishes (Eco Warriors starts with none). It also turns on the access rules.
 
@@ -43,7 +43,7 @@ Nobody can sign in until their email is on the list. The first people have to be
 
 After that, those three people are admins. You do not add leads in SQL.
 
-Country leads are added in the portal, on **Manage leads**. Enter a name, an email, a phone if you have one, and the stall. That email is added to the sign-in list, so the lead can ask for an email code. A stall can have more than one lead. **Save** changes a name, email, phone, or moves the lead to another stall. **Remove** takes that email off the list, so that person can no longer sign in. The other lead on the same stall stays.
+Country leads are added in the portal, on **Manage leads**. Each stall has one **Lead** slot and an optional **Food coordinator** slot. Enter a name, an email, and a phone if you have one. That email is added to the sign-in list, so they can ask for an email code. The food coordinator can open the same stall plan and pledges as the lead. If the slot is already filled, saving a different email asks you to replace the current person. **Remove** takes that email off the list. The admin overview, the lead’s plan, and the CSV and JSON download show both names.
 
 On **All stalls**, and again on **Manage leads**, each stall has a **Year group** dropdown: Nursery, Reception, then Year 1 through Year 11. Only an admin can set it. The lead sees it at the top of their plan, and it is included in the CSV and JSON download. Leads still cannot change it.
 
@@ -194,7 +194,7 @@ Admins see every stall: not started, draft, submitted, or locked, with the last 
 
 **Dishes on more than one stall** collects the overlap in one place.
 
-**Manage leads** adds, edits, moves, and removes country leads. **Admins** on the same page adds or removes other PTC admins. A lead can only read and write the stall they are assigned to. Removing a lead blocks them immediately, even if they had signed in before. Two leads on the same stall both see that stall.
+**Manage leads** sets the one lead and the optional food coordinator for each stall. **Admins** on the same page adds or removes other PTC admins. A lead and a food coordinator can only read and write the stall they are assigned to. Removing someone blocks them immediately, even if they had signed in before.
 
 ## How the lock works
 

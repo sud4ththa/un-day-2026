@@ -124,7 +124,7 @@ test('two parents cannot pledge more than the dish still needs', async () => {
   assert.deepEqual(stalls.data.map((stall) => stall.id).sort(), ['india', 'japan'])
 })
 
-test('a lead cannot change the assigned year group, and two leads can share a stall', async () => {
+test('a stall has one lead, and a food coordinator can open that stall', async () => {
   const { client, setActor } = clientAs(admin)
   const india = await client.from('stalls').select('assigned_year_group').eq('id', 'india').single()
   assert.equal(india.data.assigned_year_group, 'Year 1')
@@ -158,10 +158,20 @@ test('a lead cannot change the assigned year group, and two leads can share a st
     stall_id: 'japan',
     display_name: 'B',
   })
-  assert.equal(second.error, null)
-  const leads = await client.from('allowlist').select('email').eq('stall_id', 'japan')
-  assert.equal(leads.data.length, 2)
-  await client.from('allowlist').delete().eq('email', 'b@example.com')
-  const left = await client.from('allowlist').select('email').eq('stall_id', 'japan')
-  assert.deepEqual(left.data.map((person) => person.email), ['a@example.com'])
+  assert.match(second.error.message, /already has a lead/)
+  const coord = await client.from('allowlist').insert({
+    email: 'c@example.com',
+    role: 'food_coordinator',
+    stall_id: 'japan',
+    display_name: 'C',
+    phone: '0772222222',
+  }).select('phone').single()
+  assert.equal(coord.data.phone, '0772222222')
+  setActor({ email: 'c@example.com', role: 'food_coordinator', stall_id: 'japan', display_name: 'C' })
+  const visible = await client.from('stalls').select('id')
+  assert.deepEqual(visible.data.map((stall) => stall.id), ['japan'])
+  const names = await client.from('allowlist').select('email')
+  assert.ok(names.data.some((person) => person.email === 'a@example.com'))
+  const pledges = await client.from('pledges').select('id')
+  assert.equal(pledges.error, null)
 })

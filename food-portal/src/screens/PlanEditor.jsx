@@ -44,6 +44,7 @@ export function PlanEditor({
   const [confirm, setConfirm] = useState(null)
   const [showPreview, setShowPreview] = useState(false)
   const [allowBankDetails, setAllowBankDetails] = useState(false)
+  const [team, setTeam] = useState([])
 
   const version = useRef(0)
   const latest = useRef({ stall: null, dishes: [], removed: [] })
@@ -86,10 +87,11 @@ export function PlanEditor({
     setReady(false)
     setLoadError('')
     ;(async () => {
-      const [stallRes, dishRes, settingsRes] = await Promise.all([
+      const [stallRes, dishRes, settingsRes, teamRes] = await Promise.all([
         supabase.from('stalls').select('*').eq('id', stallId).single(),
         supabase.from('dishes').select('*').eq('stall_id', stallId).order('sort_order'),
         supabase.from('portal_settings').select('allow_bank_details').eq('id', 'portal').maybeSingle(),
+        supabase.from('allowlist').select('display_name, email, phone, role, stall_id').eq('stall_id', stallId),
       ])
       if (stop) return
       if (stallRes.error || !stallRes.data) {
@@ -117,6 +119,7 @@ export function PlanEditor({
         pledge_deadline: stallRes.data.pledge_deadline ? String(stallRes.data.pledge_deadline).slice(0, 10) : '',
       })
       setAllowBankDetails(Boolean(settingsRes.data?.allow_bank_details))
+      setTeam(teamRes.data || [])
       setDishes((dishRes.data || []).map(dishFromDb))
       setRemoved([])
       setDirty(false)
@@ -298,6 +301,8 @@ export function PlanEditor({
         <p className="status-line">
           <span className={`pill pill-${stall.status}`}>{STATUS_LABEL[stall.status] || stall.status}</span>
           <span>Year group: {stall.assigned_year_group || 'Not set'}</span>
+          <span>Lead: {team.find((person) => person.role === 'lead')?.display_name || team.find((person) => person.role === 'lead')?.email || 'Not set'}</span>
+          <span>Food coordinator: {team.find((person) => person.role === 'food_coordinator')?.display_name || team.find((person) => person.role === 'food_coordinator')?.email || 'Not set'}</span>
           {savedLine ? <span>{savedLine}</span> : <span>No one has saved this plan yet.</span>}
         </p>
         {stall.status === 'locked' && !isAdmin ? (

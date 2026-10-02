@@ -141,13 +141,19 @@ export function createDemoClient({ storage, getActor, seed }) {
     return Boolean(state.portal_settings[0]?.allow_bank_details)
   }
 
+  function onStall(actor) {
+    return actor?.role === 'lead' || actor?.role === 'food_coordinator'
+  }
+
   function stallWriteError(actor, stall) {
     if (!actor || actor.role === 'parent') return 'Parents cannot edit a stall plan'
-    if (actor.role === 'lead') {
+    if (actor.role === 'admin') return ''
+    if (onStall(actor)) {
       if (stall.id !== actor.stall_id) return 'row-level security'
       if (stall.status === 'locked') return 'This stall is locked'
+      return ''
     }
-    return ''
+    return 'row-level security'
   }
 
   function applyStallUpdate(row, payload, actor, bankOpen) {
@@ -196,12 +202,12 @@ export function createDemoClient({ storage, getActor, seed }) {
 
   function visibleRows(state, table, actor) {
     if (table === 'stalls') {
-      if (actor.role === 'lead') return state.stalls.filter((stall) => stall.id === actor.stall_id)
+      if (onStall(actor)) return state.stalls.filter((stall) => stall.id === actor.stall_id)
       if (actor.role === 'parent') return state.stalls.filter((stall) => stall.published_to_parents)
       return state.stalls
     }
     if (table === 'dishes') {
-      if (actor.role === 'lead') return state.dishes.filter((dish) => dish.stall_id === actor.stall_id)
+      if (onStall(actor)) return state.dishes.filter((dish) => dish.stall_id === actor.stall_id)
       if (actor.role === 'parent') {
         const open = new Set(state.stalls.filter((stall) => stall.published_to_parents).map((stall) => stall.id))
         return state.dishes.filter((dish) => open.has(dish.stall_id))
@@ -210,12 +216,18 @@ export function createDemoClient({ storage, getActor, seed }) {
     }
     if (table === 'allowlist') {
       if (actor.role === 'admin') return state.allowlist
+      if (onStall(actor)) {
+        return state.allowlist.filter((person) => (
+          person.email === (actor.email || '').toLowerCase()
+          || (person.stall_id && person.stall_id === actor.stall_id)
+        ))
+      }
       return state.allowlist.filter((person) => person.email === (actor.email || '').toLowerCase())
     }
     if (table === 'portal_settings') return state.portal_settings
     if (table === 'parents') {
       if (actor.role === 'admin') return state.parents
-      if (actor.role === 'lead') {
+      if (onStall(actor)) {
         const ids = new Set(
           state.pledges
             .filter((pledge) => pledge.stall_id === actor.stall_id && pledge.status !== 'removed')
@@ -228,7 +240,7 @@ export function createDemoClient({ storage, getActor, seed }) {
     }
     if (table === 'pledges') {
       if (actor.role === 'admin') return state.pledges
-      if (actor.role === 'lead') {
+      if (onStall(actor)) {
         return state.pledges.filter((pledge) => pledge.stall_id === actor.stall_id && pledge.status !== 'removed')
       }
       const parent = parentFor(state, actor)
@@ -354,6 +366,7 @@ export function createDemoClient({ storage, getActor, seed }) {
       if (state.allowlist.some((item) => item.email === person.row.email)) {
         return deniedObject('23505', 'That email is already on the list.')
       }
+      if (slotTaken(state.allowlist, person.row)) return denied(slotMessage(person.row.role))
       state.allowlist.push(person.row)
       save(state)
       return finish([person.row])
@@ -365,6 +378,7 @@ export function createDemoClient({ storage, getActor, seed }) {
       if (index < 0) return ok(null)
       const merged = normalizePerson({ ...state.allowlist[index], ...stateSpec.payload, id: state.allowlist[index].id })
       if (merged.error) return denied(merged.error)
+      if (slotTaken(state.allowlist, merged.row)) return denied(slotMessage(merged.row.role))
       const admins = state.allowlist.filter((item) => item.role === 'admin' && item.id !== merged.row.id)
       if (state.allowlist[index].role === 'admin' && merged.row.role !== 'admin' && admins.length === 0) {
         return denied('The list needs at least one admin')
@@ -598,9 +612,13 @@ function pick(row, cols) {
 function normalizePerson(input) {
   const email = String(input.email || '').trim().toLowerCase()
   if (!email.includes('@')) return { error: 'Enter an email address.' }
-  const role = input.role === 'admin' ? 'admin' : 'lead'
+  const role = input.role === 'food_coordinator'
+    ? 'food_coordinator'
+    : input.role === 'admin'
+      ? 'admin'
+      : 'lead'
   const stallId = role === 'admin' ? null : (input.stall_id || null)
-  if (role === 'lead' && !stallId) return { error: 'A lead must be assigned a stall' }
+  if (role !== 'admin' && !stallId) return { error: 'Choose a stall' }
   return {
     row: {
       id: input.id || (globalThis.crypto?.randomUUID?.() || `person-${Date.now()}`),
@@ -611,6 +629,17 @@ function normalizePerson(input) {
       phone: String(input.phone || '').trim(),
     },
   }
+}
+
+function slotTaken(people, row) {
+  if (!row.stall_id || (row.role !== 'lead' && row.role !== 'food_coordinator')) return false
+  return people.some((item) => item.id !== row.id && item.stall_id === row.stall_id && item.role === row.role)
+}
+
+function slotMessage(role) {
+  return role === 'food_coordinator'
+    ? 'This stall already has a food coordinator'
+    : 'This stall already has a lead'
 }
 
 function deniedObject(code, message) {

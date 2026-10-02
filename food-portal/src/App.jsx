@@ -99,7 +99,7 @@ function LiveApp() {
         }
         setGateMessage('')
         setProfile(data)
-        setStallId((current) => (data.role === 'lead' ? data.stall_id : current))
+        setStallId((current) => (data.role === 'lead' || data.role === 'food_coordinator' ? data.stall_id : current))
       })
     return () => {
       cancelled = true
@@ -135,7 +135,7 @@ function LiveApp() {
 
   if (!session || !profile) return <SignIn message={gateMessage} />
 
-  if (profile.role === 'lead' && !profile.stall_id) {
+  if ((profile.role === 'lead' || profile.role === 'food_coordinator') && !profile.stall_id) {
     return (
       <div className="wrap narrow">
         <Header title="No stall yet" onSignOut={signOut} />

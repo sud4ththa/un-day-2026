@@ -172,7 +172,7 @@ export function AdminDashboard({ profile, onOpen, onViewAsLead, onSignOut }) {
             type="button"
             className="btn"
             disabled={!stalls}
-            onClick={() => download('un-day-2026-food-plans.csv', toCsv(stalls, dishes), 'text/csv;charset=utf-8')}
+            onClick={() => download('un-day-2026-food-plans.csv', toCsv(stalls, dishes, people), 'text/csv;charset=utf-8')}
           >
             Download CSV
           </button>
@@ -182,7 +182,7 @@ export function AdminDashboard({ profile, onOpen, onViewAsLead, onSignOut }) {
             disabled={!stalls}
             onClick={() => download(
               'un-day-2026-food-plans.json',
-              JSON.stringify(toJson(stalls, dishes), null, 2),
+              JSON.stringify(toJson(stalls, dishes, people), null, 2),
               'application/json',
             )}
           >
@@ -234,7 +234,8 @@ export function AdminDashboard({ profile, onOpen, onViewAsLead, onSignOut }) {
             <h2>Stalls</h2>
             <ol className="register">
               {stalls.map((stall) => {
-                const leads = people.filter((person) => person.role === 'lead' && person.stall_id === stall.id)
+                const lead = people.find((person) => person.role === 'lead' && person.stall_id === stall.id)
+                const coordinator = people.find((person) => person.role === 'food_coordinator' && person.stall_id === stall.id)
                 const dishCount = dishes.filter((dish) => dish.stall_id === stall.id && dish.name.trim()).length
                 const who = personName(stall.updated_by_email, people)
                 return (
@@ -248,8 +249,11 @@ export function AdminDashboard({ profile, onOpen, onViewAsLead, onSignOut }) {
                         {stall.assigned_year_group || 'Year group not set'}
                         {' · '}
                         {dishCount} {dishCount === 1 ? 'dish' : 'dishes'}
+                      </p>
+                      <p>
+                        Lead: {lead ? (lead.display_name || lead.email) : 'Not set'}
                         {' · '}
-                        {leads.length ? leads.map((lead) => lead.display_name || lead.email).join(', ') : 'No lead yet'}
+                        Food coordinator: {coordinator ? (coordinator.display_name || coordinator.email) : 'Not set'}
                       </p>
                       <label className="field slim">
                         <span className="label">Year group</span>
