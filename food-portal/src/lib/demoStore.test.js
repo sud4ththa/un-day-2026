@@ -53,33 +53,30 @@ function clientAs(actor) {
   }
 }
 
-test('bank details start off and a lead cannot turn them on', async () => {
+test('bank details start off and a stall contact cannot turn them on', async () => {
   const { client, setActor } = clientAs(admin)
   const first = await client.from('portal_settings').select('*').single()
   assert.equal(first.data.allow_bank_details, false)
+  const notes = await client.from('notification_settings').select('parent_reminders').single()
+  assert.equal(notes.data.parent_reminders, false)
   setActor(japanLead)
   const blocked = await client.from('portal_settings').update({ allow_bank_details: true }).eq('id', 'portal')
   assert.match(blocked.error.message, /row-level security/)
+  setActor(admin)
   const still = await client.from('portal_settings').select('allow_bank_details').single()
   assert.equal(still.data.allow_bank_details, false)
 })
 
-test('a lead cannot read or write another stall, and an admin edit is attributed to the admin', async () => {
+test('a stall contact cannot open a plan, and an admin edit is attributed to the admin', async () => {
   const { client, setActor } = clientAs(japanLead)
   const stalls = await client.from('stalls').select('*')
-  assert.deepEqual(stalls.data.map((stall) => stall.id), ['japan'])
+  assert.deepEqual(stalls.data, [])
   const hidden = await client.from('dishes').select('*').eq('stall_id', 'india')
   assert.equal(hidden.data.length, 0)
   const blocked = await client.from('stalls').update({ year_groups: 'Hacked' }).eq('id', 'india')
   assert.ok(blocked.error)
-
-  const own = await client.from('stalls').update({ year_groups: 'Year 5' }).eq('id', 'japan').select('updated_by_email, status').single()
-  assert.equal(own.error, null)
-  assert.equal(own.data.updated_by_email, 'japan@demo.local')
-  assert.equal(own.data.status, 'draft')
-
-  const frozen = await client.from('stalls').update({ bank_account_number: '9999999' }).eq('id', 'japan').select('bank_account_number').single()
-  assert.equal(frozen.data.bank_account_number, '')
+  const own = await client.from('stalls').update({ year_groups: 'Year 5' }).eq('id', 'japan')
+  assert.ok(own.error)
 
   setActor(admin)
   const saved = await client.from('stalls').update({ dropoff_instructions: 'Gate' }).eq('id', 'india').select('updated_by_email').single()
@@ -124,27 +121,23 @@ test('two parents cannot pledge more than the dish still needs', async () => {
   assert.deepEqual(stalls.data.map((stall) => stall.id).sort(), ['india', 'japan'])
 })
 
-test('a stall has one lead, and a food coordinator can open that stall', async () => {
+test('a stall has one lead contact, and that person cannot sign in', async () => {
   const { client, setActor } = clientAs(admin)
   const india = await client.from('stalls').select('assigned_year_group').eq('id', 'india').single()
   assert.equal(india.data.assigned_year_group, 'Year 1')
   const japan = await client.from('stalls').select('assigned_year_group').eq('id', 'japan').single()
   assert.equal(japan.data.assigned_year_group, 'Year 11')
 
-  setActor(japanLead)
-  const blocked = await client.from('stalls').update({ assigned_year_group: 'Nursery' }).eq('id', 'japan').select('assigned_year_group').single()
-  assert.equal(blocked.data.assigned_year_group, 'Year 11')
-  const hidden = await client.from('allowlist').insert({
-    email: 'extra@example.com',
+  const signIn = await client.from('allowlist').insert({
+    email: 'a@example.com',
     role: 'lead',
     stall_id: 'japan',
-    display_name: 'Extra',
-    phone: '077',
+    display_name: 'A',
+    phone: '0771111111',
   })
-  assert.ok(hidden.error)
+  assert.match(signIn.error.message, /Only PTC admins can sign in/)
 
-  setActor(admin)
-  const first = await client.from('allowlist').insert({
+  const first = await client.from('stall_contacts').insert({
     email: 'a@example.com',
     role: 'lead',
     stall_id: 'japan',
@@ -152,14 +145,14 @@ test('a stall has one lead, and a food coordinator can open that stall', async (
     phone: '0771111111',
   }).select('phone').single()
   assert.equal(first.data.phone, '0771111111')
-  const second = await client.from('allowlist').insert({
+  const second = await client.from('stall_contacts').insert({
     email: 'b@example.com',
     role: 'lead',
     stall_id: 'japan',
     display_name: 'B',
   })
   assert.match(second.error.message, /already has a lead/)
-  const coord = await client.from('allowlist').insert({
+  const coord = await client.from('stall_contacts').insert({
     email: 'c@example.com',
     role: 'food_coordinator',
     stall_id: 'japan',
@@ -169,9 +162,7 @@ test('a stall has one lead, and a food coordinator can open that stall', async (
   assert.equal(coord.data.phone, '0772222222')
   setActor({ email: 'c@example.com', role: 'food_coordinator', stall_id: 'japan', display_name: 'C' })
   const visible = await client.from('stalls').select('id')
-  assert.deepEqual(visible.data.map((stall) => stall.id), ['japan'])
-  const names = await client.from('allowlist').select('email')
-  assert.ok(names.data.some((person) => person.email === 'a@example.com'))
-  const pledges = await client.from('pledges').select('id')
-  assert.equal(pledges.error, null)
+  assert.deepEqual(visible.data, [])
+  const names = await client.from('stall_contacts').select('email')
+  assert.deepEqual(names.data, [])
 })

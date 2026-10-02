@@ -6,6 +6,7 @@ import { formatWhen, friendlySaveError } from '../lib/format.js'
 import { STATUS_LABEL } from '../lib/plan.js'
 import { ASSIGNED_YEAR_GROUPS } from '../lib/yearGroups.js'
 import { ManageLeads } from './ManageLeads.jsx'
+import { Notifications } from './Notifications.jsx'
 import { clusterDuplicates } from '../lib/similarity.js'
 import { supabase } from '../lib/supabase.js'
 import { AdminPledges } from './AdminPledges.jsx'
@@ -16,10 +17,11 @@ function personName(email, people) {
   return person?.display_name || email
 }
 
-export function AdminDashboard({ profile, onOpen, onViewAsLead, onSignOut }) {
+export function AdminDashboard({ profile, onOpen, onSignOut }) {
   const [stalls, setStalls] = useState(null)
   const [dishes, setDishes] = useState([])
   const [people, setPeople] = useState([])
+  const [contacts, setContacts] = useState([])
   const [error, setError] = useState('')
   const [notice, setNotice] = useState('')
   const [lockId, setLockId] = useState(null)
@@ -27,6 +29,7 @@ export function AdminDashboard({ profile, onOpen, onViewAsLead, onSignOut }) {
   const [allowBank, setAllowBank] = useState(false)
   const [bankBusy, setBankBusy] = useState(false)
   const [managing, setManaging] = useState(false)
+  const [notifying, setNotifying] = useState(false)
   const [form, setForm] = useState({
     email: '',
     display_name: '',
@@ -34,19 +37,21 @@ export function AdminDashboard({ profile, onOpen, onViewAsLead, onSignOut }) {
 
   async function load() {
     setError('')
-    const [stallRes, dishRes, peopleRes, settingsRes] = await Promise.all([
+    const [stallRes, dishRes, peopleRes, contactRes, settingsRes] = await Promise.all([
       supabase.from('stalls').select('*').order('sort_order'),
       supabase.from('dishes').select('*').order('sort_order'),
       supabase.from('allowlist').select('*').order('email'),
+      supabase.from('stall_contacts').select('*').order('email'),
       supabase.from('portal_settings').select('allow_bank_details').eq('id', 'portal').maybeSingle(),
     ])
-    if (stallRes.error || dishRes.error || peopleRes.error || settingsRes.error) {
+    if (stallRes.error || dishRes.error || peopleRes.error || contactRes.error || settingsRes.error) {
       setError('The stalls could not be loaded.')
       return
     }
     setStalls(stallRes.data)
     setDishes(dishRes.data)
     setPeople(peopleRes.data)
+    setContacts(contactRes.data || [])
     setAllowBank(Boolean(settingsRes.data?.allow_bank_details))
   }
 
@@ -154,6 +159,10 @@ export function AdminDashboard({ profile, onOpen, onViewAsLead, onSignOut }) {
     return <ManageLeads onBack={() => { setManaging(false); void load() }} />
   }
 
+  if (notifying) {
+    return <Notifications profile={profile} onBack={() => setNotifying(false)} />
+  }
+
   const orderedPeople = [...people].filter((person) => person.role === 'admin').sort((a, b) => {
     if (a.role !== b.role) return a.role === 'admin' ? -1 : 1
     const order = new Map((stalls || []).map((stall) => [stall.id, stall.sort_order]))
@@ -172,7 +181,7 @@ export function AdminDashboard({ profile, onOpen, onViewAsLead, onSignOut }) {
             type="button"
             className="btn"
             disabled={!stalls}
-            onClick={() => download('un-day-2026-food-plans.csv', toCsv(stalls, dishes, people), 'text/csv;charset=utf-8')}
+            onClick={() => download('un-day-2026-food-plans.csv', toCsv(stalls, dishes, contacts), 'text/csv;charset=utf-8')}
           >
             Download CSV
           </button>
@@ -182,7 +191,7 @@ export function AdminDashboard({ profile, onOpen, onViewAsLead, onSignOut }) {
             disabled={!stalls}
             onClick={() => download(
               'un-day-2026-food-plans.json',
-              JSON.stringify(toJson(stalls, dishes, people), null, 2),
+              JSON.stringify(toJson(stalls, dishes, contacts), null, 2),
               'application/json',
             )}
           >
@@ -204,6 +213,7 @@ export function AdminDashboard({ profile, onOpen, onViewAsLead, onSignOut }) {
           </p>
           <nav className="jump">
             <button type="button" className="btn" onClick={() => setManaging(true)}>Manage leads</button>
+            <button type="button" className="btn" onClick={() => setNotifying(true)}>Notifications</button>
             <a href="#pledge-totals">Pledges</a>
             <a href="#stalls">Stalls</a>
             <a href="#duplicates">Duplicates</a>
@@ -223,7 +233,7 @@ export function AdminDashboard({ profile, onOpen, onViewAsLead, onSignOut }) {
             </label>
             <p className="hint">
               {allowBank
-                ? 'Leads can enter an account name, bank, branch, account number, and the reference parents should use.'
+                ? 'The PTC can enter an account name, bank, branch, account number, and the reference parents should use.'
                 : BANK_APPROVAL_NOTE}
             </p>
           </section>
@@ -234,8 +244,8 @@ export function AdminDashboard({ profile, onOpen, onViewAsLead, onSignOut }) {
             <h2>Stalls</h2>
             <ol className="register">
               {stalls.map((stall) => {
-                const lead = people.find((person) => person.role === 'lead' && person.stall_id === stall.id)
-                const coordinator = people.find((person) => person.role === 'food_coordinator' && person.stall_id === stall.id)
+                const lead = contacts.find((person) => person.role === 'lead' && person.stall_id === stall.id)
+                const coordinator = contacts.find((person) => person.role === 'food_coordinator' && person.stall_id === stall.id)
                 const dishCount = dishes.filter((dish) => dish.stall_id === stall.id && dish.name.trim()).length
                 const who = personName(stall.updated_by_email, people)
                 return (
@@ -274,10 +284,7 @@ export function AdminDashboard({ profile, onOpen, onViewAsLead, onSignOut }) {
                     </div>
                     <div className="inline-actions">
                       <button type="button" className="btn" onClick={() => onOpen(stall.id)}>
-                        Open
-                      </button>
-                      <button type="button" className="btn" onClick={() => onViewAsLead(stall.id)}>
-                        View as lead
+                        Edit stall
                       </button>
                       {lockId === stall.id ? (
                         <>
@@ -322,7 +329,7 @@ export function AdminDashboard({ profile, onOpen, onViewAsLead, onSignOut }) {
 
           <section className="block" id="people">
             <h2>Admins</h2>
-            <p className="hint">Admins see every stall. Country leads are added on Manage leads.</p>
+            <p className="hint">Only PTC admins sign in. Stall contacts are kept on Manage leads and do not sign in.</p>
             <form className="people-form" onSubmit={addPerson}>
               <label className="field">
                 <span className="label">Email</span>

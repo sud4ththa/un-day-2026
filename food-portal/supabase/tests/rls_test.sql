@@ -1,10 +1,12 @@
--- Proves a lead cannot read or write another stall, and that the sign-in
--- hook rejects an email that is not on the allowlist.
+-- Proves a stall contact cannot sign in or edit a plan, and that the
+-- sign-in hook rejects an email that is not a PTC admin.
 
-insert into public.allowlist (email, role, stall_id, display_name) values
+insert into public.stall_contacts (email, role, stall_id, display_name) values
   ('lead.japan@example.com', 'lead', 'japan', 'Japan lead'),
-  ('lead.india@example.com', 'lead', 'india', 'India lead'),
-  ('admin@example.com', 'admin', null, 'PTC admin');
+  ('lead.india@example.com', 'lead', 'india', 'India lead');
+
+insert into public.allowlist (email, role, display_name) values
+  ('admin@example.com', 'admin', 'PTC admin');
 
 -- The hook role cannot read the table directly, but the hook function can.
 set role supabase_auth_admin;
@@ -27,10 +29,15 @@ begin
   end if;
 
   result := public.hook_before_user_created('{"user":{"email":"Lead.Japan@example.com"}}'::jsonb);
-  if result <> '{}'::jsonb then
-    raise exception 'FAIL: allowlisted email was rejected (%)', result;
+  if coalesce(result->'error'->>'http_code', '') <> '403' then
+    raise exception 'FAIL: a stall contact was allowed to sign in (%)', result;
   end if;
-  raise notice 'OK: auth hook checks the allowlist';
+
+  result := public.hook_before_user_created('{"user":{"email":"admin@example.com"}}'::jsonb);
+  if result <> '{}'::jsonb then
+    raise exception 'FAIL: admin email was rejected (%)', result;
+  end if;
+  raise notice 'OK: auth hook allows PTC admins and refuses stall contacts';
 end $$;
 
 reset role;
@@ -48,79 +55,36 @@ declare
   seen int;
 begin
   select count(*) into n from public.stalls;
-  if n <> 1 then
-    raise exception 'FAIL: Japan lead sees % stalls', n;
-  end if;
-
-  select count(*) into n from public.stalls where id = 'india';
   if n <> 0 then
-    raise exception 'FAIL: Japan lead can read the India stall';
+    raise exception 'FAIL: a stall contact sees % stalls', n;
   end if;
-
-  select count(*) into n from public.dishes where stall_id = 'india';
-  if n <> 0 then
-    raise exception 'FAIL: Japan lead can read India dishes (% )', n;
-  end if;
-
-  select count(*) into seen from public.dish_name_index() where stall_id = 'india';
-  if seen = 0 then
-    raise exception 'FAIL: dish name index hid other stalls';
-  end if;
-
-  select count(*) into n from public.allowlist where email <> 'lead.japan@example.com';
-  if n <> 0 then
-    raise exception 'FAIL: Japan lead can read other people';
-  end if;
-  raise notice 'OK: lead reads only their stall, plus dish names for warnings';
-
-  update public.stalls set year_groups = 'Hacked' where id = 'india';
-  get diagnostics n = row_count;
-  if n <> 0 then
-    raise exception 'FAIL: lead updated another stall';
-  end if;
-
-  update public.dishes set name = 'Hacked' where stall_id = 'india';
-  get diagnostics n = row_count;
-  if n <> 0 then
-    raise exception 'FAIL: lead updated another stall''s dish';
-  end if;
-
-  delete from public.dishes where stall_id = 'india';
-  get diagnostics n = row_count;
-  if n <> 0 then
-    raise exception 'FAIL: lead deleted another stall''s dish';
-  end if;
-
-  begin
-    insert into public.dishes (stall_id, name, sort_order) values ('india', 'Sneaky', 99);
-    raise exception 'FAIL: lead inserted a dish on another stall';
-  exception
-    when insufficient_privilege or raise_exception then
-      if sqlerrm like 'FAIL:%' then
-        raise;
-      end if;
-      raise notice 'OK: cross-stall dish insert blocked (% )', sqlerrm;
-  end;
-
-  begin
-    insert into public.allowlist (email, role, stall_id) values ('extra@example.com', 'lead', 'japan');
-    raise exception 'FAIL: lead edited the allowlist';
-  exception
-    when insufficient_privilege or raise_exception then
-      if sqlerrm like 'FAIL:%' then
-        raise;
-      end if;
-      raise notice 'OK: lead cannot add to the allowlist';
-  end;
 
   update public.stalls set dropoff_instructions = 'Side gate' where id = 'japan';
   get diagnostics n = row_count;
-  if n <> 1 then
-    raise exception 'FAIL: lead could not update their own stall (% rows)', n;
+  if n <> 0 then
+    raise exception 'FAIL: a stall contact updated a stall';
   end if;
 
-  insert into public.dishes (stall_id, name, sort_order) values ('japan', 'Test onigiri', 50);
-  raise notice 'OK: lead can write their own stall';
+  begin
+    insert into public.dishes (stall_id, name, sort_order) values ('japan', 'Test onigiri', 50);
+    raise exception 'FAIL: a stall contact added a dish';
+  exception
+    when insufficient_privilege or raise_exception then
+      if sqlerrm like 'FAIL:%' then
+        raise;
+      end if;
+  end;
+
+  begin
+    insert into public.allowlist (email, role, display_name) values ('extra@example.com', 'admin', 'Extra');
+    raise exception 'FAIL: a stall contact edited the allowlist';
+  exception
+    when insufficient_privilege or raise_exception then
+      if sqlerrm like 'FAIL:%' then
+        raise;
+      end if;
+  end;
+  raise notice 'OK: a stall contact cannot read or write a plan';
 end $$;
 
 reset role;
@@ -136,14 +100,14 @@ begin
   select s.status, s.updated_by_email, s.dropoff_instructions
     into status, email, dropoff
   from public.stalls s where s.id = 'japan';
-  if status <> 'draft' then
-    raise exception 'FAIL: own-stall save left status %', status;
+  if status <> 'not_started' then
+    raise exception 'FAIL: contact write changed status to %', status;
   end if;
-  if email <> 'lead.japan@example.com' then
+  if email is not null then
     raise exception 'FAIL: updated_by_email is %', email;
   end if;
-  if dropoff <> 'Side gate' then
-    raise exception 'FAIL: drop-off was not saved (% )', dropoff;
+  if dropoff = 'Side gate' then
+    raise exception 'FAIL: a stall contact changed the drop-off';
   end if;
 
   select year_groups into years from public.stalls where id = 'india';
@@ -155,7 +119,7 @@ begin
   if sneaky <> 0 then
     raise exception 'FAIL: sneaky dish was stored';
   end if;
-  raise notice 'OK: other stall is unchanged and the audit trail is the lead email';
+  raise notice 'OK: a stall contact left the plan unchanged';
 end $$;
 
 select set_config(
@@ -211,15 +175,15 @@ declare
   after_count int;
 begin
   select count(*) into n from public.stalls where id = 'japan';
-  if n <> 1 then
-    raise exception 'FAIL: lead cannot read a locked stall';
+  if n <> 0 then
+    raise exception 'FAIL: a stall contact can read a locked stall';
   end if;
 
   select count(*) into before_count from public.dishes where stall_id = 'japan';
   update public.stalls set dropoff_instructions = 'Nope' where id = 'japan';
   get diagnostics n = row_count;
   if n <> 0 then
-    raise exception 'FAIL: lead updated a locked stall';
+    raise exception 'FAIL: a stall contact updated a locked stall';
   end if;
 
   begin
@@ -236,7 +200,7 @@ begin
   if after_count <> before_count then
     raise exception 'FAIL: locked stall dish count changed';
   end if;
-  raise notice 'OK: a locked stall is readable but not writable by its lead';
+  raise notice 'OK: a locked stall stays closed to a stall contact';
 end $$;
 
 reset role;
@@ -246,8 +210,8 @@ declare
   dropoff text;
 begin
   select dropoff_instructions into dropoff from public.stalls where id = 'japan';
-  if dropoff <> 'Side gate' then
-    raise exception 'FAIL: locked stall drop-off changed to %', dropoff;
+  if dropoff = 'Nope' then
+    raise exception 'FAIL: locked stall drop-off changed';
   end if;
 end $$;
 
@@ -277,7 +241,18 @@ do $$
 declare
   n int;
 begin
-  insert into public.allowlist (email, role, stall_id, display_name)
+  begin
+    insert into public.allowlist (email, role, stall_id, display_name)
+    values ('lead.europe@example.com', 'lead', 'europe', 'Europe lead');
+    raise exception 'FAIL: a lead was added to the sign-in list';
+  exception
+    when others then
+      if sqlerrm like 'FAIL:%' then
+        raise;
+      end if;
+  end;
+
+  insert into public.stall_contacts (email, role, stall_id, display_name)
   values ('lead.europe@example.com', 'lead', 'europe', 'Europe lead');
 
   begin
@@ -291,12 +266,12 @@ begin
       raise notice 'OK: the last admin stays on the list';
   end;
 
-  delete from public.allowlist where email = 'lead.europe@example.com';
+  delete from public.stall_contacts where email = 'lead.europe@example.com';
   get diagnostics n = row_count;
   if n <> 1 then
-    raise exception 'FAIL: admin could not remove a lead';
+    raise exception 'FAIL: admin could not remove a lead contact';
   end if;
-  raise notice 'OK: admin can add and remove a lead';
+  raise notice 'OK: admin keeps contacts off the sign-in list';
 end $$;
 
 reset role;
@@ -345,11 +320,11 @@ begin
   end if;
 
   update public.stalls set bank_account_number = '99999999' where id = 'india';
-  select bank_account_number into number from public.stalls where id = 'india';
-  if number is distinct from '5464113' then
-    raise exception 'FAIL: lead changed bank details while they are closed (%)', number;
+  get diagnostics n = row_count;
+  if n <> 0 then
+    raise exception 'FAIL: a stall contact changed bank details';
   end if;
-  raise notice 'OK: bank details stay closed for a lead';
+  raise notice 'OK: bank details stay closed for a stall contact';
 end $$;
 
 reset role;
@@ -374,14 +349,14 @@ set role authenticated;
 
 do $$
 declare
-  number text;
+  n int;
 begin
   update public.stalls set bank_account_number = '11111111' where id = 'india';
-  select bank_account_number into number from public.stalls where id = 'india';
-  if number is distinct from '11111111' then
-    raise exception 'FAIL: lead could not edit bank details after approval (%)', number;
+  get diagnostics n = row_count;
+  if n <> 0 then
+    raise exception 'FAIL: a stall contact edited bank details';
   end if;
-  raise notice 'OK: bank details open after the PTC allows them';
+  raise notice 'OK: bank details stay with the PTC after they are allowed';
 end $$;
 
 reset role;

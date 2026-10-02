@@ -18,7 +18,7 @@ export function ManageLeads({ onBack }) {
   async function load() {
     const [stallRes, peopleRes] = await Promise.all([
       supabase.from('stalls').select('id, name, sort_order, assigned_year_group').order('sort_order'),
-      supabase.from('allowlist').select('*').order('email'),
+      supabase.from('stall_contacts').select('*').order('email'),
     ])
     if (stallRes.error || peopleRes.error) {
       setError('The lead list could not be loaded.')
@@ -49,7 +49,7 @@ export function ManageLeads({ onBack }) {
     <div className="wrap wide">
       <Header title="Manage leads" onBack={onBack} backLabel="All stalls" />
       <p className="hint">
-        Each stall has one lead. A food coordinator is optional. Both can sign in with an email code and open that stall’s food list and pledges.
+        Each stall has one lead. A food coordinator is optional. These are contact records for the daily update. They do not sign in. The PTC enters the stall plan.
       </p>
       {error ? <p className="banner" role="alert">{error}</p> : null}
       {notice ? <p role="status">{notice}</p> : null}
@@ -128,26 +128,26 @@ function Slot({ stall, role, label, person, onError, onDone }) {
       stall_id: stall.id,
     }
     const result = person
-      ? await supabase.from('allowlist').update(payload).eq('id', person.id)
-      : await supabase.from('allowlist').insert(payload)
+      ? await supabase.from('stall_contacts').update(payload).eq('id', person.id)
+      : await supabase.from('stall_contacts').insert(payload)
     if (result.error) {
       onError(friendlySaveError(result.error))
       return
     }
     setConfirm(false)
     const verb = person ? (replacing ? 'Replaced' : 'Saved') : 'Added'
-    await onDone(`${verb}. They can sign in with an email code.`)
+    await onDone(`${verb}.`)
   }
 
   async function remove() {
     onError('')
-    const { error } = await supabase.from('allowlist').delete().eq('id', person.id)
+    const { error } = await supabase.from('stall_contacts').delete().eq('id', person.id)
     if (error) {
       onError(friendlySaveError(error))
       return
     }
     setRemoving(false)
-    await onDone('Removed. That email can no longer sign in.')
+    await onDone('Removed.')
   }
 
   return (
@@ -197,7 +197,7 @@ function Slot({ stall, role, label, person, onError, onDone }) {
       </div>
       {confirm && person ? (
         <p className="banner" role="status">
-          Replace {person.display_name || person.email} with {form.display_name.trim() || email}? {person.display_name || person.email} will no longer be able to sign in.
+          Replace {person.display_name || person.email} with {form.display_name.trim() || email}? {person.display_name || person.email} will no longer receive the daily update.
           <span className="inline-actions">
             <button className="btn btn-primary" type="submit">Replace</button>
             <button className="btn btn-quiet" type="button" onClick={() => setConfirm(false)}>Cancel</button>

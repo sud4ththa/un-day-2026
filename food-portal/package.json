@@ -8,7 +8,7 @@
     "build": "vite build",
     "build:demo": "node scripts/build-demo-seed.mjs && vite build --mode demo && node scripts/copy-pledge-page.mjs",
     "preview": "vite preview",
-    "test": "node --test src/lib/similarity.test.js src/lib/plan.test.js src/lib/export.test.js src/lib/leadPreview.test.js src/lib/bankDetails.test.js src/lib/demoMode.test.js src/lib/demoStore.test.js src/lib/pledges.test.js src/lib/yearGroups.test.js"
+    "test": "node --test src/lib/similarity.test.js src/lib/plan.test.js src/lib/export.test.js src/lib/bankDetails.test.js src/lib/demoMode.test.js src/lib/demoStore.test.js src/lib/pledges.test.js src/lib/yearGroups.test.js src/lib/notifications.test.js"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.49.8",

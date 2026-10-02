@@ -140,16 +140,10 @@ declare
   phone text;
 begin
   select count(*) into n from public.pledges where stall_id = 'india' and status = 'active';
-  if n <> 2 then
-    raise exception 'FAIL: India lead sees % pledges', n;
+  if n <> 0 then
+    raise exception 'FAIL: a stall contact sees % pledges', n;
   end if;
-  select p.phone into phone
-  from public.parents p
-  where p.email = 'ada@parent.test';
-  if phone is distinct from '0771111111' then
-    raise exception 'FAIL: India lead cannot see the parent phone (%)', phone;
-  end if;
-  raise notice 'OK: the stall lead sees names and phones for their pledges';
+  raise notice 'OK: a stall contact cannot see pledges';
 end $$;
 
 reset role;

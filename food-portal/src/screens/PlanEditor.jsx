@@ -6,7 +6,6 @@ import { Preview } from '../components/Preview.jsx'
 import { StallPledges } from './StallPledges.jsx'
 import { accountNumberFields, BANK_APPROVAL_NOTE } from '../lib/bankDetails.js'
 import { formatWhen, friendlySaveError } from '../lib/format.js'
-import { leadPreviewBanner, leadPreviewState } from '../lib/leadPreview.js'
 import {
   blankDish,
   dishFromDb,
@@ -27,8 +26,6 @@ export function PlanEditor({
   stallId,
   onBack,
   onSignOut,
-  leadPreview = null,
-  onLeadPreviewEditing,
 }) {
   const [stall, setStall] = useState(null)
   const [dishes, setDishes] = useState([])
@@ -53,11 +50,8 @@ export function PlanEditor({
   const pause = useRef(false)
 
   latest.current = { stall, dishes, removed }
-  const previewMode = leadPreviewState(leadPreview)
-  const isAdmin = profile.role === 'admin' && !previewMode.active
-  const readOnly = previewMode.active
-    ? !previewMode.editing
-    : Boolean(stall && stall.status === 'locked' && profile.role !== 'admin')
+  const isAdmin = profile.role === 'admin'
+  const readOnly = Boolean(stall && stall.status === 'locked' && !isAdmin)
   const allowRef = useRef(false)
   allowRef.current = allowBankDetails
 
@@ -91,7 +85,7 @@ export function PlanEditor({
         supabase.from('stalls').select('*').eq('id', stallId).single(),
         supabase.from('dishes').select('*').eq('stall_id', stallId).order('sort_order'),
         supabase.from('portal_settings').select('allow_bank_details').eq('id', 'portal').maybeSingle(),
-        supabase.from('allowlist').select('display_name, email, phone, role, stall_id').eq('stall_id', stallId),
+        supabase.from('stall_contacts').select('display_name, email, phone, role, stall_id').eq('stall_id', stallId),
       ])
       if (stop) return
       if (stallRes.error || !stallRes.data) {
@@ -280,9 +274,7 @@ export function PlanEditor({
       ? 'you'
       : stall.updated_by_email
   const savedLine = who ? `Last saved ${formatWhen(stall.updated_at)} by ${who}` : ''
-  const saveLabel = previewMode.active && previewMode.readOnly
-    ? 'Preview only'
-    : saveError
+  const saveLabel = saveError
     || (saveState === 'saving' ? 'Saving…' : null)
     || (dirty ? 'Unsaved changes' : null)
     || (saveState === 'submitted' || stall.status === 'submitted' ? 'Submitted' : null)
@@ -296,7 +288,7 @@ export function PlanEditor({
         title={stall.name}
         onBack={onBack}
         onSignOut={onSignOut}
-        backLabel={previewMode.active ? 'Exit' : 'All stalls'}
+        backLabel="All stalls"
       >
         <p className="status-line">
           <span className={`pill pill-${stall.status}`}>{STATUS_LABEL[stall.status] || stall.status}</span>
@@ -309,38 +301,13 @@ export function PlanEditor({
           <p className="banner">The PTC has locked this plan. You can still read it.</p>
         ) : null}
         {stall.status === 'locked' && isAdmin ? (
-          <p className="banner">Locked for leads. You can still edit it, or unlock the stall.</p>
+          <p className="banner">Locked. You can still edit it, or unlock the stall.</p>
         ) : null}
         {stall.status !== 'submitted' && stall.status !== 'locked' ? (
           <p className="deadline">Please submit this plan by Tuesday 6 October 2026.</p>
         ) : null}
         {stall.status === 'submitted' ? (
           <p className="deadline">Submitted. You can still edit until the PTC locks the stall.</p>
-        ) : null}
-        {previewMode.active ? (
-          <div className="banner" role="status">
-            <p>{leadPreviewBanner(stall.name)}</p>
-            <p className="hint">
-              {previewMode.editing
-                ? `Any edit is saved as ${profile.display_name || profile.email}.`
-                : 'Read only, the way a lead sees it.'}
-            </p>
-            <div className="inline-actions">
-              <button
-                type="button"
-                className="btn"
-                onClick={() => {
-                  if (previewMode.editing && dirty) void persist('save')
-                  onLeadPreviewEditing?.(!previewMode.editing)
-                }}
-              >
-                {previewMode.editing ? 'Stop editing' : 'Edit this plan'}
-              </button>
-              <button type="button" className="btn btn-quiet" onClick={onBack}>
-                Exit
-              </button>
-            </div>
-          </div>
         ) : null}
         {isAdmin ? (
           <div className="inline-actions">
@@ -630,7 +597,7 @@ export function PlanEditor({
             )}
           </div>
         ) : (
-          <p className="hint">{previewMode.active ? 'Preview only' : 'Locked'}</p>
+          <p className="hint">Locked</p>
         )}
       </div>
 

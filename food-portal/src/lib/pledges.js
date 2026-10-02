@@ -55,6 +55,41 @@ export function suggestedStall(stalls, yearGroup) {
   return stalls.find((stall) => yearTokens(stall.year_groups).includes(want)) || null
 }
 
+export function formatClass(yearGroup, section) {
+  const year = String(yearGroup || '').trim()
+  const letter = String(section || '').trim().toUpperCase()
+  if (!year) return ''
+  return letter ? `${year} ${letter}` : year
+}
+
+export function sectionLetter(value) {
+  const letter = String(value || '').trim().toUpperCase()
+  if (!letter) return ''
+  return /^[A-Z]{1,2}$/.test(letter) ? letter : null
+}
+
+export function stallForAssignedYear(stalls, yearGroup) {
+  const want = String(yearGroup || '').trim()
+  if (!want) return null
+  return (stalls || []).find((stall) => (
+    stall.published_to_parents && stall.assigned_year_group === want
+  )) || null
+}
+
+export function stallsStillNeedingFood(stalls, dishes, remaining) {
+  return (stalls || []).filter((stall) => {
+    if (!stall.published_to_parents) return false
+    if (stall.support_type !== 'food' && stall.support_type !== 'both') return false
+    const menu = (dishes || []).filter((dish) => dish.stall_id === stall.id && String(dish.name || '').trim())
+    if (!menu.length) return false
+    return menu.some((dish) => {
+      const row = (remaining || []).find((item) => item.dish_id === dish.id)
+      if (!row || row.remaining == null) return true
+      return row.remaining > 0
+    })
+  })
+}
+
 export function pledgeCsv(rows) {
   const headers = [
     'stall',
