@@ -46,15 +46,15 @@ function ParentApp() {
     )
   }
 
-  if (!session) return <SignIn mode="parent" />
-
-  const profile = {
-    role: 'parent',
-    email: (session.user.email || '').toLowerCase(),
-    user_id: session.user.id,
-    display_name: '',
-    stall_id: null,
-  }
+  const profile = session
+    ? {
+      role: 'parent',
+      email: (session.user.email || '').toLowerCase(),
+      user_id: session.user.id,
+      display_name: '',
+      stall_id: null,
+    }
+    : null
 
   return <ParentPledge profile={profile} onSignOut={signOut} />
 }
@@ -64,7 +64,6 @@ function LiveApp() {
   const [profile, setProfile] = useState(undefined)
   const [gateMessage, setGateMessage] = useState('')
   const [stallId, setStallId] = useState(null)
-  const [preview, setPreview] = useState(null)
 
   useEffect(() => {
     if (!supabase) return undefined
@@ -89,17 +88,15 @@ function LiveApp() {
       .maybeSingle()
       .then(async ({ data, error }) => {
         if (cancelled) return
-        if (error || !data) {
-          setGateMessage('This email is not on the list yet. Ask the PTC to add you.')
+        if (error || !data || data.role !== 'admin') {
+          setGateMessage('This email is not a PTC admin. Stall leads do not sign in here.')
           setProfile(null)
           setStallId(null)
-          setPreview(null)
           await supabase.auth.signOut()
           return
         }
         setGateMessage('')
         setProfile(data)
-        setStallId((current) => (data.role === 'lead' ? data.stall_id : current))
       })
     return () => {
       cancelled = true
@@ -109,7 +106,6 @@ function LiveApp() {
   async function signOut() {
     if (supabase) await supabase.auth.signOut()
     setStallId(null)
-    setPreview(null)
   }
 
   if (configError) {
@@ -135,22 +131,11 @@ function LiveApp() {
 
   if (!session || !profile) return <SignIn message={gateMessage} />
 
-  if (profile.role === 'lead' && !profile.stall_id) {
-    return (
-      <div className="wrap narrow">
-        <Header title="No stall yet" onSignOut={signOut} />
-        <p>Your email is on the list, but the PTC has not assigned a stall yet.</p>
-      </div>
-    )
-  }
-
   return (
     <Portal
       profile={profile}
       stallId={stallId}
       setStallId={setStallId}
-      preview={preview}
-      setPreview={setPreview}
       onSignOut={signOut}
     />
   )

@@ -1,147 +1,265 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Header } from '../components/Header.jsx'
 import { bankPreviewLines } from '../lib/bankDetails.js'
-import { allergenList, dietLabel, friendlySaveError, spiceLabel, tasteLabel } from '../lib/format.js'
-import { phoneStoredNote } from '../lib/otp.js'
-import { deadlineOpen, dishLimit, stillNeeded, suggestedStall, YEAR_GROUPS } from '../lib/pledges.js'
+import { allergenList, dietLabel, friendlySaveError, friendlySendError, friendlyVerifyError, spiceLabel, tasteLabel } from '../lib/format.js'
+import { phoneAuth } from '../lib/otp.js'
+import {
+  deadlineOpen,
+  dishLimit,
+  formatClass,
+  sectionLetter,
+  stallForAssignedYear,
+  stallsStillNeedingFood,
+  stillNeeded,
+} from '../lib/pledges.js'
 import { dishFromDb } from '../lib/plan.js'
-import { supabase } from '../lib/supabase.js'
+import { ASSIGNED_YEAR_GROUPS } from '../lib/yearGroups.js'
+import { isDemo, supabase } from '../lib/supabase.js'
+
+const phoneOn = phoneAuth.provider === 'twilio-verify'
 
 export function ParentPledge({ profile, onSignOut }) {
+  const [step, setStep] = useState('details')
+  const [channel, setChannel] = useState('email')
+  const [email, setEmail] = useState(profile?.email && !profile.email.endsWith('@demo.local') ? profile.email : '')
+  const [phone, setPhone] = useState('')
+  const [children, setChildren] = useState([{ child_name: '', year_group: '', section: '' }])
+  const [code, setCode] = useState('')
   const [stalls, setStalls] = useState(null)
   const [dishes, setDishes] = useState([])
   const [remaining, setRemaining] = useState([])
+  const [allowBank, setAllowBank] = useState(false)
   const [parent, setParent] = useState(null)
   const [pledges, setPledges] = useState([])
-  const [allowBank, setAllowBank] = useState(false)
+  const [routes, setRoutes] = useState([])
   const [stallId, setStallId] = useState('')
-  const [stallTouched, setStallTouched] = useState(false)
   const [quantities, setQuantities] = useState({})
   const [money, setMoney] = useState('')
   const [error, setError] = useState('')
-  const [notice, setNotice] = useState('')
   const [pending, setPending] = useState(false)
-  const [form, setForm] = useState({
-    parent_name: '',
-    child_name: '',
-    year_group: '',
-    phone: '',
-  })
+
+  const usePhone = phoneOn && channel === 'phone'
 
   async function load() {
-    const [stallRes, dishRes, settingsRes, parentRes, pledgeRes, remainRes] = await Promise.all([
+    const [stallRes, dishRes, settingsRes, parentRes, childRes, pledgeRes, remainRes] = await Promise.all([
       supabase.from('stalls').select('*').order('sort_order'),
       supabase.from('dishes').select('*').order('sort_order'),
       supabase.from('portal_settings').select('allow_bank_details').eq('id', 'portal').maybeSingle(),
       supabase.from('parents').select('*').maybeSingle(),
+      supabase.from('parent_children').select('*').order('sort_order'),
       supabase.from('pledges').select('*'),
       supabase.rpc('dish_remaining'),
     ])
     if (stallRes.error || dishRes.error || remainRes.error) {
       setError('The stalls could not be loaded.')
-      return
+      return null
     }
-    let row = parentRes.data
-    if (!row) {
-      const inserted = await supabase.from('parents').insert({
-        user_id: profile.user_id,
-        email: profile.email,
-        parent_name: '',
-        child_name: '',
-        year_group: '',
-        phone: '',
-      }).select('*').single()
-      if (inserted.error) {
-        setError(friendlySaveError(inserted.error))
-        return
-      }
-      row = inserted.data
-    }
-    setStalls(stallRes.data || [])
-    setDishes((dishRes.data || []).map(dishFromDb))
-    setRemaining(remainRes.data || [])
+    const nextStalls = stallRes.data || []
+    const nextDishes = (dishRes.data || []).map(dishFromDb)
+    const nextRemaining = remainRes.data || []
+    setStalls(nextStalls)
+    setDishes(nextDishes)
+    setRemaining(nextRemaining)
     setAllowBank(Boolean(settingsRes.data?.allow_bank_details))
-    setParent(row)
+    setParent(parentRes.data || null)
     setPledges(pledgeRes.data || [])
-    setForm({
-      parent_name: row.parent_name || '',
-      child_name: row.child_name || '',
-      year_group: row.year_group || '',
-      phone: row.phone || '',
-    })
-    const activeMoney = (pledgeRes.data || []).find((pledge) => pledge.kind === 'money' && pledge.status === 'active')
-    if (activeMoney && !stallTouched) setMoney(String(activeMoney.money_lkr || ''))
+    return {
+      stalls: nextStalls,
+      dishes: nextDishes,
+      remaining: nextRemaining,
+      parent: parentRes.data || null,
+      children: childRes.data || [],
+      pledges: pledgeRes.data || [],
+    }
   }
 
   useEffect(() => {
-    void load()
-  }, [])
+    if (isDemo || profile?.user_id) void load()
+  }, [profile?.user_id])
 
-  const suggestion = useMemo(
-    () => (stalls ? suggestedStall(stalls, form.year_group) : null),
-    [stalls, form.year_group],
-  )
+  function patchChild(index, partial) {
+    setChildren((list) => list.map((child, place) => (place === index ? { ...child, ...partial } : child)))
+  }
 
-  useEffect(() => {
-    if (!stalls || stallTouched) return
-    if (suggestion) setStallId(suggestion.id)
-    else if (!stallId && stalls[0]) setStallId(stalls[0].id)
-  }, [stalls, suggestion, stallTouched, stallId])
+  function familyError() {
+    if (usePhone) {
+      if (phone.replace(/\D/g, '').length < 8) return 'Enter a phone number.'
+    } else if (!email.trim().includes('@')) {
+      return 'Enter an email address.'
+    }
+    if (!children.length) return 'Add a child.'
+    for (const child of children) {
+      if (!child.child_name.trim()) return 'Enter your child’s name.'
+      if (!child.year_group) return 'Choose a class.'
+      if (sectionLetter(child.section) == null) return 'Use a section letter, or leave it blank.'
+    }
+    return ''
+  }
+
+  async function sendCode(event) {
+    event.preventDefault()
+    const problem = familyError()
+    setError(problem)
+    if (problem) return
+    if (isDemo) {
+      setStep('code')
+      setCode('')
+      return
+    }
+    setPending(true)
+    const { error: sendError } = await supabase.auth.signInWithOtp(
+      usePhone
+        ? { phone: phone.trim(), options: { channel: 'sms', shouldCreateUser: true, data: { purpose: 'parent' } } }
+        : { email: email.trim(), options: { shouldCreateUser: true, data: { purpose: 'parent' } } },
+    )
+    setPending(false)
+    if (sendError) {
+      setError(friendlySendError(sendError))
+      return
+    }
+    setStep('code')
+    setCode('')
+  }
+
+  async function saveFamily(loaded, user) {
+    const current = loaded?.parent || parent
+    const userId = user?.id || profile?.user_id
+    const savedEmail = (user?.email || email || profile?.email || '').trim().toLowerCase()
+    const payload = {
+      parent_name: current?.parent_name || '',
+      child_name: children.map((child) => child.child_name.trim()).join(', '),
+      year_group: children.map((child) => formatClass(child.year_group, sectionLetter(child.section) || '')).join(', '),
+      phone: usePhone ? phone.trim() : (current?.phone || phone.trim()),
+      email: savedEmail,
+    }
+    let row = current
+    if (!row) {
+      const inserted = await supabase.from('parents').insert({
+        user_id: userId,
+        ...payload,
+      }).select('*').single()
+      if (inserted.error) throw inserted.error
+      row = inserted.data
+    } else {
+      const updated = await supabase.from('parents').update(payload).eq('id', row.id).select('*').single()
+      if (updated.error) throw updated.error
+      row = updated.data
+    }
+    setParent(row)
+    await supabase.from('parent_children').delete().eq('parent_id', row.id)
+    const childRows = children.map((child, index) => ({
+      parent_id: row.id,
+      child_name: child.child_name.trim(),
+      year_group: child.year_group,
+      section: sectionLetter(child.section) || '',
+      sort_order: index + 1,
+    }))
+    const stored = await supabase.from('parent_children').insert(childRows).select('*')
+    if (stored.error) throw stored.error
+    return { parent: row, children: stored.data || childRows }
+  }
+
+  function goToStall(loaded, family) {
+    const list = family?.children?.length ? family.children : children
+    const nextRoutes = list.map((child) => ({
+      child,
+      stall: stallForAssignedYear(loaded.stalls, child.year_group),
+    }))
+    setRoutes(nextRoutes)
+    const ids = [...new Set(nextRoutes.map((item) => item.stall?.id).filter(Boolean))]
+    if (nextRoutes.every((item) => item.stall) && ids.length === 1) {
+      setStallId(ids[0])
+      setStep('pledge')
+      return
+    }
+    setStep('choose')
+  }
+
+  async function verify(token) {
+    setError('')
+    if (token.length !== 6) return
+    setPending(true)
+    try {
+      let user = null
+      if (!isDemo) {
+        const { error: verifyError } = await supabase.auth.verifyOtp(
+          usePhone
+            ? { phone: phone.trim(), token, type: 'sms' }
+            : { email: email.trim(), token, type: 'email' },
+        )
+        if (verifyError) {
+          setError(friendlyVerifyError(verifyError))
+          setPending(false)
+          return
+        }
+        const signedIn = await supabase.auth.getUser()
+        user = signedIn.data.user
+      }
+      const loaded = await load()
+      if (!loaded) {
+        setPending(false)
+        return
+      }
+      const family = await saveFamily(loaded, user)
+      const again = await load()
+      goToStall(again || loaded, family)
+    } catch (saveError) {
+      setError(friendlySaveError(saveError))
+    } finally {
+      setPending(false)
+    }
+  }
+
+  function openStall(id) {
+    setStallId(id)
+    setQuantities({})
+    setMoney('')
+    setError('')
+    setStep('pledge')
+  }
 
   const stall = stalls?.find((item) => item.id === stallId) || null
   const menu = dishes.filter((dish) => dish.stall_id === stallId && dish.name.trim())
   const open = stall ? deadlineOpen(stall.pledge_deadline) : false
   const wantsFood = stall && (stall.support_type === 'food' || stall.support_type === 'both')
   const wantsMoney = stall && (stall.support_type === 'money' || stall.support_type === 'both')
-  const mine = pledges.filter((pledge) => pledge.status === 'active')
 
   function remainFor(dishId) {
     return remaining.find((row) => row.dish_id === dishId) || null
   }
 
   function ownFood(dishId) {
-    return mine.find((pledge) => pledge.kind === 'food' && pledge.dish_id === dishId) || null
+    return pledges.find((pledge) => pledge.status === 'active' && pledge.kind === 'food' && pledge.dish_id === dishId) || null
   }
 
-  async function saveProfile() {
-    const result = await supabase.from('parents').update({
-      parent_name: form.parent_name.trim(),
-      child_name: form.child_name.trim(),
-      year_group: form.year_group,
-      phone: form.phone.trim(),
-    }).eq('id', parent.id).select('*').single()
-    if (result.error) throw result.error
-    setParent(result.data)
-    return result.data
+  function roomFor(dish) {
+    const row = remainFor(dish.id)
+    const cap = row?.cap ?? dishLimit(dish)
+    if (cap == null) return 0
+    const left = row?.remaining ?? stillNeeded(cap, 0)
+    return left + (ownFood(dish.id)?.quantity || 0)
+  }
+
+  function quantityFor(dish) {
+    if (quantities[dish.id] != null) return quantities[dish.id]
+    return ownFood(dish.id)?.quantity || 0
   }
 
   async function savePledge(event) {
     event.preventDefault()
     setError('')
-    setNotice('')
-    if (!form.parent_name.trim() || !form.child_name.trim() || !form.year_group || !form.phone.trim()) {
-      setError('Add your name, your child’s name, the year group, and a phone number.')
-      return
-    }
-    if (!stall) {
-      setError('Choose a stall.')
-      return
-    }
+    if (!stall || !parent) return
     if (!open) {
       setError('The pledge deadline has passed.')
       return
     }
     setPending(true)
     try {
-      await saveProfile()
       if (wantsFood) {
         for (const dish of menu) {
-          const raw = quantities[dish.id]
+          const qty = quantityFor(dish)
           const existing = ownFood(dish.id)
-          const qty = raw == null || raw === '' ? (existing ? existing.quantity : 0) : Number(raw)
-          if (!Number.isInteger(qty) || qty < 0) {
-            throw new Error('Enter a quantity')
-          }
+          if (!Number.isInteger(qty) || qty < 0) throw new Error('Enter a quantity')
           if (qty === 0 && existing) {
             const cancelled = await supabase.from('pledges').update({ status: 'cancelled', quantity: 0 }).eq('id', existing.id)
             if (cancelled.error) throw cancelled.error
@@ -162,7 +280,7 @@ export function ParentPledge({ profile, onSignOut }) {
         }
       }
       if (wantsMoney) {
-        const existing = mine.find((pledge) => pledge.kind === 'money' && pledge.stall_id === stall.id)
+        const existing = pledges.find((pledge) => pledge.status === 'active' && pledge.kind === 'money' && pledge.stall_id === stall.id)
         const amount = money.trim() === '' ? 0 : Number(money)
         if (money.trim() !== '' && (!Number.isInteger(amount) || amount < 0)) throw new Error('Enter an amount')
         if (amount === 0 && existing) {
@@ -182,9 +300,8 @@ export function ParentPledge({ profile, onSignOut }) {
           if (inserted.error) throw inserted.error
         }
       }
-      setQuantities({})
-      setNotice('Pledge saved.')
       await load()
+      setStep('done')
     } catch (saveError) {
       setError(friendlySaveError(saveError))
     } finally {
@@ -193,8 +310,8 @@ export function ParentPledge({ profile, onSignOut }) {
   }
 
   async function cancelPledge(pledge) {
-    setError('')
     setPending(true)
+    setError('')
     const patch = pledge.kind === 'money'
       ? { status: 'cancelled', money_lkr: 0 }
       : { status: 'cancelled', quantity: 0 }
@@ -204,184 +321,252 @@ export function ParentPledge({ profile, onSignOut }) {
       setError(friendlySaveError(result.error))
       return
     }
-    setNotice('Pledge cancelled.')
     await load()
   }
 
+  const active = pledges.filter((pledge) => pledge.status === 'active')
   const bankLines = allowBank && stall ? bankPreviewLines(stall, true) : []
+  const needing = stalls ? stallsStillNeedingFood(stalls, dishes, remaining) : []
 
   return (
-    <div className="wrap">
+    <div className="wrap narrow">
       <Header
         title="Pledge"
-        subtitle="Tell the stall what you can bring, or the amount you can pay."
+        subtitle="A few details, then the food for your child’s class."
         onSignOut={onSignOut}
       />
-      {!stalls ? <p role="status">Loading…</p> : null}
-      {stalls && stalls.length === 0 ? <p>No stall has published a plan yet.</p> : null}
-      {stall ? (
-        <form className="stack" onSubmit={savePledge}>
-          <h2>Your family</h2>
-          <label className="field">
-            <span className="label">Your name</span>
-            <input value={form.parent_name} onChange={(event) => setForm({ ...form, parent_name: event.target.value })} required />
-          </label>
-          <label className="field">
-            <span className="label">Child’s name</span>
-            <input value={form.child_name} onChange={(event) => setForm({ ...form, child_name: event.target.value })} required />
-          </label>
-          <label className="field">
-            <span className="label">Year group or class</span>
-            <select
-              value={form.year_group}
-              required
-              onChange={(event) => {
-                const year_group = event.target.value
-                setForm({ ...form, year_group })
-                if (!stallTouched) {
-                  const next = suggestedStall(stalls, year_group)
-                  if (next) setStallId(next.id)
-                }
-              }}
-            >
-              <option value="">Choose</option>
-              {YEAR_GROUPS.map((year) => <option key={year} value={year}>{year}</option>)}
-            </select>
-          </label>
-          <label className="field">
-            <span className="label">Phone</span>
-            <input value={form.phone} inputMode="tel" autoComplete="tel" onChange={(event) => setForm({ ...form, phone: event.target.value })} required />
-            <span className="hint">{phoneStoredNote}</span>
-          </label>
-          <p className="hint">Email: {profile.email}</p>
-
-          <label className="field">
-            <span className="label">Stall</span>
-            <select
-              aria-label="Stall"
-              value={stallId}
-              onChange={(event) => {
-                setStallTouched(true)
-                setStallId(event.target.value)
-              }}
-            >
-              {stalls.map((item) => (
-                <option key={item.id} value={item.id}>
-                  {item.name}{suggestion?.id === item.id ? ' (your child’s stall)' : ''}
-                </option>
-              ))}
-            </select>
-          </label>
-          {suggestion && suggestion.id !== stallId ? (
-            <p className="hint">{suggestion.name} is the stall for {form.year_group}. You can still pledge to this one.</p>
-          ) : null}
-
-          <h2>{stall.name}</h2>
-          {stall.pledge_deadline ? (
-            <p className="hint">Pledges can be changed until {stall.pledge_deadline}.</p>
+      {step === 'details' ? (
+        <form className="stack" onSubmit={sendCode}>
+          {phoneOn ? (
+            <fieldset className="choice">
+              <legend className="label">How should we reach you?</legend>
+              <label className="toggle">
+                <input type="radio" name="channel" checked={channel === 'email'} onChange={() => setChannel('email')} />
+                Email
+              </label>
+              <label className="toggle">
+                <input type="radio" name="channel" checked={channel === 'phone'} onChange={() => setChannel('phone')} />
+                Phone
+              </label>
+            </fieldset>
           ) : (
-            <p className="hint">This stall has not set a pledge deadline.</p>
+            <label className="field">
+              <span className="label">Email</span>
+              <input
+                type="email"
+                autoComplete="email"
+                inputMode="email"
+                required
+                value={email}
+                onChange={(event) => setEmail(event.target.value)}
+              />
+            </label>
           )}
+          {phoneOn && channel === 'email' ? (
+            <label className="field">
+              <span className="label">Email</span>
+              <input type="email" autoComplete="email" required value={email} onChange={(event) => setEmail(event.target.value)} />
+            </label>
+          ) : null}
+          {usePhone ? (
+            <label className="field">
+              <span className="label">Phone</span>
+              <input inputMode="tel" autoComplete="tel" required value={phone} onChange={(event) => setPhone(event.target.value)} />
+            </label>
+          ) : null}
+          {children.map((child, index) => (
+            <fieldset className="stack" key={index}>
+              <legend>{index === 0 ? 'Your child' : 'Second child'}</legend>
+              <label className="field">
+                <span className="label">Child’s name</span>
+                <input
+                  aria-label={index === 0 ? 'Child’s name' : 'Second child’s name'}
+                  required
+                  value={child.child_name}
+                  onChange={(event) => patchChild(index, { child_name: event.target.value })}
+                />
+              </label>
+              <label className="field">
+                <span className="label">Class</span>
+                <select
+                  aria-label={index === 0 ? 'Class' : 'Second child’s class'}
+                  required
+                  value={child.year_group}
+                  onChange={(event) => patchChild(index, { year_group: event.target.value })}
+                >
+                  <option value="">Choose</option>
+                  {ASSIGNED_YEAR_GROUPS.map((year) => <option key={year} value={year}>{year}</option>)}
+                </select>
+              </label>
+              <label className="field">
+                <span className="label">Section</span>
+                <input
+                  aria-label={index === 0 ? 'Section' : 'Second child’s section'}
+                  maxLength={2}
+                  value={child.section}
+                  placeholder="A"
+                  onChange={(event) => patchChild(index, { section: event.target.value })}
+                />
+                <span className="hint">Leave blank if the class has no section.</span>
+              </label>
+            </fieldset>
+          ))}
+          {children.length < 2 ? (
+            <button type="button" className="btn" onClick={() => setChildren([...children, { child_name: '', year_group: '', section: '' }])}>
+              Add another child
+            </button>
+          ) : (
+            <button type="button" className="btn btn-quiet" onClick={() => setChildren(children.slice(0, 1))}>
+              Remove the second child
+            </button>
+          )}
+          {error ? <p className="banner" role="alert">{error}</p> : null}
+          <button className="btn btn-primary" type="submit" disabled={pending}>
+            {pending ? 'Sending…' : usePhone ? 'Text me a code' : 'Email me a code'}
+          </button>
+        </form>
+      ) : null}
+
+      {step === 'code' ? (
+        <form className="stack" onSubmit={(event) => { event.preventDefault(); void verify(code) }}>
+          <label className="field">
+            <span className="label">6-digit code</span>
+            <input
+              className="code"
+              inputMode="numeric"
+              autoComplete="one-time-code"
+              maxLength={6}
+              required
+              value={code}
+              onChange={(event) => setCode(event.target.value.replace(/\D/g, '').slice(0, 6))}
+            />
+          </label>
+          <p className="hint">
+            {isDemo
+              ? 'Demo: enter any 6 digits. Nothing is sent.'
+              : `Sent to ${usePhone ? phone.trim() : email.trim()}.`}
+          </p>
+          {error ? <p className="banner" role="alert">{error}</p> : null}
+          <button className="btn btn-primary" type="submit" disabled={pending || code.length !== 6}>
+            {pending ? 'Checking…' : 'Continue'}
+          </button>
+          <button type="button" className="btn btn-quiet" onClick={() => { setStep('details'); setError('') }}>
+            Back
+          </button>
+        </form>
+      ) : null}
+
+      {step === 'choose' ? (
+        <div className="stack">
+          {routes.map((item, index) => {
+            const label = formatClass(item.child.year_group, item.child.section)
+            return (
+              <section className="block" key={`${item.child.child_name}-${index}`}>
+                <h2>{item.child.child_name}</h2>
+                <p>{label}</p>
+                {item.stall ? (
+                  <button type="button" className="btn btn-primary" onClick={() => openStall(item.stall.id)}>
+                    Pledge for {item.stall.name}
+                  </button>
+                ) : (
+                  <>
+                    <p>{label} does not have a food stall yet. You can still help a stall that needs food.</p>
+                    {needing.length === 0 ? <p className="hint">Every published dish is full right now.</p> : null}
+                    {needing.map((option) => (
+                      <button key={option.id} type="button" className="btn" onClick={() => openStall(option.id)}>
+                        {option.name}
+                      </button>
+                    ))}
+                  </>
+                )}
+              </section>
+            )
+          })}
+        </div>
+      ) : null}
+
+      {step === 'pledge' && stall ? (
+        <form className="stack" onSubmit={savePledge}>
+          <h2>{stall.name}</h2>
+          <p className="hint">
+            {routes.filter((item) => item.stall?.id === stall.id).map((item) => item.child.child_name).filter(Boolean).join(', ')
+              || 'Choose what you can bring.'}
+          </p>
           {!open ? <p className="banner">The pledge deadline has passed.</p> : null}
-          {(stall.food_coordinator_name || stall.food_coordinator_phone) ? (
-            <p>
-              Questions about food: {stall.food_coordinator_name}
-              {stall.food_coordinator_phone ? ` · ${stall.food_coordinator_phone}` : ''}
-            </p>
-          ) : null}
-
-          {wantsFood ? (
-            <div className="pledge-menu">
-              {menu.map((dish) => {
-                const row = remainFor(dish.id)
-                const cap = row?.cap ?? dishLimit(dish)
-                const left = row?.remaining ?? (cap == null ? null : stillNeeded(cap, 0))
-                const existing = ownFood(dish.id)
-                const room = left == null ? null : left + (existing?.quantity || 0)
-                const full = room === 0
-                const labels = [dietLabel(dish.diet), tasteLabel(dish.taste), spiceLabel(dish.spice), ...allergenList(dish).map((item) => `Contains ${item}`)].filter(Boolean)
-                return (
-                  <article key={dish.id} className="pledge-card">
-                    <h3>{dish.name}</h3>
-                    <p className="meta">{labels.join(' · ') || 'No diet or allergen marks yet'}</p>
-                    <p>
-                      {cap == null ? 'This dish has no limit yet' : full ? 'Full' : `${left} of ${cap} still needed`}
-                    </p>
-                    {full || cap == null || !open ? null : (
-                      <label className="field">
-                        <span className="label">Quantity</span>
-                        <input
-                          className="pieces"
-                          inputMode="numeric"
-                          aria-label={`Quantity for ${dish.name}`}
-                          min="0"
-                          max={room || undefined}
-                          value={quantities[dish.id] ?? (existing ? String(existing.quantity) : '')}
-                          onChange={(event) => setQuantities({ ...quantities, [dish.id]: event.target.value.replace(/\D/g, '') })}
-                        />
-                      </label>
-                    )}
-                  </article>
-                )
-              })}
-            </div>
-          ) : null}
-
+          {wantsFood ? menu.map((dish) => {
+            const row = remainFor(dish.id)
+            const cap = row?.cap ?? dishLimit(dish)
+            const left = row?.remaining ?? (cap == null ? null : stillNeeded(cap, 0))
+            const qty = quantityFor(dish)
+            const room = roomFor(dish)
+            const labels = [dietLabel(dish.diet), tasteLabel(dish.taste), spiceLabel(dish.spice), ...allergenList(dish).map((item) => `Contains ${item}`)].filter(Boolean)
+            return (
+              <article key={dish.id} className="pledge-card">
+                <h3>{dish.name}</h3>
+                <p className="meta">{labels.join(' · ') || 'No diet or allergen marks yet'}</p>
+                <p>{cap == null ? 'This dish has no limit yet' : left <= 0 && qty === 0 ? 'Full' : `${left} of ${cap} still needed`}</p>
+                {cap == null || !open ? null : (
+                  <div className="stepper">
+                    <button type="button" className="btn" aria-label={`Fewer ${dish.name}`} onClick={() => setQuantities({ ...quantities, [dish.id]: Math.max(0, qty - 1) })} disabled={qty <= 0}>−</button>
+                    <span aria-live="polite">{qty}</span>
+                    <button type="button" className="btn" aria-label={`More ${dish.name}`} onClick={() => setQuantities({ ...quantities, [dish.id]: Math.min(room, qty + 1) })} disabled={qty >= room}>+</button>
+                  </div>
+                )}
+              </article>
+            )
+          }) : null}
           {wantsMoney ? (
             <label className="field">
               <span className="label">Money pledge (LKR)</span>
-              <input
-                inputMode="numeric"
-                value={money}
-                disabled={!open}
-                onChange={(event) => setMoney(event.target.value.replace(/\D/g, ''))}
-              />
+              <input inputMode="numeric" value={money} disabled={!open} onChange={(event) => setMoney(event.target.value.replace(/\D/g, ''))} />
               {stall.amount_per_family ? <span className="hint">The stall asked for {stall.amount_per_family}.</span> : null}
-              {stall.how_to_pay ? <span className="hint">{stall.how_to_pay}</span> : null}
             </label>
           ) : null}
-          {wantsMoney && allowBank && bankLines.length ? (
+          {wantsMoney && bankLines.length ? (
             <div>
               <h3>Bank details</h3>
               {bankLines.map((line) => <p key={line}>{line}</p>)}
             </div>
           ) : null}
-
           {error ? <p className="banner" role="alert">{error}</p> : null}
-          {notice ? <p role="status">{notice}</p> : null}
           <button className="btn btn-primary" type="submit" disabled={pending || !open}>
-            {pending ? 'Saving…' : 'Save pledge'}
+            {pending ? 'Saving…' : 'Confirm pledge'}
           </button>
         </form>
       ) : null}
 
-      <section className="block" id="my-pledges">
-        <h2>My pledges</h2>
-        {mine.length === 0 ? <p className="hint">You have no pledges yet.</p> : (
+      {step === 'done' ? (
+        <div className="stack">
+          <h2>Saved</h2>
+          <p>The stall has your pledge. To change it later, open this page again and use the same {usePhone ? 'phone' : 'email'} code.</p>
+          {active.length === 0 ? <p className="hint">You have no pledges yet.</p> : null}
           <ul className="plain-list">
-            {mine.map((pledge) => {
+            {active.map((pledge) => {
               const dish = dishes.find((item) => item.id === pledge.dish_id)
               const stallName = stalls?.find((item) => item.id === pledge.stall_id)?.name || ''
-              const stallRow = stalls?.find((item) => item.id === pledge.stall_id)
-              const canEdit = stallRow ? deadlineOpen(stallRow.pledge_deadline) : false
               return (
                 <li key={pledge.id}>
                   <strong>{stallName}</strong>
                   {' · '}
                   {pledge.kind === 'money' ? `LKR ${pledge.money_lkr}` : `${dish?.name || 'Dish'} · ${pledge.quantity}`}
-                  {canEdit ? (
-                    <button type="button" className="btn btn-quiet" onClick={() => cancelPledge(pledge)} disabled={pending}>
-                      Cancel
-                    </button>
-                  ) : (
-                    <span className="hint"> Closed</span>
-                  )}
+                  <button type="button" className="btn btn-quiet" disabled={pending} onClick={() => cancelPledge(pledge)}>Cancel</button>
                 </li>
               )
             })}
           </ul>
-        )}
-      </section>
+          {error ? <p className="banner" role="alert">{error}</p> : null}
+          <button
+            type="button"
+            className="btn"
+            onClick={() => {
+              if (stallId) setStep('pledge')
+              else if (active[0]) openStall(active[0].stall_id)
+            }}
+          >
+            Edit pledge
+          </button>
+        </div>
+      ) : null}
     </div>
   )
 }

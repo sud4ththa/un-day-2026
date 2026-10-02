@@ -65,7 +65,7 @@ export function SignIn({ message, mode = 'lead' }) {
         title={mode === 'parent' ? 'Pledge' : 'Food list'}
         subtitle={mode === 'parent'
           ? 'Parents pledge food or money for a stall. Anyone with an email can sign in.'
-          : 'Country leads send their stall plan here. The deadline is Tuesday 6 October 2026.'}
+          : 'PTC admins sign in here. Stall leads do not. The deadline for plans is Tuesday 6 October 2026.'}
       />
       {step === 'email' ? (
         <form className="stack" onSubmit={sendCode}>
@@ -87,11 +87,11 @@ export function SignIn({ message, mode = 'lead' }) {
           <p className="hint">
             {mode === 'parent'
               ? 'A 6-digit code arrives by email. It is not a link. Any parent email can sign in.'
-              : 'A 6-digit code arrives by email. It is not a link. Only emails the PTC has added can sign in.'}
+              : 'A 6-digit code arrives by email. It is not a link. Only PTC admin emails can sign in.'}
           </p>
           <p className="hint">
             {mode === 'parent'
-              ? <a href={routeHref('/')}>Stall lead sign in</a>
+              ? <a href={routeHref('/')}>PTC sign in</a>
               : <a href={routeHref('/pledge')}>Parent pledge</a>}
           </p>
         </form>

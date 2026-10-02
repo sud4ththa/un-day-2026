@@ -65,6 +65,7 @@ test('writes one row per dish and a summary row when a stall has none', () => {
   ])
   const lines = csv.replace(/^\uFEFF/, '').trim().split('\r\n')
   assert.equal(lines.length, 3)
+  assert.match(lines[0], /assigned_year_group/)
   assert.match(lines[1], /Eco Warriors/)
   assert.match(lines[2], /Say ""hello""/)
   assert.match(lines[2], /nuts\|dairy/)
@@ -92,4 +93,22 @@ test('nests dishes under each stall in JSON', () => {
   assert.equal(json.stalls[0].dishes.length, 0)
   assert.equal(json.stalls[1].dishes[0].dish_name, 'Samosa')
   assert.equal(json.event, 'UN Day 2026')
+})
+
+test('names the one lead and the food coordinator on each stall', () => {
+  const people = [
+    { stall_id: 'india', role: 'lead', display_name: 'Asha', email: 'asha@example.com', phone: '0771' },
+    { stall_id: 'india', role: 'food_coordinator', display_name: 'Chandi', email: 'chandi@example.com', phone: '0772' },
+    { stall_id: 'eco-warriors', role: 'lead', display_name: 'Other', email: 'other@example.com', phone: '' },
+  ]
+  const csv = toCsv(stalls, [], people).replace(/^\uFEFF/, '')
+  const header = csv.split('\r\n')[0]
+  assert.match(header, /"lead_name","lead_email","lead_phone","coordinator_name","coordinator_email","coordinator_phone"/)
+  assert.match(csv, /"Asha","asha@example.com","0771","Chandi","chandi@example.com","0772"/)
+  assert.doesNotMatch(csv, /"Other".*"Chandi"/)
+  const json = toJson(stalls, [], people)
+  assert.equal(json.stalls[1].lead_name, 'Asha')
+  assert.equal(json.stalls[1].coordinator_email, 'chandi@example.com')
+  assert.equal(json.stalls[0].lead_name, 'Other')
+  assert.equal(json.stalls[0].coordinator_name, '')
 })

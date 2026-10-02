@@ -1,7 +1,9 @@
 import { BANK_KEYS } from './bankDetails.js'
+import { DEFAULT_NOTIFICATION_SETTINGS } from './notifications.js'
 import { deadlineOpen, dishLimit, pledgeAllowed } from './pledges.js'
+import { DEMO_ASSIGNED_YEAR_GROUPS } from './yearGroups.js'
 
-export const DEMO_STORAGE_KEY = 'un-day-2026-food-demo-v2'
+export const DEMO_STORAGE_KEY = 'un-day-2026-food-demo-v4'
 
 export const DEMO_PEOPLE = [
   {
@@ -60,6 +62,7 @@ export function freshDemoState(seed) {
       ...stall,
       published_to_parents: stall.published_to_parents ?? published,
       pledge_deadline: stall.pledge_deadline ?? (published ? '2026-10-13' : null),
+      assigned_year_group: DEMO_ASSIGNED_YEAR_GROUPS[stall.id] || null,
     }
     if (stall.id === 'india' && !next.food_coordinator_name) {
       next.food_coordinator_name = 'Chandi'
@@ -80,11 +83,13 @@ export function freshDemoState(seed) {
     return next
   })
   return {
-    version: 2,
+    version: 4,
     stalls,
     dishes,
-    allowlist: clone(DEMO_PEOPLE),
+    allowlist: clone(DEMO_PEOPLE).map((person) => ({ ...person, phone: person.phone || '' })),
+    stall_contacts: [],
     portal_settings: [{ id: 'portal', allow_bank_details: false }],
+    notification_settings: [{ ...DEFAULT_NOTIFICATION_SETTINGS }],
     parents: [
       {
         id: 'demo-parent',
@@ -96,6 +101,7 @@ export function freshDemoState(seed) {
         phone: '',
       },
     ],
+    parent_children: [],
     pledges: [],
   }
 }
@@ -118,7 +124,7 @@ export function createDemoClient({ storage, getActor, seed }) {
     }
     try {
       const parsed = JSON.parse(raw)
-      if (parsed?.version !== 2 || !parsed.stalls || !parsed.portal_settings || !parsed.pledges) {
+      if (parsed?.version !== 4 || !parsed.stalls || !parsed.portal_settings || !parsed.pledges || !parsed.stall_contacts) {
         const state = freshDemoState(seed)
         storage.setItem(DEMO_STORAGE_KEY, JSON.stringify(state))
         return state
@@ -141,11 +147,8 @@ export function createDemoClient({ storage, getActor, seed }) {
 
   function stallWriteError(actor, stall) {
     if (!actor || actor.role === 'parent') return 'Parents cannot edit a stall plan'
-    if (actor.role === 'lead') {
-      if (stall.id !== actor.stall_id) return 'row-level security'
-      if (stall.status === 'locked') return 'This stall is locked'
-    }
-    return ''
+    if (actor.role === 'admin') return ''
+    return 'row-level security'
   }
 
   function applyStallUpdate(row, payload, actor, bankOpen) {
@@ -162,6 +165,7 @@ export function createDemoClient({ storage, getActor, seed }) {
       next.sort_order = row.sort_order
       next.locked_at = row.locked_at
       next.locked_by = row.locked_by
+      next.assigned_year_group = row.assigned_year_group
       if (next.status === 'locked') return { error: 'Only the PTC can lock a stall' }
       if (row.status === 'submitted' || next.status === 'submitted') {
         next.status = 'submitted'
@@ -192,44 +196,48 @@ export function createDemoClient({ storage, getActor, seed }) {
   }
 
   function visibleRows(state, table, actor) {
+    const admin = actor.role === 'admin'
+    const parent = actor.role === 'parent'
     if (table === 'stalls') {
-      if (actor.role === 'lead') return state.stalls.filter((stall) => stall.id === actor.stall_id)
-      if (actor.role === 'parent') return state.stalls.filter((stall) => stall.published_to_parents)
-      return state.stalls
+      if (admin) return state.stalls
+      if (parent) return state.stalls.filter((stall) => stall.published_to_parents)
+      return []
     }
     if (table === 'dishes') {
-      if (actor.role === 'lead') return state.dishes.filter((dish) => dish.stall_id === actor.stall_id)
-      if (actor.role === 'parent') {
+      if (admin) return state.dishes
+      if (parent) {
         const open = new Set(state.stalls.filter((stall) => stall.published_to_parents).map((stall) => stall.id))
         return state.dishes.filter((dish) => open.has(dish.stall_id))
       }
-      return state.dishes
+      return []
     }
     if (table === 'allowlist') {
-      if (actor.role === 'admin') return state.allowlist
-      return state.allowlist.filter((person) => person.email === (actor.email || '').toLowerCase())
+      if (admin) return state.allowlist
+      return []
     }
-    if (table === 'portal_settings') return state.portal_settings
+    if (table === 'stall_contacts') {
+      return admin ? state.stall_contacts : []
+    }
+    if (table === 'notification_settings') {
+      return admin ? state.notification_settings : []
+    }
+    if (table === 'portal_settings') {
+      return admin || parent ? state.portal_settings : []
+    }
     if (table === 'parents') {
-      if (actor.role === 'admin') return state.parents
-      if (actor.role === 'lead') {
-        const ids = new Set(
-          state.pledges
-            .filter((pledge) => pledge.stall_id === actor.stall_id && pledge.status !== 'removed')
-            .map((pledge) => pledge.parent_id),
-        )
-        return state.parents.filter((parent) => ids.has(parent.id))
-      }
-      const parent = parentFor(state, actor)
-      return parent ? [parent] : []
+      if (admin) return state.parents
+      const row = parentFor(state, actor)
+      return row ? [row] : []
+    }
+    if (table === 'parent_children') {
+      if (admin) return state.parent_children
+      const row = parentFor(state, actor)
+      return row ? state.parent_children.filter((child) => child.parent_id === row.id) : []
     }
     if (table === 'pledges') {
-      if (actor.role === 'admin') return state.pledges
-      if (actor.role === 'lead') {
-        return state.pledges.filter((pledge) => pledge.stall_id === actor.stall_id && pledge.status !== 'removed')
-      }
-      const parent = parentFor(state, actor)
-      return parent ? state.pledges.filter((pledge) => pledge.parent_id === parent.id) : []
+      if (admin) return state.pledges
+      const row = parentFor(state, actor)
+      return row ? state.pledges.filter((pledge) => pledge.parent_id === row.id) : []
     }
     return []
   }
@@ -348,12 +356,13 @@ export function createDemoClient({ storage, getActor, seed }) {
       if (actor.role !== 'admin') return denied()
       const person = normalizePerson(stateSpec.payload)
       if (person.error) return denied(person.error)
+      if (person.row.role !== 'admin') return denied('Only PTC admins can sign in.')
       if (state.allowlist.some((item) => item.email === person.row.email)) {
         return deniedObject('23505', 'That email is already on the list.')
       }
       state.allowlist.push(person.row)
       save(state)
-      return ok(null)
+      return finish([person.row])
     }
 
     if (stateSpec.table === 'allowlist' && stateSpec.op === 'update') {
@@ -362,6 +371,7 @@ export function createDemoClient({ storage, getActor, seed }) {
       if (index < 0) return ok(null)
       const merged = normalizePerson({ ...state.allowlist[index], ...stateSpec.payload, id: state.allowlist[index].id })
       if (merged.error) return denied(merged.error)
+      if (merged.row.role !== 'admin') return denied('Only PTC admins can sign in.')
       const admins = state.allowlist.filter((item) => item.role === 'admin' && item.id !== merged.row.id)
       if (state.allowlist[index].role === 'admin' && merged.row.role !== 'admin' && admins.length === 0) {
         return denied('The list needs at least one admin')
@@ -423,6 +433,7 @@ export function createDemoClient({ storage, getActor, seed }) {
         status: 'active',
         removed_reason: null,
         removed_by: null,
+        created_at: stateSpec.payload.created_at || new Date().toISOString(),
       }
       const problem = pledgeError(state, actor, row)
       if (problem) return denied(problem)
@@ -449,6 +460,75 @@ export function createDemoClient({ storage, getActor, seed }) {
       }
       save(state)
       return finish(nextRows)
+    }
+
+    if (stateSpec.table === 'notification_settings' && stateSpec.op === 'update') {
+      if (actor.role !== 'admin') return denied()
+      state.notification_settings[0] = { ...state.notification_settings[0], ...stateSpec.payload }
+      save(state)
+      return finish(state.notification_settings.filter(match))
+    }
+
+    if (stateSpec.table === 'stall_contacts' && (stateSpec.op === 'insert' || stateSpec.op === 'update')) {
+      if (actor.role !== 'admin') return denied()
+      if (stateSpec.op === 'insert') {
+        const person = normalizeContact(stateSpec.payload)
+        if (person.error) return denied(person.error)
+        if (slotTaken(state.stall_contacts, person.row)) return denied(slotMessage(person.row.role))
+        state.stall_contacts.push(person.row)
+        save(state)
+        return finish([person.row])
+      }
+      const index = state.stall_contacts.findIndex(match)
+      if (index < 0) return ok(null)
+      const person = normalizeContact({ ...state.stall_contacts[index], ...stateSpec.payload, id: state.stall_contacts[index].id })
+      if (person.error) return denied(person.error)
+      if (slotTaken(state.stall_contacts, person.row)) return denied(slotMessage(person.row.role))
+      state.stall_contacts[index] = person.row
+      save(state)
+      return ok(null)
+    }
+
+    if (stateSpec.table === 'stall_contacts' && stateSpec.op === 'delete') {
+      if (actor.role !== 'admin') return denied()
+      const ids = new Set(state.stall_contacts.filter(match).map((item) => item.id))
+      state.stall_contacts = state.stall_contacts.filter((item) => !ids.has(item.id))
+      save(state)
+      return ok(null)
+    }
+
+    if (stateSpec.table === 'parent_children' && stateSpec.op === 'insert') {
+      if (actor.role !== 'admin' && actor.role !== 'parent') return denied()
+      const owner = actor.role === 'parent' ? parentFor(state, actor) : null
+      const incoming = Array.isArray(stateSpec.payload) ? stateSpec.payload : [stateSpec.payload]
+      const stored = []
+      for (const item of incoming) {
+        if (actor.role === 'parent' && item.parent_id !== owner?.id) return denied()
+        const row = {
+          id: item.id || randomId(),
+          parent_id: item.parent_id,
+          child_name: String(item.child_name || '').trim(),
+          year_group: String(item.year_group || '').trim(),
+          section: String(item.section || '').trim().toUpperCase(),
+          sort_order: Number(item.sort_order) || stored.length + 1,
+        }
+        state.parent_children.push(row)
+        stored.push(row)
+      }
+      save(state)
+      return finish(stored)
+    }
+
+    if (stateSpec.table === 'parent_children' && stateSpec.op === 'delete') {
+      if (actor.role !== 'admin' && actor.role !== 'parent') return denied()
+      const owner = actor.role === 'parent' ? parentFor(state, actor) : null
+      state.parent_children = state.parent_children.filter((child) => {
+        if (!match(child)) return true
+        if (actor.role === 'parent' && child.parent_id !== owner?.id) return true
+        return false
+      })
+      save(state)
+      return ok(null)
     }
 
     if (stateSpec.table === 'allowlist' && stateSpec.op === 'delete') {
@@ -592,12 +672,33 @@ function pick(row, cols) {
   return out
 }
 
+function normalizeContact(input) {
+  const email = String(input.email || '').trim().toLowerCase()
+  if (!email.includes('@')) return { error: 'Enter an email address.' }
+  const role = input.role === 'food_coordinator' ? 'food_coordinator' : 'lead'
+  if (!input.stall_id) return { error: 'Choose a stall' }
+  return {
+    row: {
+      id: input.id || randomId(),
+      email,
+      role,
+      stall_id: input.stall_id,
+      display_name: String(input.display_name || '').trim(),
+      phone: String(input.phone || '').trim(),
+    },
+  }
+}
+
 function normalizePerson(input) {
   const email = String(input.email || '').trim().toLowerCase()
   if (!email.includes('@')) return { error: 'Enter an email address.' }
-  const role = input.role === 'admin' ? 'admin' : 'lead'
+  const role = input.role === 'food_coordinator'
+    ? 'food_coordinator'
+    : input.role === 'admin'
+      ? 'admin'
+      : 'lead'
   const stallId = role === 'admin' ? null : (input.stall_id || null)
-  if (role === 'lead' && !stallId) return { error: 'A lead must be assigned a stall' }
+  if (role !== 'admin' && !stallId) return { error: 'Choose a stall' }
   return {
     row: {
       id: input.id || (globalThis.crypto?.randomUUID?.() || `person-${Date.now()}`),
@@ -605,8 +706,20 @@ function normalizePerson(input) {
       role,
       stall_id: stallId,
       display_name: String(input.display_name || '').trim(),
+      phone: String(input.phone || '').trim(),
     },
   }
+}
+
+function slotTaken(people, row) {
+  if (!row.stall_id || (row.role !== 'lead' && row.role !== 'food_coordinator')) return false
+  return people.some((item) => item.id !== row.id && item.stall_id === row.stall_id && item.role === row.role)
+}
+
+function slotMessage(role) {
+  return role === 'food_coordinator'
+    ? 'This stall already has a food coordinator'
+    : 'This stall already has a lead'
 }
 
 function deniedObject(code, message) {

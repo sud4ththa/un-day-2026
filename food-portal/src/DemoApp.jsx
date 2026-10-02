@@ -1,20 +1,17 @@
 import { useState } from 'react'
 import { setDemoActor } from './lib/demoClient.js'
 import { DEMO_BANNER, demoActor, demoActorOptions } from './lib/demoMode.js'
-import { demoSeed } from './lib/demoSeed.js'
 import { Portal } from './Portal.jsx'
 
 export function DemoApp({ initialActor = 'admin' }) {
   const [actorId, setActorId] = useState(initialActor)
   const [stallId, setStallId] = useState(null)
-  const [preview, setPreview] = useState(null)
-  const actor = demoActor(actorId, demoSeed.stalls)
+  const actor = demoActor(actorId)
   setDemoActor(actor)
 
   function pick(id) {
     setActorId(id)
-    setPreview(null)
-    setStallId(id === 'admin' || id === 'parent' ? null : id)
+    setStallId(null)
   }
 
   return (
@@ -24,7 +21,7 @@ export function DemoApp({ initialActor = 'admin' }) {
         <label className="demo-pick">
           <span>Try as</span>
           <select aria-label="Try as" value={actorId} onChange={(event) => pick(event.target.value)}>
-            {demoActorOptions(demoSeed.stalls).map((option) => (
+            {demoActorOptions().map((option) => (
               <option key={option.id} value={option.id}>{option.label}</option>
             ))}
           </select>
@@ -34,8 +31,6 @@ export function DemoApp({ initialActor = 'admin' }) {
         profile={actor}
         stallId={stallId}
         setStallId={setStallId}
-        preview={preview}
-        setPreview={setPreview}
       />
     </>
   )

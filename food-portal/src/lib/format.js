@@ -44,6 +44,9 @@ export function friendlySaveError(error) {
   if (/locked/i.test(msg)) return 'The PTC has locked this stall, so this change was not saved.'
   if (/row-level security/i.test(msg) || error?.code === '42501') return 'This change was not allowed.'
   if (/at least one admin/i.test(msg)) return 'The list needs at least one admin.'
+  if (/already has a lead/i.test(msg)) return 'This stall already has a lead. Replace them instead.'
+  if (/already has a food coordinator/i.test(msg)) return 'This stall already has a food coordinator. Replace them instead.'
+  if (/one_slot_per_stall/i.test(msg)) return 'This stall already has someone in that slot. Replace them instead.'
   if (error?.code === '23505') return 'That email is already on the list.'
   if (/must be assigned/i.test(msg)) return 'Choose a stall for this lead.'
   if (/still needed/i.test(msg)) return msg.replace(/^.*?(Only \d+ still needed).*$/i, '$1')
