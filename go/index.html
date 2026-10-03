@@ -67,9 +67,9 @@
   </main>
 </noscript>
 <main id="app">
-  <p class="kicker">BSC UN Day 2026, the PTC</p>
-  <h1 id="title">Contribution form</h1>
-  <p class="lead" id="message">Opening the form…</p>
+  <p class="kicker hidden" id="kicker">BSC UN Day 2026, the PTC</p>
+  <h1 id="title" class="hidden">Contribution form</h1>
+  <p class="lead" id="message">Please use the form link from your email.</p>
   <p id="actions" class="hidden"><a id="continue" class="continue" href="">Continue to form</a></p>
   <ul id="list" class="stalls hidden"></ul>
 </main>
@@ -82,6 +82,11 @@
   var actionsEl = document.getElementById("actions");
   var continueEl = document.getElementById("continue");
   var listEl = document.getElementById("list");
+
+  if (!REQUESTED) return;
+  document.getElementById("kicker").classList.remove("hidden");
+  titleEl.classList.remove("hidden");
+  messageEl.textContent = "Opening the form…";
 
   function parse(text) {
     var stalls = [];
@@ -146,10 +151,6 @@
     })
     .then(function (text) {
       var stalls = parse(text);
-      if (!REQUESTED) {
-        showList(stalls, "Contribution forms", "Choose a stall.");
-        return;
-      }
       var match = null;
       for (var i = 0; i < stalls.length; i++) {
         if (stalls[i].slug === REQUESTED) {
