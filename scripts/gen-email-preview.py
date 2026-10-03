@@ -12,27 +12,26 @@ ROOT = Path(__file__).resolve().parent.parent
 OUT = ROOT / "email-preview" / "index.html"
 
 CELL = "border:1px solid #111;padding:6px 10px;vertical-align:top"
-P = "margin:0 0 14px"
+P = "margin:0 0 14px;"
 EMAIL_STYLE = (
     "max-width:640px;margin:0 auto;font-family:Georgia,'Times New Roman',serif;"
     "color:#111;font-size:15px;line-height:1.55"
 )
 
 ROWS = [
-    ("Playgroup / Reception", "Sri Lanka", "sri-lanka"),
-    ("Nursery/Year 1", "Japan", "japan"),
+    ("Playgroup and Reception", "Sri Lanka", "sri-lanka"),
+    ("Nursery and Year 1", "Japan", "japan"),
     ("Year 2", "Australia/Philippines/Indonesia/New Zealand", "australia"),
-    ("Year 3", "Singapore/Malaysia/Thailand", "sea"),
+    ("Year 3", "Singapore/Malaysia/Vietnam", "sea"),
     ("Year 4", "The Americas/Canada", "americas"),
-    ("Year 5", "Middle East", "middle-east"),
+    ("Year 5", "Middle East and Palestine", "middle-east"),
     ("Year 6", "Europe", "europe"),
     ("Year 7", "India", "india"),
-    ("Year 8", "UN Zone and Palestine", "un-zone"),
+    ("Year 8", "Middle East and Palestine", "middle-east"),
     ("Year 9", "China", "china"),
     ("Year 10", "Maldives", "maldives"),
     ("Year 11", "India", "india"),
-    ("Year 12", "China", "china"),
-    ("Year 13", "UN Zone and Palestine", "un-zone"),
+    ("Year 12 and Year 13", "China", "china"),
 ]
 
 
@@ -71,34 +70,38 @@ def table() -> str:
 
 def email_html() -> str:
     before = [
+        paragraph("Friday 2nd October 2026"),
+        paragraph(
+            "<em>Please note that this is a repeat of the letter sent last Friday about our upcoming UN Day. It now includes the FORM links to all the countries for the purpose of parent contributions.</em>"
+        ),
         paragraph("Dear Parents,"),
         paragraph("<strong>UN Day \u2013 Friday 16th October 2026</strong>"),
         paragraph(
             "I write about our upcoming UN Day, one of the most highly anticipated days of the school year."
         ),
         paragraph(
-            "This will be a fantastic opportunity for students from across the school to learn about the role of and the importance of the UN; the Convention on the Rights of the Child; the ways that conflict are impacting their peers globally as well as how we can support children in Sri Lanka. These educational aspects will come through assemblies and through curriculum time both on our UN Day itself as well as on the build up to it."
+            "With Peace as the central theme of our UN Day this year, students will explore the important role of the United Nations and, in an age-appropriate way, how conflict and struggle are affecting children around the world. Through assemblies, curriculum learning and our UN Zone, we hope to build awareness and empathy, while encouraging students to consider how we can all contribute to building a more peaceful, compassionate world."
         ),
         paragraph(
-            "The day will of course also be a wonderful celebration of the diversity and culture within our community and students will enjoy having the opportunity to continue their learning, and discover foods and games from around the world by exploring the stalls organised by our wonderful parents."
+            "UN Day will, of course, also be a wonderful celebration of the rich diversity and cultures within our BSC community, with students enjoying food, games and experiences from around the world through the stalls organised by our wonderful parents. This much-loved event simply would not be possible without the many parents who generously volunteer their time, both in the build-up and on the day itself, as well as those who contribute food and other donations."
         ),
         paragraph(
-            "This loved event would not be possible each year without the support of those who volunteer their hours of time leading up to the event as well as on the day and send in food donations."
+            "Thank you, as always, for helping us make UN Day such a special occasion for our children. It takes the whole community to come together and provide such a happy experience."
         ),
-        paragraph("<strong>My sincere thanks to everyone involved.</strong>"),
+        paragraph("<strong>My sincere thanks to all families in advance of your food donations.</strong>"),
     ]
     after = [
         paragraph(
-            "Please note that the food donations are organised by our amazing parent volunteers so please direct any questions to the parent contacts on the FORM that will be sent early next week."
+            "Please note that the food donations are sent by all parents but organised by our amazing parent volunteers so please direct any questions to the parent contacts on the FORM that will be sent early next week."
         ),
         paragraph(
-            "On UN Day, please send your child to school with an empty food box so that they can collect some treats from each stall they visit in addition to their usual lunch. If your child has allergies or dietary requirements, please ensure that their class teacher/form tutor is aware."
+            "On UN Day, please send your child to school with an empty food box and cutlery so that they can collect some treats from each stall they visit in addition to their usual lunch. If your child has allergies or dietary requirements, please ensure that their class teacher/form tutor is aware."
         ),
         paragraph(
             "All children across the school are invited to wear the national dress of a country to which they are affiliated or their formal BSC uniform. Please ensure that the national dress of any and every country is respectful and worn properly. This is not \u201cfancy dress\u201d but a reflection of our children\u2019s international identity."
         ),
         paragraph("With my best wishes,"),
-        paragraph("Mrs Hannah Wells, Principal"),
+        paragraph("Mrs Hannah Wells<br>Principal"),
     ]
     inner = "\n".join(before) + "\n" + table() + "\n" + "\n".join(after)
     return f'<div id="email" style="{EMAIL_STYLE}">\n{inner}\n</div>'
@@ -147,7 +150,7 @@ PAGE = """<!DOCTYPE html>
 </head>
 <body>
 <div class="bar">
-  <p>Draft email preview, not sent. Based on the 2025 letter, with 2026 year groups and form links.</p>
+  <p>Draft email preview, not sent. The Principal\u2019s 2 Oct 2026 letter with FORM links added, in last year\u2019s format.</p>
   <button type="button" id="copy-email">Copy email</button>
   <button type="button" id="copy-source">Copy HTML source</button>
   <span id="status" role="status"></span>
