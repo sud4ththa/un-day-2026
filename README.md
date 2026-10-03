@@ -40,6 +40,37 @@ To add a brand-new stall, add its line to `links.txt` and (optionally) an entry 
 `STALL_FLAGS` at the top of `app.js`, e.g. `"Korea": [["kr", "South Korea"]]`, plus the
 matching `flags/kr.svg` from flag-icons (`flags/4x3/kr.svg`).
 
+## Contribution form short links
+
+Parents can open a stall's contribution form from a short link. The address of each form lives only in **`forms.txt`**. One stall per line:
+
+```
+slug | Stall name |
+slug | Stall name | https://…
+```
+
+Leave the third column blank until the form is ready. Lines starting with `#` are comments.
+
+To publish or change a form URL, edit that third column and commit. The short links read `forms.txt` when someone opens them, so no other file needs to change.
+
+Short links (GitHub Pages):
+
+- `https://sud4ththa.github.io/un-day-2026/go/<slug>/`
+- `https://sud4ththa.github.io/un-day-2026/go/?s=<slug>` does the same thing
+- `https://sud4ththa.github.io/un-day-2026/go/` lists every stall
+
+A blank URL shows a holding page. An `https://` URL replaces the page with the form. The pages also show a "Continue to form" link once the address is known, in case the redirect is blocked.
+
+To add or remove a stall, add or delete its line in `forms.txt`, then regenerate the folders:
+
+```
+python3 scripts/gen-go.py
+```
+
+Do not edit files under `go/` by hand. The script rewrites them from the slugs in `forms.txt` and does not copy form URLs into them.
+
+Those pages request `/un-day-2026/forms.txt`. To preview them, serve the parent of this repo while the repo folder is named `un-day-2026`, then open `http://localhost:8000/un-day-2026/go/sri-lanka/`.
+
 ## Previewing locally
 
 `app.js` uses `fetch()` to read `links.txt`, which browsers block for pages opened directly

@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>BSC UN Day 2026</title>
+<style>
+  :root { color-scheme: light; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; min-height: 100%; }
+  body {
+    background: #fff;
+    color: #111;
+    font-family: Palatino, "Palatino Linotype", Georgia, serif;
+    border-top: 4px solid #111;
+  }
+  main {
+    max-width: 36rem;
+    margin: 0 auto;
+    padding: 4.5rem 1.5rem 3rem;
+  }
+  .kicker {
+    font-family: system-ui, -apple-system, sans-serif;
+    font-size: 0.8rem;
+    letter-spacing: 0.04em;
+    margin: 0 0 1.25rem;
+  }
+  h1 {
+    font-weight: normal;
+    font-size: 2.25rem;
+    line-height: 1.15;
+    margin: 0 0 1.25rem;
+  }
+  .lead {
+    font-family: system-ui, -apple-system, sans-serif;
+    font-size: 1.05rem;
+    line-height: 1.55;
+    margin: 0 0 2rem;
+  }
+  a.continue {
+    font-family: system-ui, -apple-system, sans-serif;
+    color: #111;
+    border-bottom: 1px solid #111;
+    text-decoration: none;
+    padding-bottom: 0.1rem;
+  }
+  ul.stalls { list-style: none; padding: 0; margin: 0; }
+  ul.stalls li { border-top: 1px solid #111; }
+  ul.stalls li:last-child { border-bottom: 1px solid #111; }
+  ul.stalls a {
+    display: block;
+    padding: 0.9rem 0;
+    color: #111;
+    text-decoration: none;
+    font-family: system-ui, -apple-system, sans-serif;
+  }
+  .hidden { display: none; }
+</style>
+</head>
+<body>
+<noscript>
+  <style>#app { display: none; }</style>
+  <main>
+    <p class="kicker">BSC UN Day 2026, the PTC</p>
+    <h1>Contribution form</h1>
+    <p class="lead">JavaScript is required to open this form. The address is read from the form list when the page loads.</p>
+  </main>
+</noscript>
+<main id="app">
+  <p class="kicker">BSC UN Day 2026, the PTC</p>
+  <h1 id="title">Contribution form</h1>
+  <p class="lead" id="message">Opening the form…</p>
+  <p id="actions" class="hidden"><a id="continue" class="continue" href="">Continue to form</a></p>
+  <ul id="list" class="stalls hidden"></ul>
+</main>
+<script>
+(function () {
+  var BASE = "/un-day-2026";
+  var REQUESTED = "china";
+  var titleEl = document.getElementById("title");
+  var messageEl = document.getElementById("message");
+  var actionsEl = document.getElementById("actions");
+  var continueEl = document.getElementById("continue");
+  var listEl = document.getElementById("list");
+
+  function parse(text) {
+    var stalls = [];
+    text.split(/\r?\n/).forEach(function (raw) {
+      var line = raw.trim();
+      if (!line || line.charAt(0) === "#") return;
+      var parts = line.split("|");
+      if (parts.length < 2) return;
+      var slug = parts[0].trim();
+      var name = parts[1].trim();
+      var url = parts.slice(2).join("|").trim();
+      if (!slug || !name) return;
+      stalls.push({ slug: slug, name: name, url: url });
+    });
+    return stalls;
+  }
+
+  function showList(stalls, heading, message) {
+    titleEl.textContent = heading;
+    messageEl.textContent = message;
+    document.title = heading + " · BSC UN Day 2026";
+    listEl.textContent = "";
+    stalls.forEach(function (stall) {
+      var li = document.createElement("li");
+      var a = document.createElement("a");
+      a.href = BASE + "/go/" + encodeURIComponent(stall.slug) + "/";
+      a.textContent = stall.name;
+      li.appendChild(a);
+      listEl.appendChild(li);
+    });
+    listEl.classList.remove("hidden");
+  }
+
+  function showSoon(name) {
+    titleEl.textContent = name;
+    messageEl.textContent = "This contribution form opens soon. Please check back later.";
+    document.title = name + " · BSC UN Day 2026";
+  }
+
+  function openForm(stall) {
+    titleEl.textContent = stall.name;
+    document.title = stall.name + " · BSC UN Day 2026";
+    if (stall.url.indexOf("https://") === 0) {
+      messageEl.textContent = "Opening the form…";
+      continueEl.href = stall.url;
+      actionsEl.classList.remove("hidden");
+      window.location.replace(stall.url);
+      return;
+    }
+    showSoon(stall.name);
+  }
+
+  function fail() {
+    titleEl.textContent = "Contribution form";
+    messageEl.textContent = "The form list could not be loaded. Please check back later.";
+  }
+
+  fetch(BASE + "/forms.txt?t=" + Date.now(), { cache: "no-store" })
+    .then(function (res) {
+      if (!res.ok) throw new Error("bad status");
+      return res.text();
+    })
+    .then(function (text) {
+      var stalls = parse(text);
+      if (!REQUESTED) {
+        showList(stalls, "Contribution forms", "Choose a stall.");
+        return;
+      }
+      var match = null;
+      for (var i = 0; i < stalls.length; i++) {
+        if (stalls[i].slug === REQUESTED) {
+          match = stalls[i];
+          break;
+        }
+      }
+      if (!match) {
+        showList(
+          stalls,
+          "Stall not found",
+          "That short link does not match a stall. Choose one below."
+        );
+        return;
+      }
+      openForm(match);
+    })
+    .catch(fail);
+})();
+</script>
+</body>
+</html>
