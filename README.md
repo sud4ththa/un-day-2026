@@ -57,7 +57,7 @@ Short links (GitHub Pages):
 
 - `https://sud4ththa.github.io/un-day-2026/go/<slug>/`
 - `https://sud4ththa.github.io/un-day-2026/go/?s=<slug>` does the same thing
-- `https://sud4ththa.github.io/un-day-2026/go/` lists every stall
+- `https://sud4ththa.github.io/un-day-2026/go/` with no slug shows "Please use the form link from your email."
 
 A blank URL shows a holding page. An `https://` URL replaces the page with the form. The pages also show a "Continue to form" link once the address is known, in case the redirect is blocked.
 
@@ -70,6 +70,20 @@ python3 scripts/gen-go.py
 Do not edit files under `go/` by hand. The script rewrites them from the slugs in `forms.txt` and does not copy form URLs into them.
 
 Those pages request `/un-day-2026/forms.txt`. To preview them, serve the parent of this repo while the repo folder is named `un-day-2026`, then open `http://localhost:8000/un-day-2026/go/sri-lanka/`.
+
+## Click tracking (optional)
+
+Short links can record an anonymous tap. Tracking ships switched off.
+
+`tracker.txt` is comments, plus at most one line: the Apps Script web app address that ends in `/exec`. The UN Day menu's Web dashboard link shows that address. Leave the line out, as the file does now, to keep tracking off. Clearing it later switches tracking off again. The short links open either way.
+
+A tap sends the stall slug, a random id stored in that browser, a device type (mobile, tablet or desktop), and an optional source tag. No names and no form answers.
+
+The page waits at most 0.4 seconds for `tracker.txt`, then opens the form. It does not wait for the tracker itself. A missing or slow file still opens the form.
+
+Add `?src=` when you want to tell taps apart, for example `https://sud4ththa.github.io/un-day-2026/go/japan/?src=whatsapp`. The tag keeps letters, numbers, dots, underscores and hyphens, up to 24 characters.
+
+A holding page ("opens soon") and `/go/` with no slug send nothing.
 
 ## Previewing locally
 

@@ -76,12 +76,116 @@
 <script>
 (function () {
   var BASE = "/un-day-2026";
+  var TRACK_WAIT_MS = 400;
   var REQUESTED = "sri-lanka";
   var titleEl = document.getElementById("title");
   var messageEl = document.getElementById("message");
   var actionsEl = document.getElementById("actions");
   var continueEl = document.getElementById("continue");
   var listEl = document.getElementById("list");
+
+  
+
+  var trackerP = fetch(BASE + "/tracker.txt?t=" + Date.now(), { cache: "no-store" })
+    .then(function (res) {
+      if (!res.ok) return "";
+      return res.text();
+    })
+    .then(trackerEndpoint)
+    .catch(function () { return ""; });
+
+  function trackerEndpoint(text) {
+    var lines = String(text || "").split(/\r?\n/);
+    var i, line;
+    for (i = 0; i < lines.length; i++) {
+      line = lines[i].trim();
+      if (!line || line.charAt(0) === "#") continue;
+      return line.indexOf("https://") === 0 ? line : "";
+    }
+    return "";
+  }
+
+  function randomVid() {
+    var bytes = new Array(12);
+    var i;
+    try {
+      var buf = new Uint8Array(12);
+      crypto.getRandomValues(buf);
+      for (i = 0; i < 12; i++) bytes[i] = buf[i];
+    } catch (err) {
+      for (i = 0; i < 12; i++) bytes[i] = Math.floor(Math.random() * 256);
+    }
+    var hex = "";
+    for (i = 0; i < 12; i++) hex += ("0" + bytes[i].toString(16)).slice(-2);
+    return hex;
+  }
+
+  function visitorId() {
+    var key = "unday26.vid";
+    try {
+      var existing = localStorage.getItem(key);
+      if (existing && /^[A-Za-z0-9_-]{6,64}$/.test(existing)) return existing;
+      var id = randomVid();
+      try { localStorage.setItem(key, id); } catch (err) {}
+      return id;
+    } catch (err) {
+      return randomVid();
+    }
+  }
+
+  function deviceClass() {
+    var ua = navigator.userAgent || "";
+    if (/iPad|Tablet|PlayBook|Silk/i.test(ua)) return "tablet";
+    if (/Android/i.test(ua) && !/Mobile/i.test(ua)) return "tablet";
+    if (/Macintosh/i.test(ua) && navigator.maxTouchPoints > 1) return "tablet";
+    if (/Mobi|iPhone|iPod|Android|Windows Phone/i.test(ua)) return "mobile";
+    return "desktop";
+  }
+
+  function srcTag() {
+    var raw = new URLSearchParams(location.search).get("src") || "";
+    return raw.replace(/[^A-Za-z0-9_.-]/g, "").slice(0, 24);
+  }
+
+  function sendClick(endpoint, slug) {
+    if (!endpoint) return;
+    try {
+      var url = endpoint + "?t=click&s=" + encodeURIComponent(slug)
+        + "&v=" + encodeURIComponent(visitorId())
+        + "&d=" + encodeURIComponent(deviceClass());
+      var src = srcTag();
+      if (src) url += "&src=" + encodeURIComponent(src);
+      var sent = false;
+      try {
+        if (navigator.sendBeacon) sent = navigator.sendBeacon(url);
+      } catch (err) {}
+      if (!sent) {
+        try {
+          fetch(url, { method: "POST", mode: "no-cors", keepalive: true, credentials: "omit" });
+        } catch (err2) {}
+      }
+    } catch (err) {}
+  }
+
+  function withTracker(slug, redirect) {
+    var done = false;
+    function finish() {
+      if (done) return;
+      done = true;
+      redirect();
+    }
+    var timer = setTimeout(finish, TRACK_WAIT_MS);
+    trackerP.then(function (endpoint) {
+      if (done) return;
+      clearTimeout(timer);
+      sendClick(endpoint, slug);
+      finish();
+    }, function () {
+      if (done) return;
+      clearTimeout(timer);
+      finish();
+    });
+  }
 
   function parse(text) {
     var stalls = [];
@@ -128,7 +232,9 @@
       messageEl.textContent = "Opening the form…";
       continueEl.href = stall.url;
       actionsEl.classList.remove("hidden");
-      window.location.replace(stall.url);
+      withTracker(stall.slug, function () {
+        window.location.replace(stall.url);
+      });
       return;
     }
     showSoon(stall.name);
@@ -146,10 +252,6 @@
     })
     .then(function (text) {
       var stalls = parse(text);
-      if (!REQUESTED) {
-        showList(stalls, "Contribution forms", "Choose a stall.");
-        return;
-      }
       var match = null;
       for (var i = 0; i < stalls.length; i++) {
         if (stalls[i].slug === REQUESTED) {

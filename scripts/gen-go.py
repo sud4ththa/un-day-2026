@@ -21,6 +21,28 @@ FORMS = ROOT / "forms.txt"
 GO = ROOT / "go"
 SLUG_RE = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)*$")
 
+SLUG_MAIN = """<main id="app">
+  <p class="kicker">BSC UN Day 2026, the PTC</p>
+  <h1 id="title">Contribution form</h1>
+  <p class="lead" id="message">Opening the form…</p>
+  <p id="actions" class="hidden"><a id="continue" class="continue" href="">Continue to form</a></p>
+  <ul id="list" class="stalls hidden"></ul>
+</main>"""
+
+INDEX_MAIN = """<main id="app">
+  <p class="kicker hidden" id="kicker">BSC UN Day 2026, the PTC</p>
+  <h1 id="title" class="hidden">Contribution form</h1>
+  <p class="lead" id="message">Please use the form link from your email.</p>
+  <p id="actions" class="hidden"><a id="continue" class="continue" href="">Continue to form</a></p>
+  <ul id="list" class="stalls hidden"></ul>
+</main>"""
+
+INDEX_BOOT = """if (!REQUESTED) return;
+  document.getElementById("kicker").classList.remove("hidden");
+  titleEl.classList.remove("hidden");
+  messageEl.textContent = "Opening the form…";
+"""
+
 PAGE = """<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -89,22 +111,120 @@ PAGE = """<!DOCTYPE html>
     <p class="lead">JavaScript is required to open this form. The address is read from the form list when the page loads.</p>
   </main>
 </noscript>
-<main id="app">
-  <p class="kicker">BSC UN Day 2026, the PTC</p>
-  <h1 id="title">Contribution form</h1>
-  <p class="lead" id="message">Opening the form…</p>
-  <p id="actions" class="hidden"><a id="continue" class="continue" href="">Continue to form</a></p>
-  <ul id="list" class="stalls hidden"></ul>
-</main>
+__MAIN__
 <script>
 (function () {
   var BASE = "/un-day-2026";
+  var TRACK_WAIT_MS = 400;
   var REQUESTED = __REQUESTED__;
   var titleEl = document.getElementById("title");
   var messageEl = document.getElementById("message");
   var actionsEl = document.getElementById("actions");
   var continueEl = document.getElementById("continue");
   var listEl = document.getElementById("list");
+
+  __BOOT__
+
+  var trackerP = fetch(BASE + "/tracker.txt?t=" + Date.now(), { cache: "no-store" })
+    .then(function (res) {
+      if (!res.ok) return "";
+      return res.text();
+    })
+    .then(trackerEndpoint)
+    .catch(function () { return ""; });
+
+  function trackerEndpoint(text) {
+    var lines = String(text || "").split(/\\r?\\n/);
+    var i, line;
+    for (i = 0; i < lines.length; i++) {
+      line = lines[i].trim();
+      if (!line || line.charAt(0) === "#") continue;
+      return line.indexOf("https://") === 0 ? line : "";
+    }
+    return "";
+  }
+
+  function randomVid() {
+    var bytes = new Array(12);
+    var i;
+    try {
+      var buf = new Uint8Array(12);
+      crypto.getRandomValues(buf);
+      for (i = 0; i < 12; i++) bytes[i] = buf[i];
+    } catch (err) {
+      for (i = 0; i < 12; i++) bytes[i] = Math.floor(Math.random() * 256);
+    }
+    var hex = "";
+    for (i = 0; i < 12; i++) hex += ("0" + bytes[i].toString(16)).slice(-2);
+    return hex;
+  }
+
+  function visitorId() {
+    var key = "unday26.vid";
+    try {
+      var existing = localStorage.getItem(key);
+      if (existing && /^[A-Za-z0-9_-]{6,64}$/.test(existing)) return existing;
+      var id = randomVid();
+      try { localStorage.setItem(key, id); } catch (err) {}
+      return id;
+    } catch (err) {
+      return randomVid();
+    }
+  }
+
+  function deviceClass() {
+    var ua = navigator.userAgent || "";
+    if (/iPad|Tablet|PlayBook|Silk/i.test(ua)) return "tablet";
+    if (/Android/i.test(ua) && !/Mobile/i.test(ua)) return "tablet";
+    if (/Macintosh/i.test(ua) && navigator.maxTouchPoints > 1) return "tablet";
+    if (/Mobi|iPhone|iPod|Android|Windows Phone/i.test(ua)) return "mobile";
+    return "desktop";
+  }
+
+  function srcTag() {
+    var raw = new URLSearchParams(location.search).get("src") || "";
+    return raw.replace(/[^A-Za-z0-9_.-]/g, "").slice(0, 24);
+  }
+
+  function sendClick(endpoint, slug) {
+    if (!endpoint) return;
+    try {
+      var url = endpoint + "?t=click&s=" + encodeURIComponent(slug)
+        + "&v=" + encodeURIComponent(visitorId())
+        + "&d=" + encodeURIComponent(deviceClass());
+      var src = srcTag();
+      if (src) url += "&src=" + encodeURIComponent(src);
+      var sent = false;
+      try {
+        if (navigator.sendBeacon) sent = navigator.sendBeacon(url);
+      } catch (err) {}
+      if (!sent) {
+        try {
+          fetch(url, { method: "POST", mode: "no-cors", keepalive: true, credentials: "omit" });
+        } catch (err2) {}
+      }
+    } catch (err) {}
+  }
+
+  function withTracker(slug, redirect) {
+    var done = false;
+    function finish() {
+      if (done) return;
+      done = true;
+      redirect();
+    }
+    var timer = setTimeout(finish, TRACK_WAIT_MS);
+    trackerP.then(function (endpoint) {
+      if (done) return;
+      clearTimeout(timer);
+      sendClick(endpoint, slug);
+      finish();
+    }, function () {
+      if (done) return;
+      clearTimeout(timer);
+      finish();
+    });
+  }
 
   function parse(text) {
     var stalls = [];
@@ -151,7 +271,9 @@ PAGE = """<!DOCTYPE html>
       messageEl.textContent = "Opening the form…";
       continueEl.href = stall.url;
       actionsEl.classList.remove("hidden");
-      window.location.replace(stall.url);
+      withTracker(stall.slug, function () {
+        window.location.replace(stall.url);
+      });
       return;
     }
     showSoon(stall.name);
@@ -169,10 +291,6 @@ PAGE = """<!DOCTYPE html>
     })
     .then(function (text) {
       var stalls = parse(text);
-      if (!REQUESTED) {
-        showList(stalls, "Contribution forms", "Choose a stall.");
-        return;
-      }
       var match = null;
       for (var i = 0; i < stalls.length; i++) {
         if (stalls[i].slug === REQUESTED) {
@@ -220,9 +338,13 @@ def parse_slugs(text: str) -> list[str]:
     return slugs
 
 
-def render(requested: str) -> str:
-    page = PAGE.replace("__REQUESTED__", requested)
-    if "__REQUESTED__" in page:
+def render(requested: str, *, index: bool) -> str:
+    page = (
+        PAGE.replace("__MAIN__", INDEX_MAIN if index else SLUG_MAIN)
+        .replace("__BOOT__", INDEX_BOOT if index else "")
+        .replace("__REQUESTED__", requested)
+    )
+    if "__" in page:
         raise SystemExit("page template was not filled in")
     if re.search(r"https://[A-Za-z0-9]", page):
         raise SystemExit("generated page contains a URL; form addresses belong only in forms.txt")
@@ -236,10 +358,10 @@ def main() -> None:
     for slug in slugs:
         folder = GO / slug
         folder.mkdir(parents=True)
-        (folder / "index.html").write_text(render(json.dumps(slug)), encoding="utf-8")
+        (folder / "index.html").write_text(render(json.dumps(slug), index=False), encoding="utf-8")
     GO.mkdir(exist_ok=True)
     (GO / "index.html").write_text(
-        render('(new URLSearchParams(location.search).get("s") || "").trim()'),
+        render('(new URLSearchParams(location.search).get("s") || "").trim()', index=True),
         encoding="utf-8",
     )
     print(f"wrote {len(slugs)} short links and go/index.html")
