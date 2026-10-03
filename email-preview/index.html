@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Draft email preview, not sent</title>
+<style>
+  body { margin: 0; background: #fff; color: #111; }
+  .bar {
+    position: sticky;
+    top: 0;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px 12px;
+    padding: 10px 16px;
+    background: #fff;
+    color: #111;
+    border-bottom: 1px solid #111;
+    font-family: system-ui, -apple-system, sans-serif;
+    font-size: 14px;
+    line-height: 1.3;
+  }
+  .bar p { margin: 0; flex: 1 1 12rem; }
+  .bar button {
+    background: #fff;
+    color: #111;
+    border: 1px solid #111;
+    padding: 6px 10px;
+    font: inherit;
+    cursor: pointer;
+  }
+  .bar button:focus-visible { outline: 2px solid #111; outline-offset: 2px; }
+  .bar #status { min-width: 4.5rem; }
+  .sheet { padding: 28px 16px 64px; }
+</style>
+</head>
+<body>
+<div class="bar">
+  <p>Draft email preview, not sent</p>
+  <button type="button" id="copy-email">Copy email</button>
+  <button type="button" id="copy-source">Copy HTML source</button>
+  <span id="status" role="status"></span>
+</div>
+<div class="sheet">
+<!-- COPY -->
+<div style="max-width:600px;margin:0 auto;font-family:Georgia,'Times New Roman',serif;color:#111;font-size:16px;line-height:1.6;">
+<p style="font-size:13px;letter-spacing:2px;text-transform:uppercase;color:#555;margin:0 0 4px;">BSC UN Day 2026 &middot; Friday 16 October</p>
+<h1 style="font-size:26px;font-weight:normal;margin:0 0 20px;border-bottom:1px solid #111;padding-bottom:12px;">Help your child's stall shine</h1>
+<p>Dear Parents,</p>
+<p>Thank you for supporting UN Day. Each year group runs a country stall, and we're asking every family to contribute either <strong>a dish</strong> or <strong>money</strong> towards their stall.</p>
+<p>Please use the link for your child's year group below. It takes about two minutes.</p>
+<table role="presentation" cellpadding="0" cellspacing="0" style="width:100%;border-collapse:collapse;margin:20px 0;font-size:15px;">
+<tr><td style="padding:8px 0;border-bottom:1px solid #ddd;width:45%;">Playgroup &amp; Reception</td><td style="padding:8px 0;border-bottom:1px solid #ddd;"><a href="https://sud4ththa.github.io/un-day-2026/go/sri-lanka/" style="color:#111;">Sri Lanka</a></td></tr>
+<tr><td style="padding:8px 0;border-bottom:1px solid #ddd;width:45%;">Nursery &amp; Year 1</td><td style="padding:8px 0;border-bottom:1px solid #ddd;"><a href="https://sud4ththa.github.io/un-day-2026/go/japan/" style="color:#111;">Japan</a></td></tr>
+<tr><td style="padding:8px 0;border-bottom:1px solid #ddd;width:45%;">Year 2</td><td style="padding:8px 0;border-bottom:1px solid #ddd;"><a href="https://sud4ththa.github.io/un-day-2026/go/australia/" style="color:#111;">Australia / NZ / Philippines / Indonesia</a></td></tr>
+<tr><td style="padding:8px 0;border-bottom:1px solid #ddd;width:45%;">Year 3</td><td style="padding:8px 0;border-bottom:1px solid #ddd;"><a href="https://sud4ththa.github.io/un-day-2026/go/sea/" style="color:#111;">Singapore / Malaysia / Thailand</a></td></tr>
+<tr><td style="padding:8px 0;border-bottom:1px solid #ddd;width:45%;">Year 4</td><td style="padding:8px 0;border-bottom:1px solid #ddd;"><a href="https://sud4ththa.github.io/un-day-2026/go/americas/" style="color:#111;">USA / Canada</a></td></tr>
+<tr><td style="padding:8px 0;border-bottom:1px solid #ddd;width:45%;">Year 5</td><td style="padding:8px 0;border-bottom:1px solid #ddd;"><a href="https://sud4ththa.github.io/un-day-2026/go/middle-east/" style="color:#111;">Middle East</a></td></tr>
+<tr><td style="padding:8px 0;border-bottom:1px solid #ddd;width:45%;">Year 6</td><td style="padding:8px 0;border-bottom:1px solid #ddd;"><a href="https://sud4ththa.github.io/un-day-2026/go/europe/" style="color:#111;">Europe</a></td></tr>
+<tr><td style="padding:8px 0;border-bottom:1px solid #ddd;width:45%;">Years 7 &amp; 11</td><td style="padding:8px 0;border-bottom:1px solid #ddd;"><a href="https://sud4ththa.github.io/un-day-2026/go/india/" style="color:#111;">India</a></td></tr>
+<tr><td style="padding:8px 0;border-bottom:1px solid #ddd;width:45%;">Years 8 &amp; 13</td><td style="padding:8px 0;border-bottom:1px solid #ddd;"><a href="https://sud4ththa.github.io/un-day-2026/go/un-zone/" style="color:#111;">UN Zone / Palestine</a></td></tr>
+<tr><td style="padding:8px 0;border-bottom:1px solid #ddd;width:45%;">Years 9 &amp; 12</td><td style="padding:8px 0;border-bottom:1px solid #ddd;"><a href="https://sud4ththa.github.io/un-day-2026/go/china/" style="color:#111;">China</a></td></tr>
+<tr><td style="padding:8px 0;border-bottom:1px solid #ddd;width:45%;">Year 10</td><td style="padding:8px 0;border-bottom:1px solid #ddd;"><a href="https://sud4ththa.github.io/un-day-2026/go/maldives/" style="color:#111;">Maldives</a></td></tr>
+</table>
+<h2 style="font-size:18px;font-weight:normal;margin:24px 0 8px;">If you're giving money</h2>
+<p style="margin:0 0 12px;">We suggest <strong>[AMOUNT TBC]</strong> per family, though any amount helps. Payment: <strong>[PAYMENT METHOD TBC]</strong>.</p>
+<h2 style="font-size:18px;font-weight:normal;margin:24px 0 8px;">If you're bringing a dish</h2>
+<ul style="margin:0 0 12px;padding-left:20px;">
+<li>Choose from your stall's dish list on the form so we don't end up with duplicates.</li>
+<li>Please label it clearly: vegetarian, vegan, halal, and any allergens (nuts, dairy, gluten, egg).</li>
+<li>Please avoid single-use plastic packaging.</li>
+<li>Drop-off: <strong>[TIME AND PLACE TBC]</strong> on Friday 16 October.</li>
+</ul>
+<p style="margin-top:24px;">Please fill in the form by <strong>[DEADLINE TBC]</strong>. If you have any questions, your stall lead or the PTC will be glad to help.</p>
+<p>Thank you,<br>The PTC<br><span style="color:#555;">The British School in Colombo Parent Collective</span></p>
+</div>
+<!-- /COPY -->
+</div>
+<script>
+(function () {
+  var statusEl = document.getElementById("status");
+
+  function emailEl() {
+    var walker = document.createTreeWalker(document.body, NodeFilter.SHOW_COMMENT);
+    var node;
+    while ((node = walker.nextNode())) {
+      if (node.nodeValue.trim() === "COPY") return node.nextElementSibling;
+    }
+    return null;
+  }
+
+  function setStatus(text) {
+    statusEl.textContent = text;
+  }
+
+  function selectCopy(el) {
+    var range = document.createRange();
+    range.selectNode(el);
+    var selection = window.getSelection();
+    selection.removeAllRanges();
+    selection.addRange(range);
+    var ok = document.execCommand("copy");
+    selection.removeAllRanges();
+    if (!ok) throw new Error("copy failed");
+  }
+
+  function sourceCopy(text) {
+    var area = document.createElement("textarea");
+    area.value = text;
+    area.setAttribute("readonly", "");
+    area.style.position = "fixed";
+    area.style.top = "0";
+    area.style.left = "-9999px";
+    document.body.appendChild(area);
+    area.select();
+    var ok = document.execCommand("copy");
+    document.body.removeChild(area);
+    if (!ok) throw new Error("copy failed");
+  }
+
+  document.getElementById("copy-email").addEventListener("click", function () {
+    var el = emailEl();
+    var html = el.outerHTML;
+    var text = el.innerText;
+    if (navigator.clipboard && window.ClipboardItem) {
+      navigator.clipboard.write([
+        new ClipboardItem({
+          "text/html": new Blob([html], { type: "text/html" }),
+          "text/plain": new Blob([text], { type: "text/plain" })
+        })
+      ]).then(function () {
+        setStatus("Copied");
+      }, function () {
+        try {
+          selectCopy(el);
+          setStatus("Copied");
+        } catch (err) {
+          setStatus("Copy failed");
+        }
+      });
+      return;
+    }
+    try {
+      selectCopy(el);
+      setStatus("Copied");
+    } catch (err) {
+      setStatus("Copy failed");
+    }
+  });
+
+  document.getElementById("copy-source").addEventListener("click", function () {
+    var html = emailEl().outerHTML;
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(html).then(function () {
+        setStatus("Copied");
+      }, function () {
+        try {
+          sourceCopy(html);
+          setStatus("Copied");
+        } catch (err) {
+          setStatus("Copy failed");
+        }
+      });
+      return;
+    }
+    try {
+      sourceCopy(html);
+      setStatus("Copied");
+    } catch (err) {
+      setStatus("Copy failed");
+    }
+  });
+})();
+</script>
+</body>
+</html>
