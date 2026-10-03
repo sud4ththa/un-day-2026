@@ -1,0 +1,27 @@
+# UN Day 2026 contribution forms
+#
+# One stall per line:
+#   slug | Stall name | form-url
+#
+# Leave the form-url blank until the form is ready. The short links at
+# /un-day-2026/go/<slug>/ read this file and send people there.
+# To point a stall at its form, paste the https address in the third
+# column and commit. That is the only edit required — do not put form
+# addresses in any other file.
+#
+# Lines starting with # are comments. Blank lines are ignored.
+# To add or remove a stall, edit the lines below and then run:
+#   python3 scripts/gen-go.py
+#
+sri-lanka | Sri Lanka |
+japan | Japan |
+australia | Australia/NZ/Philippines/Indonesia |
+sea | Singapore/Malaysia/Thailand |
+americas | USA/Canada |
+middle-east | Middle East |
+europe | Europe |
+india | India |
+un-zone | UN Zone / Palestine |
+china | China |
+maldives | Maldives |
+eco | Eco Warriors |
