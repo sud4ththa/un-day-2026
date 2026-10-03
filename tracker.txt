@@ -1,0 +1,10 @@
+# UN Day 2026 click tracker (optional)
+#
+# Put ONE line below: the Apps Script web app address that ends in /exec
+# (UN Day menu > Web dashboard link shows it). Leave it blank to switch
+# tracking off. The short links keep working either way: they wait at
+# most 0.4 seconds for this file and never wait for the tracker itself.
+#
+# Sent per tap: stall slug, a random ID kept in the visitor's browser,
+# device type (mobile/tablet/desktop) and an optional ?src= tag.
+# No names, no form answers.
