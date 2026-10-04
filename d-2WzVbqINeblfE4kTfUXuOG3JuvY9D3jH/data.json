@@ -1,6 +1,6 @@
 {
-  "updated": "2026-10-04T22:30+05:30",
-  "data_hash": "1bca8d401cf2c5c6",
+  "updated": "2026-10-04T23:07+05:30",
+  "data_hash": "132e36cd8a4247c9",
   "event": {
     "name": "UN Day 2026",
     "date": "2026-10-16",
@@ -8,9 +8,9 @@
   },
   "tracking": "off",
   "summary": {
-    "stalls": 5,
+    "stalls": 6,
     "connected": 4,
-    "stall_managed": 1,
+    "stall_managed": 2,
     "responses": 0,
     "families": 0,
     "contribution": {
@@ -195,6 +195,21 @@
       "slug": "australia",
       "name": "Australia/NZ/Philippines/Indonesia",
       "year_groups": "Year 2",
+      "status": "stall_managed",
+      "responses": 0,
+      "families": 0,
+      "by_class": [],
+      "contribution": null,
+      "menu": [],
+      "unlisted_ticks": 0,
+      "last_response": null,
+      "clicks": null,
+      "conversion": null
+    },
+    {
+      "slug": "sea",
+      "name": "Singapore/Malaysia/Vietnam/Thailand",
+      "year_groups": "Year 3",
       "status": "stall_managed",
       "responses": 0,
       "families": 0,
