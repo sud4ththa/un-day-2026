@@ -19,7 +19,7 @@
 # Lines starting with # are comments. Blank lines are ignored.
 #
 sri-lanka | Sri Lanka | | Playgroup & Reception
-japan | Japan | https://drive.google.com/file/d/1SLZABBPMj0gweCSQoMRjEZcX23CTKd_e/view?usp=sharing | Nursery & Year 1 | Read the Japan team letter.
+japan | Japan | https://sud4ththa.github.io/un-day-2026/files/japan-letter.pdf | Nursery & Year 1 | Read the Japan team letter.
 australia | Australia/NZ/Philippines/Indonesia | | Year 2
 sea | Singapore/Malaysia/Thailand | | Year 3
 americas | USA/Canada | | Year 4
