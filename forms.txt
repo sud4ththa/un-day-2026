@@ -1,27 +1,32 @@
 # UN Day 2026 contribution forms
 #
 # One stall per line:
-#   slug | Stall name | form-url
+#   slug | Stall name | form-url | year groups | note
 #
 # Leave the form-url blank until the form is ready. The short links at
 # /un-day-2026/go/<slug>/ read this file and send people there.
 # To point a stall at its form, paste the https address in the third
-# column and commit. That is the only edit required — do not put form
-# addresses in any other file.
+# column and commit. That is the only edit required for the redirect —
+# do not put form addresses in any other file. The address is only the
+# third column (it must not contain a "|").
 #
-# Lines starting with # are comments. Blank lines are ignored.
-# To add or remove a stall, edit the lines below and then run:
+# Year groups and the optional note are the WhatsApp link preview.
+# Leave year groups blank for a generic preview. The note, if present,
+# replaces "Tap to pledge food or a contribution for the … stall."
+# After changing a name, year group, or note, run:
 #   python3 scripts/gen-go.py
 #
-sri-lanka | Sri Lanka |
-japan | Japan |
-australia | Australia/NZ/Philippines/Indonesia |
-sea | Singapore/Malaysia/Thailand |
-americas | USA/Canada |
-middle-east | Middle East |
-europe | Europe |
-india | India |
-un-zone | UN Zone / Palestine |
-china | China |
-maldives | Maldives |
-eco | Eco Warriors |
+# Lines starting with # are comments. Blank lines are ignored.
+#
+sri-lanka | Sri Lanka | | Playgroup & Reception
+japan | Japan | | Nursery & Year 1 | Read the Japan team letter.
+australia | Australia/NZ/Philippines/Indonesia | | Year 2
+sea | Singapore/Malaysia/Thailand | | Year 3
+americas | USA/Canada | | Year 4
+middle-east | Middle East | | Years 5 & 8
+europe | Europe | | Year 6
+india | India | | Years 7 & 11
+un-zone | UN Zone / Palestine | |
+china | China | | Years 9, 12 & 13
+maldives | Maldives | | Year 10
+eco | Eco Warriors | |
