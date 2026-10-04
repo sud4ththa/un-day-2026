@@ -1,0 +1,328 @@
+{
+  "updated": "2026-10-04T20:59+05:30",
+  "data_hash": "b9bcd14a5238b3af",
+  "event": {
+    "name": "UN Day 2026",
+    "date": "2026-10-16",
+    "leads_summary": "2026-10-06"
+  },
+  "tracking": "off",
+  "summary": {
+    "stalls": 4,
+    "connected": 0,
+    "responses": 0,
+    "families": 0,
+    "contribution": {
+      "Food": 0,
+      "Monetary contribution": 0,
+      "Both": 0,
+      "Not given": 0
+    },
+    "menu_items": 55,
+    "menu_items_unpledged": 55,
+    "last_response": null,
+    "clicks": null,
+    "conversion": null
+  },
+  "stalls": [
+    {
+      "slug": "sri-lanka",
+      "name": "Sri Lanka",
+      "year_groups": "Playgroup & Reception",
+      "status": "not_connected",
+      "responses": 0,
+      "families": 0,
+      "by_class": [],
+      "contribution": {
+        "Food": 0,
+        "Monetary contribution": 0,
+        "Both": 0,
+        "Not given": 0
+      },
+      "menu": [
+        {
+          "item": "Milk rice",
+          "count": 0
+        },
+        {
+          "item": "Lunu miris",
+          "count": 0
+        },
+        {
+          "item": "Konda kavum",
+          "count": 0
+        },
+        {
+          "item": "Kokis",
+          "count": 0
+        },
+        {
+          "item": "Asmi",
+          "count": 0
+        },
+        {
+          "item": "Mung kavum",
+          "count": 0
+        },
+        {
+          "item": "Hadi kavum",
+          "count": 0
+        },
+        {
+          "item": "Naran kavum",
+          "count": 0
+        },
+        {
+          "item": "Aluwa",
+          "count": 0
+        },
+        {
+          "item": "Wali thalapa",
+          "count": 0
+        },
+        {
+          "item": "Halapa",
+          "count": 0
+        },
+        {
+          "item": "Dodol",
+          "count": 0
+        },
+        {
+          "item": "Milk toffee",
+          "count": 0
+        },
+        {
+          "item": "Ala toffee",
+          "count": 0
+        },
+        {
+          "item": "Coconut toffee",
+          "count": 0
+        },
+        {
+          "item": "Pani walalu",
+          "count": 0
+        },
+        {
+          "item": "Undu wel",
+          "count": 0
+        },
+        {
+          "item": "Cupcakes with SL flag",
+          "count": 0
+        },
+        {
+          "item": "Thala karali",
+          "count": 0
+        },
+        {
+          "item": "Bibikkan",
+          "count": 0
+        },
+        {
+          "item": "Vienna roll",
+          "count": 0
+        },
+        {
+          "item": "Fish bun",
+          "count": 0
+        },
+        {
+          "item": "Mini pol roti",
+          "count": 0
+        },
+        {
+          "item": "King coconut water",
+          "count": 0
+        },
+        {
+          "item": "Banana",
+          "count": 0
+        }
+      ],
+      "unlisted_ticks": 0,
+      "last_response": null,
+      "clicks": null,
+      "conversion": null
+    },
+    {
+      "slug": "india",
+      "name": "India",
+      "year_groups": "Years 7 & 11",
+      "status": "not_connected",
+      "responses": 0,
+      "families": 0,
+      "by_class": [],
+      "contribution": {
+        "Food": 0,
+        "Monetary contribution": 0,
+        "Both": 0,
+        "Not given": 0
+      },
+      "menu": [
+        {
+          "item": "Boondi (5 kg)",
+          "count": 0
+        },
+        {
+          "item": "Jalebi (300 pieces)",
+          "count": 0
+        },
+        {
+          "item": "Gulab jamun (300 pieces)",
+          "count": 0
+        },
+        {
+          "item": "Chicken momos (300)",
+          "count": 0
+        },
+        {
+          "item": "Veg samosa (100)",
+          "count": 0
+        },
+        {
+          "item": "Chicken samosa (200)",
+          "count": 0
+        },
+        {
+          "item": "Paneer tikka skewers (300)",
+          "count": 0
+        },
+        {
+          "item": "Chicken/potato cutlets (300)",
+          "count": 0
+        },
+        {
+          "item": "Pani puri",
+          "count": 0
+        },
+        {
+          "item": "Chicken biryani (50 packs)",
+          "count": 0
+        },
+        {
+          "item": "Murukku or mixture (5 kg)",
+          "count": 0
+        },
+        {
+          "item": "Lemon mojito",
+          "count": 0
+        }
+      ],
+      "unlisted_ticks": 0,
+      "last_response": null,
+      "clicks": null,
+      "conversion": null
+    },
+    {
+      "slug": "americas",
+      "name": "USA/Canada",
+      "year_groups": "Year 4",
+      "status": "not_connected",
+      "responses": 0,
+      "families": 0,
+      "by_class": [],
+      "contribution": {
+        "Food": 0,
+        "Monetary contribution": 0,
+        "Both": 0,
+        "Not given": 0
+      },
+      "menu": [
+        {
+          "item": "Cupcakes",
+          "count": 0
+        },
+        {
+          "item": "Mini pizza",
+          "count": 0
+        },
+        {
+          "item": "Mini doughnuts",
+          "count": 0
+        },
+        {
+          "item": "Waffles/pancakes with syrup",
+          "count": 0
+        },
+        {
+          "item": "Cookies",
+          "count": 0
+        },
+        {
+          "item": "Mini hotdogs",
+          "count": 0
+        },
+        {
+          "item": "Mini burgers",
+          "count": 0
+        },
+        {
+          "item": "Mac and cheese",
+          "count": 0
+        }
+      ],
+      "unlisted_ticks": 0,
+      "last_response": null,
+      "clicks": null,
+      "conversion": null
+    },
+    {
+      "slug": "europe",
+      "name": "Europe",
+      "year_groups": "Year 6",
+      "status": "not_connected",
+      "responses": 0,
+      "families": 0,
+      "by_class": [],
+      "contribution": null,
+      "menu": [
+        {
+          "item": "Mini pizza (chicken/veg)",
+          "count": 0
+        },
+        {
+          "item": "Macarons",
+          "count": 0
+        },
+        {
+          "item": "Fruits (grapes/strawberries)",
+          "count": 0
+        },
+        {
+          "item": "Mini quiche/pie",
+          "count": 0
+        },
+        {
+          "item": "Chicken sausages",
+          "count": 0
+        },
+        {
+          "item": "Chicken meatballs",
+          "count": 0
+        },
+        {
+          "item": "Mini donuts",
+          "count": 0
+        },
+        {
+          "item": "Mini cupcakes",
+          "count": 0
+        },
+        {
+          "item": "Chocolate fudge",
+          "count": 0
+        },
+        {
+          "item": "Pastries or other savoury items",
+          "count": 0
+        }
+      ],
+      "unlisted_ticks": 0,
+      "last_response": null,
+      "clicks": null,
+      "conversion": null
+    }
+  ]
+}
