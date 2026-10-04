@@ -34,7 +34,6 @@
       "contribution_options": [
         "Food",
         "Monetary contribution",
-        "Option 4",
         "Both"
       ]
     },
@@ -57,7 +56,7 @@
       ],
       "contribution_options": [
         "Food",
-        "Money",
+        "Monetary contribution",
         "Both"
       ]
     },
@@ -76,7 +75,7 @@
       ],
       "contribution_options": [
         "Food",
-        "Money",
+        "Monetary contribution",
         "Both"
       ]
     },

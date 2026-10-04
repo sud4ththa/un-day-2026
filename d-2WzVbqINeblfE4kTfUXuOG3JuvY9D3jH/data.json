@@ -1,6 +1,6 @@
 {
-  "updated": "2026-10-04T20:59+05:30",
-  "data_hash": "b9bcd14a5238b3af",
+  "updated": "2026-10-04T21:18+05:30",
+  "data_hash": "3787c6fa2536c0ca",
   "event": {
     "name": "UN Day 2026",
     "date": "2026-10-16",
@@ -9,7 +9,7 @@
   "tracking": "off",
   "summary": {
     "stalls": 4,
-    "connected": 0,
+    "connected": 4,
     "responses": 0,
     "families": 0,
     "contribution": {
@@ -29,7 +29,7 @@
       "slug": "sri-lanka",
       "name": "Sri Lanka",
       "year_groups": "Playgroup & Reception",
-      "status": "not_connected",
+      "status": "ok",
       "responses": 0,
       "families": 0,
       "by_class": [],
@@ -150,7 +150,7 @@
       "slug": "india",
       "name": "India",
       "year_groups": "Years 7 & 11",
-      "status": "not_connected",
+      "status": "ok",
       "responses": 0,
       "families": 0,
       "by_class": [],
@@ -219,7 +219,7 @@
       "slug": "americas",
       "name": "USA/Canada",
       "year_groups": "Year 4",
-      "status": "not_connected",
+      "status": "ok",
       "responses": 0,
       "families": 0,
       "by_class": [],
@@ -272,7 +272,7 @@
       "slug": "europe",
       "name": "Europe",
       "year_groups": "Year 6",
-      "status": "not_connected",
+      "status": "ok",
       "responses": 0,
       "families": 0,
       "by_class": [],
