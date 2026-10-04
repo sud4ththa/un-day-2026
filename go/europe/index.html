@@ -2,6 +2,12 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
+<script>
+(function () {
+  var FORM = "https://docs.google.com/forms/d/e/1FAIpQLSdc0oyVcNHv475axdKNQLRZWBgrhWWlqx_HgWku_DBdXdDFWw/viewform";
+  setTimeout(function () { location.replace(FORM); }, 400);
+})();
+</script>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta property="og:title" content="UN Day 2026 · Europe stall">
 <meta property="og:description" content="Year 6 · Friday 16 October. Tap to pledge food or a contribution for the Europe stall.">
@@ -149,9 +155,10 @@
   <h1>Europe</h1>
   <p class="detail">Year 6</p>
   <p class="detail">Friday 16 October</p>
-  <div class="status">
-    <p class="lead">This contribution form opens soon.</p>
-    <p class="sub">Please check back later.</p>
+  <div class="status" role="status">
+    <p class="lead">Opening the form…</p>
+    <div class="bar" aria-hidden="true"><span></span></div>
+    <p class="actions"><a class="continue" href="https://docs.google.com/forms/d/e/1FAIpQLSdc0oyVcNHv475axdKNQLRZWBgrhWWlqx_HgWku_DBdXdDFWw/viewform">Continue to form</a></p>
   </div>
 </main>
 <footer>The British School in Colombo · PTC</footer>
