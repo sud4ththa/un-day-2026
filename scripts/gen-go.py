@@ -23,7 +23,11 @@ whose name and year groups did not change keeps a byte-identical image.
 A stall with a painted banner at assets/banners/<slug>.png gets og-v2.jpg
 (the banner, extended to 1200x630, with "UN Day 2026", the stall name and
 year groups set in Playfair Display above it). A stall without a banner
-gets the plain black-and-white og.jpg with the school logos. The new file
+gets the plain black-and-white og.jpg with the school logos.
+
+Stall-made graphics win: if a stall team made its own preview art, save it
+as assets/custom-og/<slug>.jpg (1200x630) and it is copied as-is to
+og-v3.jpg, with no text added by us. The new file
 name matters: WhatsApp caches a preview by its image URL, so a redesigned
 preview needs a new name to show up in fresh shares.
 """
@@ -56,9 +60,11 @@ PC_LOGO = ROOT / "assets" / "pc-logo.png"
 BANNERS = ROOT / "assets" / "banners"
 PLAYFAIR = ROOT / "assets" / "fonts" / "PlayfairDisplay.ttf"
 BANNER_OG = "og-v2.jpg"
+CUSTOM_OG_DIR = ROOT / "assets" / "custom-og"
+CUSTOM_OG = "og-v3.jpg"
 PLAIN_OG = "og.jpg"
 PREVIEW_URL = re.compile(
-    r"https://sud4ththa\.github\.io/un-day-2026/go/[a-z0-9-]+/(?:og(?:-v2)?\.jpg)?"
+    r"https://sud4ththa\.github\.io/un-day-2026/go/[a-z0-9-]+/(?:og(?:-v[23])?\.jpg)?"
 )
 # How long the "Opening the form…" screen shows before the redirect. The
 # click beacon is sent before this timer starts and is never waited for.
@@ -471,9 +477,25 @@ def banner_path(stall: Stall) -> Path | None:
     return path if path.is_file() else None
 
 
+def custom_og_path(stall: Stall) -> Path | None:
+    """The stall team's own preview art, used as-is (see the module docstring)."""
+    path = CUSTOM_OG_DIR / f"{stall.slug}.jpg"
+    return path if path.is_file() else None
+
+
 def og_image_name(stall: Stall) -> str:
     """File name of the stall's preview image inside go/<slug>/."""
+    if custom_og_path(stall):
+        return CUSTOM_OG
     return BANNER_OG if banner_path(stall) else PLAIN_OG
+
+
+def og_image_size(stall: Stall) -> tuple[int, int]:
+    custom = custom_og_path(stall)
+    if custom:
+        with Image.open(custom) as image:
+            return image.size
+    return 1200, 630
 
 
 def og_tags(stall: Stall) -> str:
@@ -483,8 +505,8 @@ def og_tags(stall: Stall) -> str:
         ("property", "og:title", stall.title),
         ("property", "og:description", stall.description),
         ("property", "og:image", image),
-        ("property", "og:image:width", "1200"),
-        ("property", "og:image:height", "630"),
+        ("property", "og:image:width", str(og_image_size(stall)[0])),
+        ("property", "og:image:height", str(og_image_size(stall)[1])),
         ("property", "og:url", page),
         ("property", "og:type", "website"),
         ("name", "twitter:card", "summary_large_image"),
@@ -812,7 +834,10 @@ def main() -> None:
         folder.mkdir(parents=True)
         (folder / "index.html").write_text(render_stall(stall, endpoint, logos), encoding="utf-8")
         banner = banner_path(stall)
-        if banner:
+        custom = custom_og_path(stall)
+        if custom:
+            shutil.copyfile(custom, folder / CUSTOM_OG)
+        elif banner:
             write_banner_og_image(folder / BANNER_OG, stall, banner)
         else:
             write_og_image(folder / PLAIN_OG, stall)

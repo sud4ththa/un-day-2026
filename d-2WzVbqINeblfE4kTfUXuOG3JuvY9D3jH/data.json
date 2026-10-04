@@ -1,6 +1,6 @@
 {
-  "updated": "2026-10-04T21:18+05:30",
-  "data_hash": "3787c6fa2536c0ca",
+  "updated": "2026-10-04T22:30+05:30",
+  "data_hash": "1bca8d401cf2c5c6",
   "event": {
     "name": "UN Day 2026",
     "date": "2026-10-16",
@@ -8,8 +8,9 @@
   },
   "tracking": "off",
   "summary": {
-    "stalls": 4,
+    "stalls": 5,
     "connected": 4,
+    "stall_managed": 1,
     "responses": 0,
     "families": 0,
     "contribution": {
@@ -18,8 +19,8 @@
       "Both": 0,
       "Not given": 0
     },
-    "menu_items": 55,
-    "menu_items_unpledged": 55,
+    "menu_items": 54,
+    "menu_items_unpledged": 54,
     "last_response": null,
     "clicks": null,
     "conversion": null
@@ -41,106 +42,165 @@
       },
       "menu": [
         {
-          "item": "Milk rice",
-          "count": 0
+          "item": "Milk rice with lunu miris (200)",
+          "count": 0,
+          "label": "Milk rice with lunu miris",
+          "needed": "200"
         },
         {
-          "item": "Lunu miris",
-          "count": 0
+          "item": "Konda kavum (200)",
+          "count": 0,
+          "label": "Konda kavum",
+          "needed": "200"
         },
         {
-          "item": "Konda kavum",
-          "count": 0
+          "item": "Kokis (500)",
+          "count": 0,
+          "label": "Kokis",
+          "needed": "500"
         },
         {
-          "item": "Kokis",
-          "count": 0
+          "item": "Asmi (150)",
+          "count": 0,
+          "label": "Asmi",
+          "needed": "150"
         },
         {
-          "item": "Asmi",
-          "count": 0
+          "item": "Mung kavum (150)",
+          "count": 0,
+          "label": "Mung kavum",
+          "needed": "150"
         },
         {
-          "item": "Mung kavum",
-          "count": 0
+          "item": "Hadi kavum (150)",
+          "count": 0,
+          "label": "Hadi kavum",
+          "needed": "150"
         },
         {
-          "item": "Hadi kavum",
-          "count": 0
+          "item": "Naran kavum (75)",
+          "count": 0,
+          "label": "Naran kavum",
+          "needed": "75"
         },
         {
-          "item": "Naran kavum",
-          "count": 0
+          "item": "Aluwa (75)",
+          "count": 0,
+          "label": "Aluwa",
+          "needed": "75"
         },
         {
-          "item": "Aluwa",
-          "count": 0
+          "item": "Wali thalapa (100)",
+          "count": 0,
+          "label": "Wali thalapa",
+          "needed": "100"
         },
         {
-          "item": "Wali thalapa",
-          "count": 0
+          "item": "Halapa (50)",
+          "count": 0,
+          "label": "Halapa",
+          "needed": "50"
         },
         {
-          "item": "Halapa",
-          "count": 0
+          "item": "Dodol (200)",
+          "count": 0,
+          "label": "Dodol",
+          "needed": "200"
         },
         {
-          "item": "Dodol",
-          "count": 0
+          "item": "Milk toffee (100)",
+          "count": 0,
+          "label": "Milk toffee",
+          "needed": "100"
         },
         {
-          "item": "Milk toffee",
-          "count": 0
+          "item": "Ala toffee (50)",
+          "count": 0,
+          "label": "Ala toffee",
+          "needed": "50"
         },
         {
-          "item": "Ala toffee",
-          "count": 0
+          "item": "Coconut toffee (50)",
+          "count": 0,
+          "label": "Coconut toffee",
+          "needed": "50"
         },
         {
-          "item": "Coconut toffee",
-          "count": 0
+          "item": "Pani walalu (150)",
+          "count": 0,
+          "label": "Pani walalu",
+          "needed": "150"
         },
         {
-          "item": "Pani walalu",
-          "count": 0
+          "item": "Cake (5 kg)",
+          "count": 0,
+          "label": "Cake",
+          "needed": "5 kg"
         },
         {
-          "item": "Undu wel",
-          "count": 0
+          "item": "Thala karali (100)",
+          "count": 0,
+          "label": "Thala karali",
+          "needed": "100"
         },
         {
-          "item": "Cupcakes with SL flag",
-          "count": 0
+          "item": "Bibikkan (150)",
+          "count": 0,
+          "label": "Bibikkan",
+          "needed": "150"
         },
         {
-          "item": "Thala karali",
-          "count": 0
+          "item": "Vienna roll (50)",
+          "count": 0,
+          "label": "Vienna roll",
+          "needed": "50"
         },
         {
-          "item": "Bibikkan",
-          "count": 0
+          "item": "Fish bun, please order from Paan Paan (75)",
+          "count": 0,
+          "label": "Fish bun, please order from Paan Paan",
+          "needed": "75"
         },
         {
-          "item": "Vienna roll",
-          "count": 0
+          "item": "Coconut roti (50)",
+          "count": 0,
+          "label": "Coconut roti",
+          "needed": "50"
         },
         {
-          "item": "Fish bun",
-          "count": 0
+          "item": "King coconut (100)",
+          "count": 0,
+          "label": "King coconut",
+          "needed": "100"
         },
         {
-          "item": "Mini pol roti",
-          "count": 0
+          "item": "Kesari (75)",
+          "count": 0,
+          "label": "Kesari",
+          "needed": "75"
         },
         {
-          "item": "King coconut water",
-          "count": 0
-        },
-        {
-          "item": "Banana",
-          "count": 0
+          "item": "Laddu (75)",
+          "count": 0,
+          "label": "Laddu",
+          "needed": "75"
         }
       ],
+      "unlisted_ticks": 0,
+      "last_response": null,
+      "clicks": null,
+      "conversion": null
+    },
+    {
+      "slug": "australia",
+      "name": "Australia/NZ/Philippines/Indonesia",
+      "year_groups": "Year 2",
+      "status": "stall_managed",
+      "responses": 0,
+      "families": 0,
+      "by_class": [],
+      "contribution": null,
+      "menu": [],
       "unlisted_ticks": 0,
       "last_response": null,
       "clicks": null,
@@ -163,35 +223,51 @@
       "menu": [
         {
           "item": "Boondi (5 kg)",
-          "count": 0
+          "count": 0,
+          "label": "Boondi",
+          "needed": "5 kg"
         },
         {
           "item": "Jalebi (300 pieces)",
-          "count": 0
+          "count": 0,
+          "label": "Jalebi",
+          "needed": "300 pieces"
         },
         {
           "item": "Gulab jamun (300 pieces)",
-          "count": 0
+          "count": 0,
+          "label": "Gulab jamun",
+          "needed": "300 pieces"
         },
         {
           "item": "Chicken momos (300)",
-          "count": 0
+          "count": 0,
+          "label": "Chicken momos",
+          "needed": "300"
         },
         {
           "item": "Veg samosa (100)",
-          "count": 0
+          "count": 0,
+          "label": "Veg samosa",
+          "needed": "100"
         },
         {
           "item": "Chicken samosa (200)",
-          "count": 0
+          "count": 0,
+          "label": "Chicken samosa",
+          "needed": "200"
         },
         {
           "item": "Paneer tikka skewers (300)",
-          "count": 0
+          "count": 0,
+          "label": "Paneer tikka skewers",
+          "needed": "300"
         },
         {
           "item": "Chicken/potato cutlets (300)",
-          "count": 0
+          "count": 0,
+          "label": "Chicken/potato cutlets",
+          "needed": "300"
         },
         {
           "item": "Pani puri",
@@ -199,11 +275,15 @@
         },
         {
           "item": "Chicken biryani (50 packs)",
-          "count": 0
+          "count": 0,
+          "label": "Chicken biryani",
+          "needed": "50 packs"
         },
         {
           "item": "Murukku or mixture (5 kg)",
-          "count": 0
+          "count": 0,
+          "label": "Murukku or mixture",
+          "needed": "5 kg"
         },
         {
           "item": "Lemon mojito",

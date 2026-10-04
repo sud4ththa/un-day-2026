@@ -145,8 +145,22 @@ WA_BODY = {
         "Team Japan for the menu and how to contribute."
     ),
 }
+# A stall team's own WhatsApp write-up, used word for word: the only change
+# is that its form link is swapped for our counted short link. These cards
+# use the forms.txt stall name and carry no PTC sign-off (the team signs it).
+STALL_WA_DIR = ROOT / "assets" / "wa-messages"
+
+
+def stall_wa_text(stall) -> str | None:
+    path = STALL_WA_DIR / f"{stall.slug}.txt"
+    return path.read_text(encoding="utf-8").strip("\n") if path.is_file() else None
+
+
 # Shown on the card only (not part of the message).
-WA_HINT = {"japan": "Attach the Team Japan letter (PDF) when you send this."}
+WA_HINT = {
+    "japan": "Attach the Team Japan letter (PDF) when you send this.",
+    "australia": "The Year 2 team\u2019s own message, word for word; only the form link is our short link.",
+}
 
 
 def esc(text: str) -> str:
@@ -166,6 +180,9 @@ def wa_name(stall) -> str:
 
 
 def wa_message(stall) -> str:
+    own = stall_wa_text(stall)
+    if own is not None:
+        return own
     name = wa_name(stall)
     second = f"{stall.years} \u00b7 Friday 16 October" if stall.years else "Friday 16 October"
     # "the {stall} stall": avoid "the The Americas/Canada stall".
@@ -186,7 +203,7 @@ def wa_message(stall) -> str:
 def wa_section() -> str:
     cards = []
     for stall in wa_stalls():
-        name = wa_name(stall)
+        name = stall.name if stall_wa_text(stall) is not None else wa_name(stall)
         msg_id = f"wa-{stall.slug}"
         meta = esc(stall.years) + " \u00b7 " if stall.years else ""
         hint = WA_HINT.get(stall.slug)
