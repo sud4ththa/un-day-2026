@@ -9,7 +9,7 @@
 # - Only https:// links are accepted.
 
 Sri Lanka | | full
-India | https://chat.whatsapp.com/K1xBMtqTLFw05Iwdk0i9Dz?s=sh&p=i&mlu=4&ilr=4
+India | https://chat.whatsapp.com/K1xBMtqTLFw05Iwdk0i9Dz?s=sh&p=i&mlu=4&ilr=4 | full
 USA/Canada | https://chat.whatsapp.com/KWaxmjcDM4QIngcfELLXXr?mode=gi_t | full
 Europe | | full
 Japan | https://chat.whatsapp.com/LF62bwb86EGC9MF6Y4R4Rn?mode=gi_t | full
