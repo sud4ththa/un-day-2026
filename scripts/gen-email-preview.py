@@ -362,6 +362,9 @@ __OG__
     font-size: 13px;
     color: #333;
   }
+  /* The letter table is wider than a phone; scroll it inside the card
+     instead of widening the whole page. */
+  .card { overflow-x: auto; }
   @media (max-width: 480px) {
     .card { margin: 0; padding: 24px 16px; }
     .wa { margin-top: 40px; padding: 0 12px; }
