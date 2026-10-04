@@ -18,9 +18,14 @@ the regenerated go/ folder after any of these changes:
 
     python3 scripts/gen-go.py
 
-The Open Graph preview images (og.jpg) are drawn deterministically, so a
-stall whose name and year groups did not change keeps a byte-identical
-image.
+The Open Graph preview images are drawn deterministically, so a stall
+whose name and year groups did not change keeps a byte-identical image.
+A stall with a painted banner at assets/banners/<slug>.png gets og-v2.jpg
+(the banner, extended to 1200x630, with "UN Day 2026", the stall name and
+year groups set in Playfair Display above it). A stall without a banner
+gets the plain black-and-white og.jpg with the school logos. The new file
+name matters: WhatsApp caches a preview by its image URL, so a redesigned
+preview needs a new name to show up in fresh shares.
 """
 
 from __future__ import annotations
@@ -35,7 +40,7 @@ import shutil
 import sys
 from pathlib import Path
 
-from PIL import Image, ImageDraw, ImageFont, ImageOps
+from PIL import Image, ImageDraw, ImageFilter, ImageFont, ImageOps
 
 ROOT = Path(__file__).resolve().parent.parent
 FORMS = ROOT / "forms.txt"
@@ -48,8 +53,12 @@ SERIF = "/usr/share/fonts/truetype/liberation/LiberationSerif-Regular.ttf"
 SANS = "/usr/share/fonts/truetype/liberation/LiberationSans-Regular.ttf"
 BSC_LOGO = ROOT / "assets" / "bsc-logo.png"
 PC_LOGO = ROOT / "assets" / "pc-logo.png"
+BANNERS = ROOT / "assets" / "banners"
+PLAYFAIR = ROOT / "assets" / "fonts" / "PlayfairDisplay.ttf"
+BANNER_OG = "og-v2.jpg"
+PLAIN_OG = "og.jpg"
 PREVIEW_URL = re.compile(
-    r"https://sud4ththa\.github\.io/un-day-2026/go/[a-z0-9-]+/(?:og\.jpg)?"
+    r"https://sud4ththa\.github\.io/un-day-2026/go/[a-z0-9-]+/(?:og(?:-v2)?\.jpg)?"
 )
 # How long the "Opening the form…" screen shows before the redirect. The
 # click beacon is sent before this timer starts and is never waited for.
@@ -457,9 +466,19 @@ def parse_tracker(text: str) -> str:
     return ""
 
 
+def banner_path(stall: Stall) -> Path | None:
+    path = BANNERS / f"{stall.slug}.png"
+    return path if path.is_file() else None
+
+
+def og_image_name(stall: Stall) -> str:
+    """File name of the stall's preview image inside go/<slug>/."""
+    return BANNER_OG if banner_path(stall) else PLAIN_OG
+
+
 def og_tags(stall: Stall) -> str:
     page = f"{SITE}/go/{stall.slug}/"
-    image = f"{page}og.jpg"
+    image = f"{page}{og_image_name(stall)}"
     fields = [
         ("property", "og:title", stall.title),
         ("property", "og:description", stall.description),
@@ -663,6 +682,119 @@ def write_og_image(path: Path, stall: Stall) -> None:
     image.save(path, "JPEG", quality=85, optimize=True, subsampling=2)
 
 
+# Banner previews: the 1600x400 banner is scaled to the full 1200 px width
+# (so every landmark stays in view) and sits at the bottom of the card. The
+# sky above and the ground below are the banner's own edge rows, blurred
+# sideways and faded into the art, then lifted toward cream behind the text.
+OG_W, OG_H = 1200, 630
+INK = (26, 26, 26)
+SOFT_INK = (58, 52, 44)
+CREAM = (250, 245, 234)
+TEXT_BOTTOM = 348  # text block is centred between y=40 and this line
+TEXT_MAX_W = 580  # keeps the text inside the square centre crop (630 px) of the card
+
+
+def playfair(size: int, weight: str) -> ImageFont.FreeTypeFont:
+    font = ImageFont.truetype(str(PLAYFAIR), size)
+    font.set_variation_by_name(weight)
+    return font
+
+
+def column_strip(image: Image.Image, top: int, height: int, clean: bool = False) -> tuple[Image.Image, float]:
+    """One row: the per-column average of `height` rows, softly blurred sideways.
+
+    With clean=True, columns far from the open-sky colour (the mean of the
+    lighter half of the row), such as a tree cut off by the top edge, are
+    replaced by that colour so they don't smear upward. Also returns the
+    share of columns that were replaced.
+    """
+    row = image.crop((0, top, image.width, top + height)).resize((image.width, 1), Image.Resampling.BOX)
+    if not clean:
+        return row.filter(ImageFilter.GaussianBlur(40)), 0.0
+    raw = row.tobytes()
+    pixels = [tuple(raw[i:i + 3]) for i in range(0, len(raw), 3)]
+    light = sorted(pixels, key=sum)[len(pixels) // 2:]
+    sky = tuple(round(sum(p[i] for p in light) / len(light)) for i in range(3))
+    far = [max(abs(p[i] - sky[i]) for i in range(3)) > 40 for p in pixels]
+    if any(far):
+        row.putdata([sky if f else p for p, f in zip(pixels, far)])
+    return row.filter(ImageFilter.GaussianBlur(40)), sum(far) / len(far)
+
+
+def vertical_mask(values: list[int], width: int) -> Image.Image:
+    mask = Image.new("L", (1, len(values)))
+    mask.putdata(values)
+    return mask.resize((width, len(values)), Image.Resampling.NEAREST)
+
+
+def name_lines(draw: ImageDraw.ImageDraw, name: str) -> tuple[ImageFont.FreeTypeFont, list[str]]:
+    """The stall name on one line if it fits, else split in two after a "/" or space."""
+    for size in range(64, 47, -2):
+        font = playfair(size, "SemiBold")
+        if draw.textlength(name, font=font) <= TEXT_MAX_W:
+            return font, [name]
+    breaks = [i + 1 for i, ch in enumerate(name) if ch in "/ "]
+    candidates = sorted(breaks, key=lambda i: abs(i - len(name) / 2))
+    for size in range(56, 35, -2):
+        font = playfair(size, "SemiBold")
+        for at in candidates:
+            lines = [name[:at].strip(), name[at:].strip()]
+            if all(draw.textlength(line, font=font) <= TEXT_MAX_W for line in lines):
+                return font, lines
+    return playfair(36, "SemiBold"), [name]
+
+
+def write_banner_og_image(path: Path, stall: Stall, banner_file: Path) -> None:
+    """Banner preview. assets/banners/<slug>-og.png, if present, is a taller
+    crop of the same painting used here instead of the 4:1 banner; its top
+    must be open sky across the text area (x 300-900, y above ~300 once
+    scaled to 1200 px wide and sat on the bottom edge)."""
+    fade_top, fade_bottom, bottom = 36, 24, 12
+    tall = banner_file.with_name(f"{banner_file.stem}-og.png")
+    banner = Image.open(tall if tall.is_file() else banner_file).convert("RGB")
+    art_h = min(round(banner.height * OG_W / banner.width), OG_H - bottom)
+    banner = ImageOps.fit(banner, (OG_W, art_h), Image.Resampling.LANCZOS, centering=(0.5, 1.0))
+    top = OG_H - art_h - bottom
+    half = top + art_h // 2
+    canvas = Image.new("RGB", (OG_W, OG_H))
+    sky, cut_off = column_strip(banner, 0, 6, clean=True)
+    ground, _ = column_strip(banner, art_h - 6, 6)
+    if cut_off > 0.15:  # a lot runs off the top edge: dissolve it gently into the sky
+        fade_top = 110
+    canvas.paste(sky.resize((OG_W, half), Image.Resampling.NEAREST), (0, 0))
+    canvas.paste(ground.resize((OG_W, OG_H - half), Image.Resampling.NEAREST), (0, half))
+    alpha = [255] * art_h
+    for y in range(fade_top):
+        alpha[y] = round(255 * y / fade_top)
+    for y in range(fade_bottom):
+        alpha[art_h - 1 - y] = round(255 * y / fade_bottom)
+    canvas.paste(banner, (0, top), vertical_mask(alpha, OG_W))
+    lift_end = max(top + fade_top, TEXT_BOTTOM + 6)
+    lift = [round(140 * (1 - y / lift_end) ** 1.2) if y < lift_end else 0 for y in range(OG_H)]
+    canvas = Image.composite(Image.new("RGB", (OG_W, OG_H), CREAM), canvas, vertical_mask(lift, OG_W))
+
+    draw = ImageDraw.Draw(canvas)
+    name_font, names = name_lines(draw, stall.name)
+    detail = f"{stall.years} \u00b7 Friday 16 October" if stall.years else "Friday 16 October"
+    blocks: list[tuple[str, ImageFont.FreeTypeFont, tuple[int, int, int], int]] = [
+        ("UN Day 2026", playfair(96, "Bold"), INK, 0)
+    ]
+    for i, line in enumerate(names):
+        blocks.append((line, name_font, INK, 22 if i == 0 else 10))
+    detail_size = 30
+    while detail_size > 22 and draw.textlength(detail, font=playfair(detail_size, "Regular")) > TEXT_MAX_W:
+        detail_size -= 1
+    blocks.append((detail, playfair(detail_size, "Regular"), SOFT_INK, 20))
+    boxes = [draw.textbbox((0, 0), text, font=font) for text, font, _, _ in blocks]
+    total = sum(box[3] - box[1] for box in boxes) + sum(gap for *_, gap in blocks)
+    y = 40 + (TEXT_BOTTOM - 40 - total) // 2
+    for (text, font, colour, gap), box in zip(blocks, boxes):
+        y += gap
+        draw.text(((OG_W - (box[2] - box[0])) / 2 - box[0], y - box[1]), text, font=font, fill=colour)
+        y += box[3] - box[1]
+    canvas.save(path, "JPEG", quality=86, optimize=True, subsampling=2)
+
+
 
 def main() -> None:
     stalls = parse_stalls(FORMS.read_text(encoding="utf-8"))
@@ -679,7 +811,11 @@ def main() -> None:
         folder = GO / stall.slug
         folder.mkdir(parents=True)
         (folder / "index.html").write_text(render_stall(stall, endpoint, logos), encoding="utf-8")
-        write_og_image(folder / "og.jpg", stall)
+        banner = banner_path(stall)
+        if banner:
+            write_banner_og_image(folder / BANNER_OG, stall, banner)
+        else:
+            write_og_image(folder / PLAIN_OG, stall)
     GO.mkdir(exist_ok=True)
     (GO / "index.html").write_text(render_index(stalls, endpoint, logos), encoding="utf-8")
     live = sum(1 for stall in stalls if stall.is_open)
