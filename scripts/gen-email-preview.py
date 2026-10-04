@@ -127,10 +127,12 @@ def email_html() -> str:
 
 
 # WhatsApp messages for Amrit and the stall volunteers. One card per stall in
-# forms.txt that has an https address, in forms.txt order. The stall name is
-# the letter's Country/Countries wording (ROWS) where there is one, else the
-# forms.txt name. A stall not listed in WA_BODY gets DEFAULT_BODY.
-WA_SRC = "wa"
+# forms.txt that has an https address, in forms.txt order, named as in
+# forms.txt. A stall not listed in WA_BODY gets DEFAULT_BODY. Messages end
+# with the stall's contact line (WA_CONTACT) and carry no sign-off.
+# WA_SRC tags the short link; a new value also makes WhatsApp build a fresh
+# preview card for the link (v2 posts of 4 Oct: "g2").
+WA_SRC = "g2"
 DEFAULT_BODY = (
     "Thank you for supporting the {stall} stall! Please use the form below to let us know "
     "what food you can send in, or if you'd like to make a monetary contribution."
@@ -140,14 +142,27 @@ WA_BODY = {
         "Thank you for supporting the {stall} stall! Please use the form below to let us know "
         "what food you can send in. This stall is collecting food only."
     ),
+    "americas": (
+        "Thank you for supporting the {stall} stall! Please use the form below to let us know "
+        "what food you can send in, or if you'd like to make a monetary contribution "
+        "(we suggest Rs 3,000 to 5,000), or both."
+    ),
     "japan": (
         "Thank you for supporting the {stall} stall! Please see the attached letter from "
         "Team Japan for the menu and how to contribute."
     ),
 }
+# Who parents should ask, from Subs (4 Oct) and the Team Japan letter.
+WA_CONTACT = {
+    "sri-lanka": "Avanthi (0777557800) or Melanie (0770657150)",
+    "japan": "Tomo (0779851630)",
+    "americas": "Mina (0778388388)",
+    "europe": "Dinusha \u201cDhinu\u201d (0776383877)",
+    "india": "Gaja (0773935886)",
+}
 # A stall team's own WhatsApp write-up, used word for word: the only change
 # is that its form link is swapped for our counted short link. These cards
-# use the forms.txt stall name and carry no PTC sign-off (the team signs it).
+# use the forms.txt stall name and get no contact line from us.
 STALL_WA_DIR = ROOT / "assets" / "wa-messages"
 
 
@@ -173,9 +188,6 @@ def wa_stalls() -> list:
 
 
 def wa_name(stall) -> str:
-    for _year, country, slug in ROWS:
-        if slug == stall.slug:
-            return country
     return stall.name
 
 
@@ -185,25 +197,22 @@ def wa_message(stall) -> str:
         return own
     name = wa_name(stall)
     second = f"{stall.years} \u00b7 Friday 16 October" if stall.years else "Friday 16 October"
-    # "the {stall} stall": avoid "the The Americas/Canada stall".
-    in_sentence = name[4:] if name.startswith("The ") else name
-    body = WA_BODY.get(stall.slug, DEFAULT_BODY).format(stall=in_sentence)
+    body = WA_BODY.get(stall.slug, DEFAULT_BODY).format(stall=name)
     link = f"{SITE}/go/{stall.slug}/?src={WA_SRC}"
-    return (
-        f"*UN Day 2026 \u2013 {name} stall*\n"
-        f"{second}\n"
-        "\n"
-        f"{body}\n"
-        f"{link}\n"
-        "\n"
-        "\u2013 The PTC"
-    )
+    lines = [f"*UN Day 2026 \u2013 {name} stall*", second, "", body, link]
+    contact = WA_CONTACT.get(stall.slug)
+    if contact:
+        lines += ["", f"Questions? Please contact {contact}."]
+    text = "\n".join(lines)
+    if "PTC" in text:
+        raise SystemExit(f"{stall.slug}: WhatsApp message must not mention the PTC")
+    return text
 
 
 def wa_section() -> str:
     cards = []
     for stall in wa_stalls():
-        name = stall.name if stall_wa_text(stall) is not None else wa_name(stall)
+        name = wa_name(stall)
         msg_id = f"wa-{stall.slug}"
         meta = esc(stall.years) + " \u00b7 " if stall.years else ""
         hint = WA_HINT.get(stall.slug)
