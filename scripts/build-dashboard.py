@@ -165,6 +165,40 @@ def class_sort(label: str):
     return (0 if first in order else 2, order.get(first, 9), label)
 
 
+NEED_RE = re.compile(r"\s*\((\d+(?:\.\d+)?)\s*([A-Za-z]+)?\)\s*$")
+
+
+def split_need(option: str) -> tuple[str, str | None]:
+    """'Kokis (500)' -> ('Kokis', '500'); 'Cake (5 kg)' -> ('Cake', '5 kg').
+
+    The number in brackets at the end of a menu option is the quantity the
+    stall needs in total. It is shown beside the tick count, never combined
+    with it: a tick is one family pledging, not one piece.
+    """
+    m = NEED_RE.search(option)
+    if not m:
+        return option, None
+    return option[: m.start()].strip(), m[1] + (f" {m[2]}" if m[2] else "")
+
+
+def match_items(cell: str, known: list[str]) -> list[str]:
+    """Split a checkbox answer into options. Google joins ticks with ", ", and
+    an option may itself contain ", " (e.g. "Fish bun, please order from …"),
+    so consecutive pieces are joined back whenever they spell a known option."""
+    known_l = {norm(k).lower() for k in known}
+    parts = [norm(x) for x in norm(cell).split(", ")]
+    out, i = [], 0
+    while i < len(parts):
+        for j in range(len(parts), i, -1):
+            joined = ", ".join(parts[i:j])
+            if j == i + 1 or joined.lower() in known_l:
+                if joined:
+                    out.append(joined)
+                i = j
+                break
+    return out
+
+
 def contrib_type(raw: str) -> str:
     s = norm(raw).lower()
     if "both" in s:
@@ -199,6 +233,14 @@ def load_clicks(args) -> tuple[dict | None, str]:
 
 # ---------------------------------------------------------------- aggregate
 
+def menu_entry(option: str, count: int) -> dict:
+    label, needed = split_need(option)
+    entry = {"item": option, "count": count}
+    if needed:
+        entry.update(label=label, needed=needed)
+    return entry
+
+
 def build(args, now: datetime):
     cfg = json.loads(CONFIG.read_text(encoding="utf-8"))
     forms = {s.slug: s for s in GEN.parse_stalls((ROOT / "forms.txt").read_text(encoding="utf-8"))}
@@ -215,23 +257,24 @@ def build(args, now: datetime):
         slug = sc["slug"]
         meta = forms.get(slug)
         menu = sc["menu"]
+        managed = bool(sc.get("stall_managed"))
         has_contrib = bool(sc.get("contribution_options"))
         entry = {
             "slug": slug,
             "name": meta.name if meta else slug,
             "year_groups": meta.years if meta else "",
-            "status": "not_connected",
+            "status": "stall_managed" if managed else "not_connected",
             "responses": 0,
             "families": 0,
             "by_class": [],
             "contribution": ({k: 0 for k in CONTRIB_KEYS} if has_contrib else None),
-            "menu": [{"item": m, "count": 0} for m in menu],
+            "menu": [menu_entry(m, 0) for m in menu],
             "unlisted_ticks": 0,
             "last_response": None,
             "clicks": None,
             "conversion": None,
         }
-        src = next((p for p in (Path(args.data_dir) / f"{slug}.csv", Path(args.data_dir) / f"{slug}.json") if p.exists()), None)
+        src = None if managed else next((p for p in (Path(args.data_dir) / f"{slug}.csv", Path(args.data_dir) / f"{slug}.json") if p.exists()), None)
         rows_out = []
         if src:
             headers, rows = read_rows(src)
@@ -240,6 +283,14 @@ def build(args, now: datetime):
             fams, classes, unlisted = set(), {}, {}
             counts = {m: 0 for m in menu}
             lookup = {norm(m).lower(): m for m in menu}
+            # Old option strings from before a menu change still count: the
+            # same name without its "(N)" target, or an explicit alias.
+            for m in menu:
+                lookup.setdefault(norm(split_need(m)[0]).lower(), m)
+            for old, new in (sc.get("aliases") or {}).items():
+                if new in counts:
+                    lookup.setdefault(norm(old).lower(), new)
+            known = list(menu) + list((sc.get("aliases") or {}).keys())
             last = None
             for n, row in enumerate(rows, 1):
                 r = {k: norm(row[i]) if i < len(row) else "" for k, i in col.items()}
@@ -257,13 +308,16 @@ def build(args, now: datetime):
                     entry["contribution"][ct] += 1
                 else:
                     ct = "Food"
-                items = [norm(x) for x in r.get("food", "").split(", ") if norm(x)]
+                items = match_items(r.get("food", ""), known)
+                ticked = set()  # one family, one tick per item (e.g. old "Milk rice" + "Lunu miris")
                 for it in items:
                     m = lookup.get(it.lower())
                     if m:
-                        counts[m] += 1
+                        ticked.add(m)
                     else:
                         unlisted[it] = unlisted.get(it, 0) + 1
+                for m in ticked:
+                    counts[m] += 1
                 t = parse_time(r.get("timestamp", ""), now)
                 if t and (last is None or t > last):
                     last = t
@@ -273,7 +327,7 @@ def build(args, now: datetime):
                 responses=len(rows),
                 families=len(fams),
                 by_class=[{"class": c, "count": classes[c]} for c in sorted(classes, key=class_sort)],
-                menu=[{"item": m, "count": counts[m]} for m in menu],
+                menu=[menu_entry(m, counts[m]) for m in menu],
                 # Ticks that match no current menu item (e.g. an option renamed later). Only the
                 # number is published: the text could be free text and stays in the private list.
                 unlisted_ticks=sum(unlisted.values()),
@@ -289,7 +343,7 @@ def build(args, now: datetime):
             }
         elif click_mode == "unavailable":
             entry["clicks"] = prev_clicks.get(slug)
-        if entry["clicks"] and entry["clicks"]["unique"]:
+        if entry["clicks"] and entry["clicks"]["unique"] and not managed:
             entry["conversion"] = round(entry["responses"] / entry["clicks"]["unique"], 3)
         stalls.append(entry)
         private.append((entry, rows_out))
@@ -298,6 +352,7 @@ def build(args, now: datetime):
     summary = {
         "stalls": len(stalls),
         "connected": len(connected),
+        "stall_managed": sum(1 for s in stalls if s["status"] == "stall_managed"),
         "responses": sum(s["responses"] for s in stalls),
         "families": len(all_families),
         "contribution": {k: sum((s["contribution"] or {}).get(k, 0) for s in stalls) for k in CONTRIB_KEYS},
@@ -319,8 +374,11 @@ def build(args, now: datetime):
         summary["clicks"] = {"total": sum(s["clicks"]["total"] for s in with_clicks),
                              "unique": stall_unique,
                              "all_links": {"total": total, "unique": unique}}
-        if stall_unique:
-            summary["conversion"] = round(summary["responses"] / stall_unique, 3)
+        # Stall-managed forms have no response count here, so their visitors
+        # stay out of the conversion figure.
+        conv_unique = sum(s["clicks"]["unique"] for s in with_clicks if s["status"] != "stall_managed")
+        if conv_unique:
+            summary["conversion"] = round(summary["responses"] / conv_unique, 3)
 
     payload = {
         "event": {"name": "UN Day 2026", "date": "2026-10-16", "leads_summary": "2026-10-06"},
@@ -397,6 +455,7 @@ td a { color: inherit; text-decoration: none; border-bottom: 1px solid var(--hai
 .bars li { display: grid; grid-template-columns: minmax(0, 1fr) 2.2rem; grid-template-rows: auto 3px; column-gap: .75rem;
   padding: .45rem 0 .5rem; border-bottom: 1px solid var(--hair); }
 .bars .label { overflow-wrap: anywhere; }
+.bars .need { font-size: .76rem; color: var(--mute); white-space: nowrap; margin-left: .35rem; }
 .bars .n { text-align: right; font-variant-numeric: tabular-nums; font-weight: 600; }
 .bars .track { grid-column: 1 / -1; margin-top: .35rem; height: 3px; background: rgba(17,17,17,.07); }
 .bars .fill { display: block; height: 100%; background: var(--ink); }
@@ -426,6 +485,8 @@ def render(data: dict, logos: dict) -> str:
         ok = st["status"] == "ok"
         c = st["contribution"]
         fmb = f'{c["Food"]} · {c[MONEY]} · {c["Both"]}' if (ok and c) else ("food only" if ok else "—")
+        if st["status"] == "stall_managed":
+            fmb = "stall form"
         rows.append(
             f'<tr><td><a href="#{esc(st["slug"])}">{esc(st["name"])}</a></td>'
             f'<td>{num(st["responses"]) if ok else "—"}</td><td>{num(st["families"]) if ok else "—"}</td>'
@@ -442,10 +503,14 @@ def render(data: dict, logos: dict) -> str:
     )
     head = ('<tr><th>Stall</th><th>Responses</th><th>Families</th><th class="hide-xs wrap">Food · Monetary contribution · Both</th>'
             + ("<th>Clicks</th><th>Conv.</th>" if tracking else "") + "</tr>")
-    not_conn = s["stalls"] - s["connected"]
+    not_conn = sum(1 for st in data["stalls"] if st["status"] == "not_connected")
     summary_notes = [f'{s["menu_items_unpledged"]} of {s["menu_items"]} menu items have no pledge yet.']
     if not_conn:
         summary_notes.append(f'{not_conn} of {s["stalls"]} response sheets not connected yet, shown as “—”.')
+    managed = [st["name"] for st in data["stalls"] if st["status"] == "stall_managed"]
+    if managed:
+        summary_notes.append(f'Stall-managed form{"s" if len(managed) > 1 else ""} ({", ".join(managed)}): '
+                             'the stall team keeps its own responses, so only short-link clicks are shown.')
     if not tracking:
         summary_notes.append("Click tracking off.")
     else:
@@ -456,10 +521,15 @@ def render(data: dict, logos: dict) -> str:
         ok = st["status"] == "ok"
         mx = max([m["count"] for m in st["menu"]] + [1])
         bars = "".join(
-            f'<li class="{"zero" if m["count"] == 0 else ""}"><span class="label">{esc(m["item"])}</span>'
-            f'<span class="n">{m["count"]}</span><span class="track"><span class="fill" style="width:{round(100 * m["count"] / mx, 1)}%"></span></span></li>'
+            f'<li class="{"zero" if m["count"] == 0 else ""}"><span class="label">{esc(m.get("label", m["item"]))}'
+            + (f' <span class="need">needed {esc(m["needed"])}</span>' if m.get("needed") else "")
+            + f'</span><span class="n">{m["count"]}</span><span class="track"><span class="fill" style="width:{round(100 * m["count"] / mx, 1)}%"></span></span></li>'
             for m in st["menu"]
         )
+        has_need = any(m.get("needed") for m in st["menu"])
+        need_note = ('<p class="note">The number on the right is families pledging the item; “needed” is the '
+                     'total quantity the stall needs. A family can send several pieces, so the two are not '
+                     'directly comparable.</p>') if has_need else ""
         gaps = sum(1 for m in st["menu"] if m["count"] == 0)
         unlisted = ""
         if st["unlisted_ticks"]:
@@ -476,6 +546,26 @@ def render(data: dict, logos: dict) -> str:
             classes = ("<ul class=\"chips\">" + "".join(f'<li>{esc(x["class"])}<b>{x["count"]}</b></li>' for x in st["by_class"]) + "</ul>") if st["by_class"] else '<p class="note">No responses yet.</p>'
         else:
             classes = '<p class="note">Response sheet not connected yet.</p>'
+        if st["status"] == "stall_managed":
+            if st["clicks"]:
+                ck = st["clicks"]
+                cdl = "".join(f'<div><dt>{a}</dt><dd>{b}</dd></div>' for a, b in
+                              [("Clicks", num(ck["total"])), ("Unique visitors", num(ck["unique"]))])
+                src = "".join(f'<li>{esc(k)}<b>{v}</b></li>' for k, v in ck["by_src"].items()) or "<li>none yet</li>"
+                dev = "".join(f'<li>{esc(k)}<b>{v}</b></li>' for k, v in ck["by_device"].items()) or "<li>none yet</li>"
+                clicks_html = (f'<dl class="stats">{cdl}</dl><h3>By source</h3><ul class="chips">{src}</ul>'
+                               f'<h3>By device</h3><ul class="chips">{dev}</ul>')
+            else:
+                clicks_html = '<p class="off">Click tracking off</p>'
+            sections.append(f"""
+<section id="{esc(st["slug"])}">
+  <h2>{GEN.heading(st["name"])}</h2>
+  <p class="sub">{esc(st["year_groups"])}</p>
+  <p class="note">Stall-managed form. The stall team keeps its own responses, so only short-link clicks are shown here.</p>
+  <h3>Short-link clicks</h3>
+  {clicks_html}
+</section>""")
+            continue
         if st["clicks"]:
             ck = st["clicks"]
             cstats = [("Clicks", num(ck["total"])), ("Unique visitors", num(ck["unique"])), ("Conversion", pct(st["conversion"]))]
@@ -492,7 +582,7 @@ def render(data: dict, logos: dict) -> str:
   <p class="sub">{esc(st["year_groups"])}</p>
   <dl class="stats">{dl}</dl>
   <h3>Menu · {gaps} of {len(st["menu"])} with no pledge</h3>
-  <ul class="bars">{bars}</ul>{unlisted}
+  <ul class="bars">{bars}</ul>{need_note}{unlisted}
   <h3>Responses by class</h3>
   {classes}
   <h3>Short-link clicks</h3>
@@ -549,6 +639,9 @@ def render_private(data: dict, private: list, now: datetime) -> str:
            f"Generated {now.strftime('%a %-d %b %Y, %-I:%M %p')} (Colombo). Not for the public site.", ""]
     for entry, rows in private:
         out.append(f"## {entry['name']} ({entry['year_groups']})")
+        if entry["status"] == "stall_managed":
+            out += ["", "Stall-managed form: the stall team keeps its own responses.", ""]
+            continue
         if entry["status"] != "ok":
             out += ["", "Response sheet not connected yet.", ""]
             continue
@@ -586,6 +679,8 @@ def assert_no_pii(texts: list[str], pii: set[str], safe: str) -> None:
 def update_menus() -> None:
     cfg = json.loads(CONFIG.read_text(encoding="utf-8"))
     for sc in cfg["stalls"]:
+        if sc.get("stall_managed") or not sc.get("form_id"):
+            continue
         url = f"https://docs.google.com/forms/d/e/{sc['form_id']}/viewform"
         req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
         page = urllib.request.urlopen(req, timeout=30).read().decode("utf-8")
