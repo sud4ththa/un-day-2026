@@ -45,13 +45,14 @@ matching `flags/kr.svg` from flag-icons (`flags/4x3/kr.svg`).
 Parents can open a stall's contribution form from a short link. The address of each form lives only in **`forms.txt`**. One stall per line:
 
 ```
-slug | Stall name |
-slug | Stall name | https://…
+slug | Stall name | form-url | year groups | note
 ```
 
-Leave the third column blank until the form is ready. Lines starting with `#` are comments.
+Leave the form URL blank until the form is ready. Lines starting with `#` are comments. The form address is only the third column.
 
 To publish or change a form URL, edit that third column and commit. The short links read `forms.txt` when someone opens them, so no other file needs to change.
+
+Year groups and the optional note are the preview shown when a `/go/<slug>/` link is pasted into WhatsApp. Leave the year groups blank for a generic preview. A note replaces the sentence "Tap to pledge food or a contribution for the … stall." After editing a name, year group, or note, run `python3 scripts/gen-go.py`.
 
 Short links (GitHub Pages):
 

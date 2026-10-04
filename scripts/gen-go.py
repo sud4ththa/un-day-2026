@@ -10,16 +10,47 @@ need a regeneration.
 
 from __future__ import annotations
 
+import html
 import json
 import re
+from dataclasses import dataclass
 import shutil
 import sys
 from pathlib import Path
 
+from PIL import Image, ImageDraw, ImageFont, ImageOps
+
 ROOT = Path(__file__).resolve().parent.parent
 FORMS = ROOT / "forms.txt"
 GO = ROOT / "go"
+SITE = "https://sud4ththa.github.io/un-day-2026"
 SLUG_RE = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)*$")
+SERIF = "/usr/share/fonts/truetype/liberation/LiberationSerif-Regular.ttf"
+SANS = "/usr/share/fonts/truetype/liberation/LiberationSans-Regular.ttf"
+BSC_LOGO = ROOT / "assets" / "bsc-logo.png"
+PC_LOGO = ROOT / "assets" / "pc-logo.png"
+PREVIEW_URL = re.compile(
+    r"https://sud4ththa\.github\.io/un-day-2026/go/[a-z0-9-]+/(?:og\.jpg)?"
+)
+
+
+@dataclass
+class Stall:
+    slug: str
+    name: str
+    years: str
+    note: str
+
+    @property
+    def title(self) -> str:
+        return f"UN Day 2026 · {self.name} stall"
+
+    @property
+    def description(self) -> str:
+        pledge = self.note or f"Tap to pledge food or a contribution for the {self.name} stall."
+        if self.years:
+            return f"{self.years} · Friday 16 October. {pledge}"
+        return f"Friday 16 October. {pledge}"
 
 SLUG_MAIN = """<main id="app">
   <p class="kicker">BSC UN Day 2026, the PTC</p>
@@ -48,7 +79,7 @@ PAGE = """<!DOCTYPE html>
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>BSC UN Day 2026</title>
+__OG__<title>__TITLE__</title>
 <style>
   :root { color-scheme: light; }
   * { box-sizing: border-box; }
@@ -235,7 +266,7 @@ __MAIN__
       if (parts.length < 2) return;
       var slug = parts[0].trim();
       var name = parts[1].trim();
-      var url = parts.slice(2).join("|").trim();
+      var url = (parts.length > 2 ? parts[2] : "").trim();
       if (!slug || !name) return;
       stalls.push({ slug: slug, name: name, url: url });
     });
@@ -316,8 +347,8 @@ __MAIN__
 """
 
 
-def parse_slugs(text: str) -> list[str]:
-    slugs: list[str] = []
+def parse_stalls(text: str) -> list[Stall]:
+    stalls: list[Stall] = []
     seen: set[str] = set()
     for lineno, raw in enumerate(text.splitlines(), 1):
         line = raw.strip()
@@ -325,46 +356,157 @@ def parse_slugs(text: str) -> list[str]:
             continue
         parts = [part.strip() for part in line.split("|")]
         if len(parts) < 2 or not parts[0] or not parts[1]:
-            raise SystemExit(f"forms.txt:{lineno}: expected slug | Stall name | form-url")
+            raise SystemExit(f"forms.txt:{lineno}: expected slug | Stall name | form-url | year groups | note")
         slug = parts[0]
         if not SLUG_RE.fullmatch(slug):
             raise SystemExit(f"forms.txt:{lineno}: slug must be lowercase letters, numbers and hyphens")
         if slug in seen:
             raise SystemExit(f"forms.txt:{lineno}: duplicate slug {slug}")
         seen.add(slug)
-        slugs.append(slug)
-    if not slugs:
+        stalls.append(
+            Stall(
+                slug=slug,
+                name=parts[1],
+                years=parts[3] if len(parts) > 3 else "",
+                note=parts[4] if len(parts) > 4 else "",
+            )
+        )
+    if not stalls:
         raise SystemExit("forms.txt has no stalls")
-    return slugs
+    return stalls
 
 
-def render(requested: str, *, index: bool) -> str:
+def og_tags(stall: Stall) -> str:
+    page = f"{SITE}/go/{stall.slug}/"
+    image = f"{page}og.jpg"
+    fields = [
+        ("property", "og:title", stall.title),
+        ("property", "og:description", stall.description),
+        ("property", "og:image", image),
+        ("property", "og:image:width", "1200"),
+        ("property", "og:image:height", "630"),
+        ("property", "og:url", page),
+        ("property", "og:type", "website"),
+        ("name", "twitter:card", "summary_large_image"),
+        ("name", "twitter:image", image),
+    ]
+    lines = [
+        f'<meta {attr}="{name}" content="{html.escape(value, quote=True)}">'
+        for attr, name, value in fields
+    ]
+    return "\n".join(lines) + "\n"
+
+
+def render(requested: str, *, index: bool, stall: Stall | None = None) -> str:
+    if index or stall is None:
+        og = ""
+        title = "BSC UN Day 2026"
+        main = INDEX_MAIN
+        boot = INDEX_BOOT
+    else:
+        og = og_tags(stall)
+        title = html.escape(stall.title)
+        main = SLUG_MAIN
+        boot = ""
     page = (
-        PAGE.replace("__MAIN__", INDEX_MAIN if index else SLUG_MAIN)
-        .replace("__BOOT__", INDEX_BOOT if index else "")
+        PAGE.replace("__MAIN__", main)
+        .replace("__BOOT__", boot)
+        .replace("__OG__", og)
+        .replace("__TITLE__", title)
         .replace("__REQUESTED__", requested)
     )
     if "__" in page:
         raise SystemExit("page template was not filled in")
-    if re.search(r"https://[A-Za-z0-9]", page):
+    stripped = PREVIEW_URL.sub("", page)
+    if re.search(r"https://[A-Za-z0-9]", stripped):
         raise SystemExit("generated page contains a URL; form addresses belong only in forms.txt")
     return page
 
 
+def fit_lines(draw: ImageDraw.ImageDraw, text: str, font_path: str, max_width: int, start: int, floor: int) -> tuple[ImageFont.FreeTypeFont, list[str]]:
+    size = start
+    while size >= floor:
+        font = ImageFont.truetype(font_path, size)
+        words = text.split()
+        lines: list[str] = []
+        current = ""
+        for word in words:
+            trial = word if not current else f"{current} {word}"
+            if draw.textlength(trial, font=font) <= max_width:
+                current = trial
+            else:
+                if current:
+                    lines.append(current)
+                current = word
+        if current:
+            lines.append(current)
+        if len(lines) <= 2 and all(draw.textlength(line, font=font) <= max_width for line in lines):
+            return font, lines
+        size -= 2
+    font = ImageFont.truetype(font_path, floor)
+    return font, [text]
+
+
+def paste_logo(canvas: Image.Image, path: Path, box: tuple[int, int, int, int]) -> None:
+    logo = Image.open(path).convert("RGBA")
+    rgb = ImageOps.grayscale(logo.convert("RGB"))
+    logo = Image.merge("RGBA", (rgb, rgb, rgb, logo.getchannel("A")))
+    max_w, max_h = box[2] - box[0], box[3] - box[1]
+    scale = min(max_w / logo.width, max_h / logo.height)
+    size = (max(1, round(logo.width * scale)), max(1, round(logo.height * scale)))
+    logo = logo.resize(size, Image.Resampling.LANCZOS)
+    x = box[0] + (max_w - size[0]) // 2
+    y = box[1] + (max_h - size[1]) // 2
+    canvas.paste(logo, (x, y), logo)
+
+
+def write_og_image(path: Path, stall: Stall) -> None:
+    image = Image.new("RGB", (1200, 630), "white")
+    draw = ImageDraw.Draw(image)
+    draw.rectangle((0, 0, 1199, 10), fill="black")
+    paste_logo(image, BSC_LOGO, (36, 150, 250, 480))
+    paste_logo(image, PC_LOGO, (950, 170, 1164, 460))
+    name_font, name_lines = fit_lines(draw, stall.name, SERIF, 680, 68, 36)
+    kicker = ImageFont.truetype(SERIF, 34)
+    detail = ImageFont.truetype(SERIF, 30)
+    footer = ImageFont.truetype(SANS, 24)
+    blocks: list[tuple[str, ImageFont.FreeTypeFont]] = [("UN Day 2026", kicker)]
+    blocks.extend((line, name_font) for line in name_lines)
+    if stall.years:
+        blocks.append((stall.years, detail))
+    blocks.append(("Friday 16 October", detail))
+    gap = 14
+    heights = [draw.textbbox((0, 0), text, font=font)[3] for text, font in blocks]
+    total = sum(heights) + gap * (len(blocks) - 1)
+    y = 150 + (360 - total) // 2
+    for (text, font), height in zip(blocks, heights):
+        width = draw.textlength(text, font=font)
+        draw.text(((1200 - width) / 2, y), text, font=font, fill="black")
+        y += height + gap
+    foot = "The British School in Colombo · PTC"
+    width = draw.textlength(foot, font=footer)
+    draw.text(((1200 - width) / 2, 560), foot, font=footer, fill="black")
+    image.save(path, "JPEG", quality=85, optimize=True, subsampling=2)
+
+
 def main() -> None:
-    slugs = parse_slugs(FORMS.read_text(encoding="utf-8"))
+    stalls = parse_stalls(FORMS.read_text(encoding="utf-8"))
     if GO.exists():
         shutil.rmtree(GO)
-    for slug in slugs:
-        folder = GO / slug
+    for stall in stalls:
+        folder = GO / stall.slug
         folder.mkdir(parents=True)
-        (folder / "index.html").write_text(render(json.dumps(slug), index=False), encoding="utf-8")
+        (folder / "index.html").write_text(
+            render(json.dumps(stall.slug), index=False, stall=stall),
+            encoding="utf-8",
+        )
+        write_og_image(folder / "og.jpg", stall)
     GO.mkdir(exist_ok=True)
     (GO / "index.html").write_text(
         render('(new URLSearchParams(location.search).get("s") || "").trim()', index=True),
         encoding="utf-8",
     )
-    print(f"wrote {len(slugs)} short links and go/index.html")
+    print(f"wrote {len(stalls)} short links, previews, and go/index.html")
 
 
 if __name__ == "__main__":

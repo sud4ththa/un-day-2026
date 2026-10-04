@@ -200,7 +200,7 @@
       if (parts.length < 2) return;
       var slug = parts[0].trim();
       var name = parts[1].trim();
-      var url = parts.slice(2).join("|").trim();
+      var url = (parts.length > 2 ? parts[2] : "").trim();
       if (!slug || !name) return;
       stalls.push({ slug: slug, name: name, url: url });
     });
