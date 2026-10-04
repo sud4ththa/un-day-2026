@@ -115,6 +115,28 @@
         "Pastries or other savoury items"
       ],
       "contribution_options": null
+    },
+    {
+      "slug": "middle-east",
+      "form_id": "1FAIpQLSeCThiDTkPAf0f58asyiMK0JXXJAkhsaLJNv4Nx7bqR3edrPA",
+      "menu": [
+        "Pita bread / Hummus & Tabbouleh",
+        "Fatayer",
+        "Arabic rice",
+        "Mini kebabs",
+        "Mini shawarma",
+        "Baklava",
+        "Date cake",
+        "Basbousa",
+        "Kunafa",
+        "Dates (non-sticky, easy to handle)",
+        "Variety of nuts (almonds, pistachios, cashews, walnuts)"
+      ],
+      "contribution_options": [
+        "Food",
+        "Monetary contribution",
+        "Both"
+      ]
     }
   ]
 }
