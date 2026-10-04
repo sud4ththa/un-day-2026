@@ -133,7 +133,7 @@ def email_html() -> str:
 WA_SRC = "wa"
 DEFAULT_BODY = (
     "Thank you for supporting the {stall} stall! Please use the form below to let us know "
-    "what food you can send in, or if you'd like to make a money contribution."
+    "what food you can send in, or if you'd like to make a monetary contribution."
 )
 WA_BODY = {
     "europe": (
