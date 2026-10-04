@@ -690,6 +690,7 @@ OG_W, OG_H = 1200, 630
 INK = (26, 26, 26)
 SOFT_INK = (58, 52, 44)
 CREAM = (250, 245, 234)
+TEXT_BOTTOM = 348  # text block is centred between y=40 and this line
 TEXT_MAX_W = 580  # keeps the text inside the square centre crop (630 px) of the card
 
 
@@ -699,10 +700,25 @@ def playfair(size: int, weight: str) -> ImageFont.FreeTypeFont:
     return font
 
 
-def column_strip(image: Image.Image, top: int, height: int) -> Image.Image:
-    """One row: the per-column average of `height` rows, softly blurred sideways."""
+def column_strip(image: Image.Image, top: int, height: int, clean: bool = False) -> tuple[Image.Image, float]:
+    """One row: the per-column average of `height` rows, softly blurred sideways.
+
+    With clean=True, columns far from the open-sky colour (the mean of the
+    lighter half of the row), such as a tree cut off by the top edge, are
+    replaced by that colour so they don't smear upward. Also returns the
+    share of columns that were replaced.
+    """
     row = image.crop((0, top, image.width, top + height)).resize((image.width, 1), Image.Resampling.BOX)
-    return row.filter(ImageFilter.GaussianBlur(40))
+    if not clean:
+        return row.filter(ImageFilter.GaussianBlur(40)), 0.0
+    raw = row.tobytes()
+    pixels = [tuple(raw[i:i + 3]) for i in range(0, len(raw), 3)]
+    light = sorted(pixels, key=sum)[len(pixels) // 2:]
+    sky = tuple(round(sum(p[i] for p in light) / len(light)) for i in range(3))
+    far = [max(abs(p[i] - sky[i]) for i in range(3)) > 40 for p in pixels]
+    if any(far):
+        row.putdata([sky if f else p for p, f in zip(pixels, far)])
+    return row.filter(ImageFilter.GaussianBlur(40)), sum(far) / len(far)
 
 
 def vertical_mask(values: list[int], width: int) -> Image.Image:
@@ -729,22 +745,31 @@ def name_lines(draw: ImageDraw.ImageDraw, name: str) -> tuple[ImageFont.FreeType
 
 
 def write_banner_og_image(path: Path, stall: Stall, banner_file: Path) -> None:
+    """Banner preview. assets/banners/<slug>-og.png, if present, is a taller
+    crop of the same painting used here instead of the 4:1 banner; its top
+    must be open sky across the text area (x 300-900, y above ~300 once
+    scaled to 1200 px wide and sat on the bottom edge)."""
     fade_top, fade_bottom, bottom = 36, 24, 12
-    banner = Image.open(banner_file).convert("RGB")
-    art_h = round(banner.height * OG_W / banner.width)
-    banner = banner.resize((OG_W, art_h), Image.Resampling.LANCZOS)
+    tall = banner_file.with_name(f"{banner_file.stem}-og.png")
+    banner = Image.open(tall if tall.is_file() else banner_file).convert("RGB")
+    art_h = min(round(banner.height * OG_W / banner.width), OG_H - bottom)
+    banner = ImageOps.fit(banner, (OG_W, art_h), Image.Resampling.LANCZOS, centering=(0.5, 1.0))
     top = OG_H - art_h - bottom
     half = top + art_h // 2
     canvas = Image.new("RGB", (OG_W, OG_H))
-    canvas.paste(column_strip(banner, 0, 6).resize((OG_W, half), Image.Resampling.NEAREST), (0, 0))
-    canvas.paste(column_strip(banner, art_h - 6, 6).resize((OG_W, OG_H - half), Image.Resampling.NEAREST), (0, half))
+    sky, cut_off = column_strip(banner, 0, 6, clean=True)
+    ground, _ = column_strip(banner, art_h - 6, 6)
+    if cut_off > 0.15:  # a lot runs off the top edge: dissolve it gently into the sky
+        fade_top = 110
+    canvas.paste(sky.resize((OG_W, half), Image.Resampling.NEAREST), (0, 0))
+    canvas.paste(ground.resize((OG_W, OG_H - half), Image.Resampling.NEAREST), (0, half))
     alpha = [255] * art_h
     for y in range(fade_top):
         alpha[y] = round(255 * y / fade_top)
     for y in range(fade_bottom):
         alpha[art_h - 1 - y] = round(255 * y / fade_bottom)
     canvas.paste(banner, (0, top), vertical_mask(alpha, OG_W))
-    lift_end = top + fade_top
+    lift_end = max(top + fade_top, TEXT_BOTTOM + 6)
     lift = [round(140 * (1 - y / lift_end) ** 1.2) if y < lift_end else 0 for y in range(OG_H)]
     canvas = Image.composite(Image.new("RGB", (OG_W, OG_H), CREAM), canvas, vertical_mask(lift, OG_W))
 
@@ -762,7 +787,7 @@ def write_banner_og_image(path: Path, stall: Stall, banner_file: Path) -> None:
     blocks.append((detail, playfair(detail_size, "Regular"), SOFT_INK, 20))
     boxes = [draw.textbbox((0, 0), text, font=font) for text, font, _, _ in blocks]
     total = sum(box[3] - box[1] for box in boxes) + sum(gap for *_, gap in blocks)
-    y = 40 + (top + 30 - 40 - total) // 2
+    y = 40 + (TEXT_BOTTOM - 40 - total) // 2
     for (text, font, colour, gap), box in zip(blocks, boxes):
         y += gap
         draw.text(((OG_W - (box[2] - box[0])) / 2 - box[0], y - box[1]), text, font=font, fill=colour)
