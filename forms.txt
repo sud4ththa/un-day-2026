@@ -14,7 +14,7 @@
 #   python3 scripts/gen-go.py
 #
 sri-lanka | Sri Lanka |
-japan | Japan |
+japan | Japan | https://sud4ththa.github.io/un-day-2026/files/japan-letter.pdf
 australia | Australia/NZ/Philippines/Indonesia |
 sea | Singapore/Malaysia/Thailand |
 americas | USA/Canada |
