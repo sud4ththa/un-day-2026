@@ -193,7 +193,7 @@ def wa_section() -> str:
         hint_html = f'\n  <p class="wa-hint">{esc(hint)}</p>' if hint else ""
         cards.append(
             f"""<article class="wa-card">
-  <img class="wa-og" src="../go/{stall.slug}/og.jpg" width="1200" height="630" loading="lazy" alt="WhatsApp link preview: {esc(name)} stall">
+  <img class="wa-og" src="../go/{stall.slug}/{GEN_GO.og_image_name(stall)}" width="1200" height="630" loading="lazy" alt="WhatsApp link preview: {esc(name)} stall">
   <div class="wa-body">
   <h3>{esc(name)}</h3>
   <p class="wa-meta">{meta}Friday 16 October</p>{hint_html}
