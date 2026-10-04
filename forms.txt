@@ -4,17 +4,19 @@
 #   slug | Stall name | form-url | year groups | note
 #
 # Leave the form-url blank until the form is ready. The short links at
-# /un-day-2026/go/<slug>/ read this file and send people there.
+# /un-day-2026/go/<slug>/ are built from this file: the form address is
+# copied into each page so the link opens the form straight away.
 # To point a stall at its form, paste the https address in the third
-# column and commit. That is the only edit required for the redirect —
-# do not put form addresses in any other file. The address is only the
-# third column (it must not contain a "|").
+# column, then ALWAYS run:
+#   python3 scripts/gen-go.py
+# and commit forms.txt together with the regenerated go/ folder. Editing
+# this file alone does not change where a short link goes. The address
+# is only the third column (it must not contain a "|").
 #
 # Year groups and the optional note are the WhatsApp link preview.
 # Leave year groups blank for a generic preview. The note, if present,
 # replaces "Tap to pledge food or a contribution for the … stall."
-# After changing a name, year group, or note, run:
-#   python3 scripts/gen-go.py
+# After changing a name, year group, or note, run the same script.
 #
 # Lines starting with # are comments. Blank lines are ignored.
 #

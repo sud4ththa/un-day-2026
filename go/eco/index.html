@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta property="og:title" content="UN Day 2026 · Eco Warriors stall">
 <meta property="og:description" content="Friday 16 October. Tap to pledge food or a contribution for the Eco Warriors stall.">
 <meta property="og:image" content="https://sud4ththa.github.io/un-day-2026/go/eco/og.jpg">
@@ -16,270 +16,143 @@
 <style>
   :root { color-scheme: light; }
   * { box-sizing: border-box; }
-  html, body { margin: 0; min-height: 100%; }
+  [hidden] { display: none !important; }
+  html, body { margin: 0; }
   body {
+    min-height: 100vh;
+    min-height: 100svh;
+    display: flex;
+    flex-direction: column;
     background: #fff;
     color: #111;
-    font-family: Palatino, "Palatino Linotype", Georgia, serif;
-    border-top: 4px solid #111;
+    font-family: "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua", Georgia, serif;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
   }
   main {
-    max-width: 36rem;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    width: 100%;
+    max-width: 40rem;
     margin: 0 auto;
-    padding: 4.5rem 1.5rem 3rem;
+    padding: 3.5rem 1.75rem 2rem;
   }
+  .logos {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1.5rem;
+    margin: 0 0 2.75rem;
+  }
+  .logos img { display: block; height: 56px; width: auto; }
+  .logos .rule { width: 1px; height: 40px; background: #111; opacity: 0.2; }
   .kicker {
-    font-family: system-ui, -apple-system, sans-serif;
-    font-size: 0.8rem;
-    letter-spacing: 0.04em;
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    font-size: 0.72rem;
+    font-weight: 500;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
     margin: 0 0 1.25rem;
+    padding-left: 0.28em;
   }
   h1 {
     font-weight: normal;
-    font-size: 2.25rem;
-    line-height: 1.15;
+    font-size: clamp(2.25rem, 9vw, 3.75rem);
+    line-height: 1.08;
+    letter-spacing: -0.01em;
     margin: 0 0 1.25rem;
+    text-wrap: balance;
   }
-  .lead {
-    font-family: system-ui, -apple-system, sans-serif;
-    font-size: 1.05rem;
-    line-height: 1.55;
-    margin: 0 0 2rem;
+  .detail {
+    font-style: italic;
+    font-size: 1.15rem;
+    line-height: 1.45;
+    margin: 0;
   }
+  .status {
+    margin-top: 3rem;
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  }
+  .lead { font-size: 0.95rem; letter-spacing: 0.01em; margin: 0; }
+  .sub { font-size: 0.85rem; color: #555; margin: 0.5rem 0 0; }
+  .bar {
+    width: 8.5rem;
+    height: 1px;
+    margin: 1.1rem auto 0;
+    background: rgba(17, 17, 17, 0.12);
+    overflow: hidden;
+  }
+  .bar span {
+    display: block;
+    height: 100%;
+    background: #111;
+    transform: scaleX(0);
+    transform-origin: left center;
+    animation: fill 1.6s cubic-bezier(0.2, 0.7, 0.3, 1) forwards;
+  }
+  @keyframes fill { to { transform: scaleX(1); } }
+  @media (prefers-reduced-motion: reduce) {
+    .bar span { animation: none; transform: scaleX(0.6); }
+  }
+  .actions { margin: 1.75rem 0 0; }
   a.continue {
-    font-family: system-ui, -apple-system, sans-serif;
+    font-size: 0.85rem;
     color: #111;
-    border-bottom: 1px solid #111;
     text-decoration: none;
+    border-bottom: 1px solid rgba(17, 17, 17, 0.35);
     padding-bottom: 0.1rem;
   }
-  ul.stalls { list-style: none; padding: 0; margin: 0; }
+  a.continue:hover, a.continue:focus { border-bottom-color: #111; }
+  ul.stalls {
+    list-style: none;
+    padding: 0;
+    margin: 2rem auto 0;
+    max-width: 22rem;
+    text-align: left;
+  }
   ul.stalls li { border-top: 1px solid #111; }
   ul.stalls li:last-child { border-bottom: 1px solid #111; }
   ul.stalls a {
     display: block;
-    padding: 0.9rem 0;
+    padding: 0.85rem 0;
     color: #111;
     text-decoration: none;
-    font-family: system-ui, -apple-system, sans-serif;
   }
-  .hidden { display: none; }
+  footer {
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    font-size: 0.7rem;
+    letter-spacing: 0.04em;
+    color: #666;
+    text-align: center;
+    padding: 0 1.5rem 1.75rem;
+  }
+  @media (min-width: 48rem) {
+    .logos { gap: 2rem; margin-bottom: 3.25rem; }
+    .logos img { height: 68px; }
+    .logos .rule { height: 48px; }
+    .detail { font-size: 1.25rem; }
+  }
 </style>
 </head>
 <body>
-<noscript>
-  <style>#app { display: none; }</style>
-  <main>
-    <p class="kicker">BSC UN Day 2026, the PTC</p>
-    <h1>Contribution form</h1>
-    <p class="lead">JavaScript is required to open this form. The address is read from the form list when the page loads.</p>
-  </main>
-</noscript>
-<main id="app">
-  <p class="kicker">BSC UN Day 2026, the PTC</p>
-  <h1 id="title">Contribution form</h1>
-  <p class="lead" id="message">Opening the form…</p>
-  <p id="actions" class="hidden"><a id="continue" class="continue" href="">Continue to form</a></p>
-  <ul id="list" class="stalls hidden"></ul>
+<main>
+  <div class="logos">
+    <img src="data:image/png;base64,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" width="42" height="56" alt="The British School in Colombo">
+    <span class="rule" aria-hidden="true"></span>
+    <img src="data:image/png;base64,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" width="57" height="56" alt="BSC Parent Collective">
+  </div>
+  <p class="kicker">UN Day 2026</p>
+  <h1>Eco Warriors</h1>
+  <p class="detail">Friday 16 October</p>
+  <div class="status">
+    <p class="lead">This contribution form opens soon.</p>
+    <p class="sub">Please check back later.</p>
+  </div>
 </main>
-<script>
-(function () {
-  var BASE = "/un-day-2026";
-  var TRACK_WAIT_MS = 400;
-  var REQUESTED = "eco";
-  var titleEl = document.getElementById("title");
-  var messageEl = document.getElementById("message");
-  var actionsEl = document.getElementById("actions");
-  var continueEl = document.getElementById("continue");
-  var listEl = document.getElementById("list");
-
-  
-
-  var trackerP = fetch(BASE + "/tracker.txt?t=" + Date.now(), { cache: "no-store" })
-    .then(function (res) {
-      if (!res.ok) return "";
-      return res.text();
-    })
-    .then(trackerEndpoint)
-    .catch(function () { return ""; });
-
-  function trackerEndpoint(text) {
-    var lines = String(text || "").split(/\r?\n/);
-    var i, line;
-    for (i = 0; i < lines.length; i++) {
-      line = lines[i].trim();
-      if (!line || line.charAt(0) === "#") continue;
-      return line.indexOf("https://") === 0 ? line : "";
-    }
-    return "";
-  }
-
-  function randomVid() {
-    var bytes = new Array(12);
-    var i;
-    try {
-      var buf = new Uint8Array(12);
-      crypto.getRandomValues(buf);
-      for (i = 0; i < 12; i++) bytes[i] = buf[i];
-    } catch (err) {
-      for (i = 0; i < 12; i++) bytes[i] = Math.floor(Math.random() * 256);
-    }
-    var hex = "";
-    for (i = 0; i < 12; i++) hex += ("0" + bytes[i].toString(16)).slice(-2);
-    return hex;
-  }
-
-  function visitorId() {
-    var key = "unday26.vid";
-    try {
-      var existing = localStorage.getItem(key);
-      if (existing && /^[A-Za-z0-9_-]{6,64}$/.test(existing)) return existing;
-      var id = randomVid();
-      try { localStorage.setItem(key, id); } catch (err) {}
-      return id;
-    } catch (err) {
-      return randomVid();
-    }
-  }
-
-  function deviceClass() {
-    var ua = navigator.userAgent || "";
-    if (/iPad|Tablet|PlayBook|Silk/i.test(ua)) return "tablet";
-    if (/Android/i.test(ua) && !/Mobile/i.test(ua)) return "tablet";
-    if (/Macintosh/i.test(ua) && navigator.maxTouchPoints > 1) return "tablet";
-    if (/Mobi|iPhone|iPod|Android|Windows Phone/i.test(ua)) return "mobile";
-    return "desktop";
-  }
-
-  function srcTag() {
-    var raw = new URLSearchParams(location.search).get("src") || "";
-    return raw.replace(/[^A-Za-z0-9_.-]/g, "").slice(0, 24);
-  }
-
-  function sendClick(endpoint, slug) {
-    if (!endpoint) return;
-    try {
-      var url = endpoint + "?t=click&s=" + encodeURIComponent(slug)
-        + "&v=" + encodeURIComponent(visitorId())
-        + "&d=" + encodeURIComponent(deviceClass());
-      var src = srcTag();
-      if (src) url += "&src=" + encodeURIComponent(src);
-      var sent = false;
-      try {
-        if (navigator.sendBeacon) sent = navigator.sendBeacon(url);
-      } catch (err) {}
-      if (!sent) {
-        try {
-          fetch(url, { method: "POST", mode: "no-cors", keepalive: true, credentials: "omit" });
-        } catch (err2) {}
-      }
-    } catch (err) {}
-  }
-
-  function withTracker(slug, redirect) {
-    var done = false;
-    function finish() {
-      if (done) return;
-      done = true;
-      redirect();
-    }
-    var timer = setTimeout(finish, TRACK_WAIT_MS);
-    trackerP.then(function (endpoint) {
-      if (done) return;
-      clearTimeout(timer);
-      sendClick(endpoint, slug);
-      finish();
-    }, function () {
-      if (done) return;
-      clearTimeout(timer);
-      finish();
-    });
-  }
-
-  function parse(text) {
-    var stalls = [];
-    text.split(/\r?\n/).forEach(function (raw) {
-      var line = raw.trim();
-      if (!line || line.charAt(0) === "#") return;
-      var parts = line.split("|");
-      if (parts.length < 2) return;
-      var slug = parts[0].trim();
-      var name = parts[1].trim();
-      var url = (parts.length > 2 ? parts[2] : "").trim();
-      if (!slug || !name) return;
-      stalls.push({ slug: slug, name: name, url: url });
-    });
-    return stalls;
-  }
-
-  function showList(stalls, heading, message) {
-    titleEl.textContent = heading;
-    messageEl.textContent = message;
-    document.title = heading + " · BSC UN Day 2026";
-    listEl.textContent = "";
-    stalls.forEach(function (stall) {
-      var li = document.createElement("li");
-      var a = document.createElement("a");
-      a.href = BASE + "/go/" + encodeURIComponent(stall.slug) + "/";
-      a.textContent = stall.name;
-      li.appendChild(a);
-      listEl.appendChild(li);
-    });
-    listEl.classList.remove("hidden");
-  }
-
-  function showSoon(name) {
-    titleEl.textContent = name;
-    messageEl.textContent = "This contribution form opens soon. Please check back later.";
-    document.title = name + " · BSC UN Day 2026";
-  }
-
-  function openForm(stall) {
-    titleEl.textContent = stall.name;
-    document.title = stall.name + " · BSC UN Day 2026";
-    if (stall.url.indexOf("https://") === 0) {
-      messageEl.textContent = "Opening the form…";
-      continueEl.href = stall.url;
-      actionsEl.classList.remove("hidden");
-      withTracker(stall.slug, function () {
-        window.location.replace(stall.url);
-      });
-      return;
-    }
-    showSoon(stall.name);
-  }
-
-  function fail() {
-    titleEl.textContent = "Contribution form";
-    messageEl.textContent = "The form list could not be loaded. Please check back later.";
-  }
-
-  fetch(BASE + "/forms.txt?t=" + Date.now(), { cache: "no-store" })
-    .then(function (res) {
-      if (!res.ok) throw new Error("bad status");
-      return res.text();
-    })
-    .then(function (text) {
-      var stalls = parse(text);
-      var match = null;
-      for (var i = 0; i < stalls.length; i++) {
-        if (stalls[i].slug === REQUESTED) {
-          match = stalls[i];
-          break;
-        }
-      }
-      if (!match) {
-        showList(
-          stalls,
-          "Stall not found",
-          "That short link does not match a stall. Choose one below."
-        );
-        return;
-      }
-      openForm(match);
-    })
-    .catch(fail);
-})();
-</script>
+<footer>The British School in Colombo · PTC</footer>
 </body>
 </html>

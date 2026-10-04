@@ -2,8 +2,12 @@
 #
 # Put ONE line below: the Apps Script web app address that ends in /exec
 # (UN Day menu > Web dashboard link shows it). Leave it blank to switch
-# tracking off. The short links keep working either way: they wait at
-# most 0.4 seconds for this file and never wait for the tracker itself.
+# tracking off. The address is copied into the short-link pages, so after
+# setting, changing or clearing it run python3 scripts/gen-go.py and
+# commit the regenerated go/ folder. The short links never read this file
+# in the browser and never wait for the tracker: the tap is sent at once
+# (sendBeacon), and the form opens after the 0.4 second "Opening the
+# form" screen either way.
 #
 # Sent per tap: stall slug, a random ID kept in the visitor's browser,
 # device type (mobile/tablet/desktop) and an optional ?src= tag.
