@@ -147,6 +147,12 @@ WA_BODY = {
         "what food you can send in, or if you'd like to make a monetary contribution "
         "(we suggest Rs 3,000 to 5,000), or both."
     ),
+    # Year 3 made its own form; the body uses its facts and wording.
+    "sea": (
+        "Thank you for supporting the Year 3 food stall! This year the team is collecting funds "
+        "and arranging the food centrally through selected vendors. They kindly request a minimum "
+        "contribution of LKR 5,000 per child. Please see the menu, bank details and form here:"
+    ),
     "japan": (
         "Thank you for supporting the {stall} stall! Please see the attached letter from "
         "Team Japan for the menu and how to contribute."
@@ -159,7 +165,10 @@ WA_CONTACT = {
     "americas": "Mina (0778388388)",
     "europe": "Dinusha \u201cDhinu\u201d (0776383877)",
     "india": "Gaja (0773935886)",
+    "sea": "Anisha Mawzoon (077 956 7567) or Tina Lobo (076 033 3333)",
 }
+# Message title where the stall's own wording differs from the forms.txt name.
+WA_TITLE = {"sea": "Singapore, Malaysia, Vietnam & Thailand"}
 # A stall team's own WhatsApp write-up, used word for word: the only change
 # is that its form link is swapped for our counted short link. These cards
 # use the forms.txt stall name and get no contact line from us.
@@ -199,7 +208,7 @@ def wa_message(stall) -> str:
     second = f"{stall.years} \u00b7 Friday 16 October" if stall.years else "Friday 16 October"
     body = WA_BODY.get(stall.slug, DEFAULT_BODY).format(stall=name)
     link = f"{SITE}/go/{stall.slug}/?src={WA_SRC}"
-    lines = [f"*UN Day 2026 \u2013 {name} stall*", second, "", body, link]
+    lines = [f"*UN Day 2026 \u2013 {WA_TITLE.get(stall.slug, name)} stall*", second, "", body, link]
     contact = WA_CONTACT.get(stall.slug)
     if contact:
         lines += ["", f"Questions? Please contact {contact}."]

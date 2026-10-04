@@ -51,6 +51,13 @@
       "contribution_options": null
     },
     {
+      "slug": "sea",
+      "stall_managed": true,
+      "form_id": null,
+      "menu": [],
+      "contribution_options": null
+    },
+    {
       "slug": "india",
       "form_id": "1FAIpQLScv1lkhUCwI8t587pc9nYLn6liwDGPztnVw6Max3aKh9aiPmA",
       "menu": [
