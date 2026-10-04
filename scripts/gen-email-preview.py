@@ -1,15 +1,34 @@
 #!/usr/bin/env python3
-"""Write email-preview/index.html.
+"""Write email-preview/index.html and email-preview/og.jpg.
 
 The letter text lives in this script. Run it again after the wording changes:
 
     python3 scripts/gen-email-preview.py
 """
 
+import html
+import importlib.util
+import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 OUT = ROOT / "email-preview" / "index.html"
+OG_IMAGE = ROOT / "email-preview" / "og.jpg"
+SITE = "https://sud4ththa.github.io/un-day-2026"
+PAGE_URL = f"{SITE}/email-preview/"
+
+
+def load_gen_go():
+    """scripts/gen-go.py (forms.txt parser and og.jpg drawing helpers)."""
+    spec = importlib.util.spec_from_file_location("gen_go", ROOT / "scripts" / "gen-go.py")
+    module = importlib.util.module_from_spec(spec)
+    sys.modules["gen_go"] = module
+    sys.dont_write_bytecode = True
+    spec.loader.exec_module(module)
+    return module
+
+
+GEN_GO = load_gen_go()
 
 CELL = "border:1px solid #111;padding:6px 10px;vertical-align:top"
 P = "margin:0 0 14px;"
@@ -70,7 +89,7 @@ def table() -> str:
 
 def email_html() -> str:
     before = [
-        paragraph("Friday 2nd October 2026"),
+        paragraph("Monday 5th October 2026"),
         paragraph(
             "<em>Please note that this is a repeat of the letter sent last Friday about our upcoming UN Day. It now includes the FORM links to all the countries for the purpose of parent contributions.</em>"
         ),
@@ -107,6 +126,114 @@ def email_html() -> str:
     return f'<div id="email" style="{EMAIL_STYLE}">\n{inner}\n</div>'
 
 
+# WhatsApp messages for Amrit and the stall volunteers. One card per stall in
+# forms.txt that has an https address, in forms.txt order. The stall name is
+# the letter's Country/Countries wording (ROWS) where there is one, else the
+# forms.txt name. A stall not listed in WA_BODY gets DEFAULT_BODY.
+WA_SRC = "wa"
+DEFAULT_BODY = (
+    "Thank you for supporting the {stall} stall! Please use the form below to let us know "
+    "what food you can send in, or if you'd like to make a money contribution."
+)
+WA_BODY = {
+    "europe": (
+        "Thank you for supporting the {stall} stall! Please use the form below to let us know "
+        "what food you can send in. This stall is collecting food only."
+    ),
+    "japan": (
+        "Thank you for supporting the {stall} stall! Please see the attached letter from "
+        "Team Japan for the menu and how to contribute."
+    ),
+}
+# Shown on the card only (not part of the message).
+WA_HINT = {"japan": "Attach the Team Japan letter (PDF) when you send this."}
+
+
+def esc(text: str) -> str:
+    return html.escape(text, quote=True)
+
+
+def wa_stalls() -> list:
+    stalls = GEN_GO.parse_stalls((ROOT / "forms.txt").read_text(encoding="utf-8"))
+    return [stall for stall in stalls if stall.url.startswith("https://")]
+
+
+def wa_name(stall) -> str:
+    for _year, country, slug in ROWS:
+        if slug == stall.slug:
+            return country
+    return stall.name
+
+
+def wa_message(stall) -> str:
+    name = wa_name(stall)
+    second = f"{stall.years} \u00b7 Friday 16 October" if stall.years else "Friday 16 October"
+    # "the {stall} stall": avoid "the The Americas/Canada stall".
+    in_sentence = name[4:] if name.startswith("The ") else name
+    body = WA_BODY.get(stall.slug, DEFAULT_BODY).format(stall=in_sentence)
+    link = f"{SITE}/go/{stall.slug}/?src={WA_SRC}"
+    return (
+        f"*UN Day 2026 \u2013 {name} stall*\n"
+        f"{second}\n"
+        "\n"
+        f"{body}\n"
+        f"{link}\n"
+        "\n"
+        "\u2013 The PTC"
+    )
+
+
+def wa_section() -> str:
+    cards = []
+    for stall in wa_stalls():
+        name = wa_name(stall)
+        msg_id = f"wa-{stall.slug}"
+        meta = esc(stall.years) + " \u00b7 " if stall.years else ""
+        hint = WA_HINT.get(stall.slug)
+        hint_html = f'\n  <p class="wa-hint">{esc(hint)}</p>' if hint else ""
+        cards.append(
+            f"""<article class="wa-card">
+  <img class="wa-og" src="../go/{stall.slug}/og.jpg" width="1200" height="630" loading="lazy" alt="WhatsApp link preview: {esc(name)} stall">
+  <div class="wa-body">
+  <h3>{esc(name)}</h3>
+  <p class="wa-meta">{meta}Friday 16 October</p>{hint_html}
+  <pre class="wa-msg" id="{msg_id}">{esc(wa_message(stall))}</pre>
+  <div class="wa-actions"><button type="button" class="wa-copy" data-target="{msg_id}">Copy</button><span class="wa-state" role="status"></span></div>
+  </div>
+</article>"""
+        )
+    return (
+        '<section class="wa" aria-labelledby="wa-title">\n'
+        '<h2 id="wa-title">For sharing on WhatsApp</h2>\n'
+        '<p class="wa-intro">For Amrit (class WhatsApp groups) and the stall volunteers. '
+        "Copy a message and paste it into WhatsApp. Keep the link on its own line so "
+        "WhatsApp shows the preview card pictured above each message.</p>\n"
+        + "\n".join(cards)
+        + "\n</section>"
+    )
+
+
+def og_tags() -> str:
+    image = f"{SITE}/email-preview/og.jpg"
+    fields = [
+        ("property", "og:title", "UN Day 2026 \u00b7 Parent email (preview)"),
+        ("property", "og:description", "Letter to parents with each year group's food contribution form. Friday 16 October 2026."),
+        ("property", "og:image", image),
+        ("property", "og:image:width", "1200"),
+        ("property", "og:image:height", "630"),
+        ("property", "og:url", PAGE_URL),
+        ("property", "og:type", "website"),
+        ("name", "twitter:card", "summary_large_image"),
+        ("name", "twitter:image", image),
+    ]
+    return "\n".join(f'<meta {attr}="{name}" content="{esc(value)}">' for attr, name, value in fields)
+
+
+def write_og_image() -> None:
+    card = GEN_GO.Stall(slug="email-preview", name="Parent email", url="", years="", note="")
+    GEN_GO.write_og_image(OG_IMAGE, card)
+
+
 PAGE = """<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -114,6 +241,7 @@ PAGE = """<!DOCTYPE html>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name=robots content=noindex>
 <title>UN Day 2026 parent email (draft preview)</title>
+__OG__
 <style>
   body { margin: 0; background: #f4f4f4; }
   .bar {
@@ -146,6 +274,99 @@ PAGE = """<!DOCTYPE html>
     margin: 24px auto;
     padding: 32px 28px;
   }
+  .wa {
+    max-width: 700px;
+    margin: 56px auto 48px;
+    padding: 0 16px;
+    font-family: Georgia, 'Times New Roman', serif;
+    color: #111;
+  }
+  .wa h2 {
+    font-weight: normal;
+    font-size: 26px;
+    letter-spacing: -0.01em;
+    margin: 0 0 10px;
+    padding-top: 28px;
+    border-top: 2px solid #111;
+  }
+  .wa-intro {
+    font-size: 15px;
+    line-height: 1.55;
+    margin: 0 0 24px;
+    color: #333;
+  }
+  .wa-card {
+    background: #fff;
+    border: 1px solid #111;
+    margin: 0 0 24px;
+  }
+  .wa-og {
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1200 / 630;
+    border-bottom: 1px solid #111;
+  }
+  .wa-body { padding: 18px 20px 20px; }
+  .wa-card h3 {
+    font-weight: normal;
+    font-size: 22px;
+    line-height: 1.2;
+    margin: 0 0 4px;
+  }
+  .wa-meta {
+    font-style: italic;
+    font-size: 15px;
+    margin: 0 0 14px;
+    color: #333;
+  }
+  .wa-hint {
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 13px;
+    margin: -6px 0 14px;
+    padding-left: 10px;
+    border-left: 2px solid #111;
+  }
+  .wa-msg {
+    margin: 0;
+    padding: 14px 16px;
+    background: #f7f7f7;
+    border: 1px solid #ccc;
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 14px;
+    line-height: 1.5;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    -webkit-user-select: text;
+    user-select: text;
+  }
+  .wa-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 12px;
+  }
+  .wa-copy {
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 14px;
+    color: #fff;
+    background: #000;
+    border: 1px solid #000;
+    padding: 8px 18px;
+    min-width: 96px;
+    cursor: pointer;
+  }
+  .wa-copy.is-copied { background: #fff; color: #000; }
+  .wa-state {
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 13px;
+    color: #333;
+  }
+  @media (max-width: 480px) {
+    .card { margin: 0; padding: 24px 16px; }
+    .wa { margin-top: 40px; padding: 0 12px; }
+    .wa-body { padding: 16px 14px 18px; }
+  }
 </style>
 </head>
 <body>
@@ -160,6 +381,7 @@ PAGE = """<!DOCTYPE html>
 __EMAIL__
 <!-- COPY TO HERE -->
 </div>
+__WA__
 <script>
 (function () {
   var statusEl = document.getElementById("status");
@@ -243,6 +465,52 @@ __EMAIL__
       setStatus("Copy failed");
     }
   });
+  Array.prototype.forEach.call(document.querySelectorAll(".wa-copy"), function (button) {
+    var box = document.getElementById(button.getAttribute("data-target"));
+    var state = button.parentNode.querySelector(".wa-state");
+    var timer = null;
+
+    function selectBox() {
+      var range = document.createRange();
+      range.selectNodeContents(box);
+      var selection = window.getSelection();
+      selection.removeAllRanges();
+      selection.addRange(range);
+      return selection;
+    }
+
+    function copied() {
+      button.textContent = "Copied";
+      button.classList.add("is-copied");
+      state.textContent = "";
+      clearTimeout(timer);
+      timer = setTimeout(function () {
+        button.textContent = "Copy";
+        button.classList.remove("is-copied");
+      }, 2000);
+    }
+
+    function fallback() {
+      var selection = selectBox();
+      var ok = false;
+      try { ok = document.execCommand("copy"); } catch (err) {}
+      if (ok) {
+        selection.removeAllRanges();
+        copied();
+      } else {
+        state.textContent = "Text selected: copy it from the menu";
+      }
+    }
+
+    button.addEventListener("click", function () {
+      var text = box.textContent;
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(copied, fallback);
+        return;
+      }
+      fallback();
+    });
+  });
 })();
 </script>
 </body>
@@ -251,12 +519,20 @@ __EMAIL__
 
 
 def main() -> None:
-    page = PAGE.replace("__EMAIL__", email_html())
-    if "__EMAIL__" in page:
-        raise SystemExit("email was not inserted")
+    page = (
+        PAGE.replace("__EMAIL__", email_html())
+        .replace("__OG__", og_tags())
+        .replace("__WA__", wa_section())
+    )
+    for marker in ("__EMAIL__", "__OG__", "__WA__"):
+        if marker in page:
+            raise SystemExit(f"{marker} was not inserted")
+    if page.count("<title>") != 1 or page.count("<head>") != 1:
+        raise SystemExit("page must have exactly one <head> and one <title>")
     OUT.parent.mkdir(parents=True, exist_ok=True)
     OUT.write_text(page, encoding="utf-8")
-    print(f"wrote {OUT.relative_to(ROOT)}")
+    write_og_image()
+    print(f"wrote {OUT.relative_to(ROOT)} ({len(wa_stalls())} WhatsApp cards) and {OG_IMAGE.relative_to(ROOT)}")
 
 
 if __name__ == "__main__":
