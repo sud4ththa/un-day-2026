@@ -44,6 +44,13 @@
       ]
     },
     {
+      "slug": "japan",
+      "stall_managed": true,
+      "form_id": null,
+      "menu": [],
+      "contribution_options": null
+    },
+    {
       "slug": "australia",
       "stall_managed": true,
       "form_id": null,
@@ -142,6 +149,13 @@
         "Monetary contribution",
         "Both"
       ]
+    },
+    {
+      "slug": "maldives",
+      "stall_managed": true,
+      "form_id": null,
+      "menu": [],
+      "contribution_options": null
     }
   ]
 }

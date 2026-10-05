@@ -1,6 +1,6 @@
 {
-  "updated": "2026-10-05T12:12+05:30",
-  "data_hash": "55edd1c668e8db5d",
+  "updated": "2026-10-05T13:16+05:30",
+  "data_hash": "777f5ca75adf4fb7",
   "event": {
     "name": "UN Day 2026",
     "date": "2026-10-16",
@@ -8,20 +8,20 @@
   },
   "tracking": "off",
   "summary": {
-    "stalls": 7,
+    "stalls": 9,
     "connected": 4,
-    "stall_managed": 2,
-    "responses": 21,
-    "families": 19,
+    "stall_managed": 4,
+    "responses": 33,
+    "families": 29,
     "contribution": {
-      "Food": 6,
-      "Monetary contribution": 5,
-      "Both": 2,
+      "Food": 12,
+      "Monetary contribution": 8,
+      "Both": 3,
       "Not given": 0
     },
     "menu_items": 70,
-    "menu_items_unpledged": 61,
-    "last_response": "2026-10-05T12:04+05:30",
+    "menu_items_unpledged": 57,
+    "last_response": "2026-10-05T13:04+05:30",
     "clicks": null,
     "conversion": null
   },
@@ -31,9 +31,17 @@
       "name": "Sri Lanka",
       "year_groups": "Playgroup & Reception",
       "status": "ok",
-      "responses": 8,
-      "families": 8,
+      "responses": 14,
+      "families": 13,
       "by_class": [
+        {
+          "class": "Playgroup B",
+          "count": 1
+        },
+        {
+          "class": "Playgroup C",
+          "count": 1
+        },
         {
           "class": "Reception A",
           "count": 4
@@ -44,16 +52,16 @@
         },
         {
           "class": "Reception C",
-          "count": 1
+          "count": 4
         },
         {
           "class": "Reception D",
-          "count": 2
+          "count": 3
         }
       ],
       "contribution": {
-        "Food": 4,
-        "Monetary contribution": 3,
+        "Food": 8,
+        "Monetary contribution": 5,
         "Both": 1,
         "Not given": 0
       },
@@ -126,7 +134,7 @@
         },
         {
           "item": "Milk toffee (100)",
-          "count": 2,
+          "count": 3,
           "label": "Milk toffee",
           "needed": "100"
         },
@@ -156,7 +164,7 @@
         },
         {
           "item": "Thala karali (100)",
-          "count": 3,
+          "count": 5,
           "label": "Thala karali",
           "needed": "100"
         },
@@ -180,7 +188,7 @@
         },
         {
           "item": "Coconut roti (50)",
-          "count": 0,
+          "count": 1,
           "label": "Coconut roti",
           "needed": "50"
         },
@@ -204,7 +212,22 @@
         }
       ],
       "unlisted_ticks": 0,
-      "last_response": "2026-10-05T12:03+05:30",
+      "last_response": "2026-10-05T12:48+05:30",
+      "clicks": null,
+      "conversion": null
+    },
+    {
+      "slug": "japan",
+      "name": "Japan",
+      "year_groups": "Nursery & Year 1",
+      "status": "stall_managed",
+      "responses": 0,
+      "families": 0,
+      "by_class": [],
+      "contribution": null,
+      "menu": [],
+      "unlisted_ticks": 0,
+      "last_response": null,
       "clicks": null,
       "conversion": null
     },
@@ -243,16 +266,20 @@
       "name": "India",
       "year_groups": "Years 7 & 11",
       "status": "ok",
-      "responses": 2,
-      "families": 2,
+      "responses": 3,
+      "families": 3,
       "by_class": [
+        {
+          "class": "Year 11A",
+          "count": 1
+        },
         {
           "class": "Year 11B",
           "count": 2
         }
       ],
       "contribution": {
-        "Food": 2,
+        "Food": 3,
         "Monetary contribution": 0,
         "Both": 0,
         "Not given": 0
@@ -290,7 +317,7 @@
         },
         {
           "item": "Chicken samosa (200)",
-          "count": 0,
+          "count": 1,
           "label": "Chicken samosa",
           "needed": "200"
         },
@@ -328,7 +355,7 @@
         }
       ],
       "unlisted_ticks": 0,
-      "last_response": "2026-10-05T11:50+05:30",
+      "last_response": "2026-10-05T12:42+05:30",
       "clicks": null,
       "conversion": null
     },
@@ -337,8 +364,8 @@
       "name": "USA/Canada",
       "year_groups": "Year 4",
       "status": "ok",
-      "responses": 3,
-      "families": 3,
+      "responses": 6,
+      "families": 6,
       "by_class": [
         {
           "class": "Year 4A",
@@ -347,22 +374,26 @@
         {
           "class": "Year 4B",
           "count": 1
+        },
+        {
+          "class": "Year 4D",
+          "count": 3
         }
       ],
       "contribution": {
-        "Food": 0,
-        "Monetary contribution": 2,
-        "Both": 1,
+        "Food": 1,
+        "Monetary contribution": 3,
+        "Both": 2,
         "Not given": 0
       },
       "menu": [
         {
           "item": "Cupcakes",
-          "count": 0
+          "count": 1
         },
         {
           "item": "Mini pizza",
-          "count": 0
+          "count": 1
         },
         {
           "item": "Mini doughnuts",
@@ -390,7 +421,7 @@
         }
       ],
       "unlisted_ticks": 0,
-      "last_response": "2026-10-05T12:04+05:30",
+      "last_response": "2026-10-05T13:04+05:30",
       "clicks": null,
       "conversion": null
     },
@@ -399,9 +430,13 @@
       "name": "Europe",
       "year_groups": "Year 6",
       "status": "ok",
-      "responses": 8,
-      "families": 8,
+      "responses": 10,
+      "families": 10,
       "by_class": [
+        {
+          "class": "Year 6A",
+          "count": 1
+        },
         {
           "class": "Year 6B",
           "count": 3
@@ -412,7 +447,7 @@
         },
         {
           "class": "Year 6D",
-          "count": 1
+          "count": 2
         }
       ],
       "contribution": null,
@@ -435,7 +470,7 @@
         },
         {
           "item": "Chicken sausages",
-          "count": 2
+          "count": 3
         },
         {
           "item": "Chicken meatballs",
@@ -447,7 +482,7 @@
         },
         {
           "item": "Mini cupcakes",
-          "count": 1
+          "count": 2
         },
         {
           "item": "Chocolate fudge",
@@ -459,7 +494,7 @@
         }
       ],
       "unlisted_ticks": 0,
-      "last_response": "2026-10-05T12:04+05:30",
+      "last_response": "2026-10-05T12:23+05:30",
       "clicks": null,
       "conversion": null
     },
@@ -543,6 +578,21 @@
           "count": 0
         }
       ],
+      "unlisted_ticks": 0,
+      "last_response": null,
+      "clicks": null,
+      "conversion": null
+    },
+    {
+      "slug": "maldives",
+      "name": "Maldives",
+      "year_groups": "Year 10",
+      "status": "stall_managed",
+      "responses": 0,
+      "families": 0,
+      "by_class": [],
+      "contribution": null,
+      "menu": [],
       "unlisted_ticks": 0,
       "last_response": null,
       "clicks": null,
