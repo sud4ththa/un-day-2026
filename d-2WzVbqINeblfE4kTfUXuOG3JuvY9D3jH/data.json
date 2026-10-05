@@ -1,6 +1,6 @@
 {
-  "updated": "2026-10-05T20:19+05:30",
-  "data_hash": "bc16abc3267dcd22",
+  "updated": "2026-10-05T21:24+05:30",
+  "data_hash": "28eac37df267826d",
   "event": {
     "name": "UN Day 2026",
     "date": "2026-10-16",
@@ -11,26 +11,26 @@
     "stalls": 9,
     "connected": 4,
     "stall_managed": 4,
-    "responses": 55,
-    "families": 50,
+    "responses": 56,
+    "families": 51,
     "contribution": {
       "Food": 23,
-      "Monetary contribution": 17,
+      "Monetary contribution": 18,
       "Both": 3,
       "Not given": 0
     },
     "menu_items": 70,
     "menu_items_unpledged": 51,
-    "last_response": "2026-10-05T19:22+05:30",
+    "last_response": "2026-10-05T20:46+05:30",
     "clicks": {
-      "total": 40,
-      "unique": 36,
+      "total": 51,
+      "unique": 46,
       "all_links": {
-        "total": 59,
-        "unique": 49
+        "total": 72,
+        "unique": 60
       }
     },
-    "conversion": 4.583
+    "conversion": 4.0
   },
   "stalls": [
     {
@@ -245,14 +245,14 @@
       "unlisted_ticks": 0,
       "last_response": null,
       "clicks": {
-        "total": 7,
-        "unique": 7,
+        "total": 9,
+        "unique": 8,
         "by_src": {
-          "g2": 4,
+          "g2": 6,
           "(none)": 3
         },
         "by_device": {
-          "mobile": 4,
+          "mobile": 6,
           "desktop": 3
         }
       },
@@ -271,13 +271,15 @@
       "unlisted_ticks": 0,
       "last_response": null,
       "clicks": {
-        "total": 4,
-        "unique": 4,
+        "total": 6,
+        "unique": 6,
         "by_src": {
-          "(none)": 4
+          "(none)": 4,
+          "g2": 2
         },
         "by_device": {
-          "desktop": 4
+          "desktop": 4,
+          "mobile": 2
         }
       },
       "conversion": null
@@ -295,15 +297,15 @@
       "unlisted_ticks": 0,
       "last_response": null,
       "clicks": {
-        "total": 11,
-        "unique": 9,
+        "total": 16,
+        "unique": 14,
         "by_src": {
-          "g2": 9,
+          "g2": 14,
           "(none)": 2
         },
         "by_device": {
-          "mobile": 9,
-          "desktop": 2
+          "mobile": 11,
+          "desktop": 5
         }
       },
       "conversion": null
@@ -313,12 +315,12 @@
       "name": "India",
       "year_groups": "Years 7 & 11",
       "status": "ok",
-      "responses": 10,
-      "families": 10,
+      "responses": 11,
+      "families": 11,
       "by_class": [
         {
           "class": "Year 7B",
-          "count": 1
+          "count": 2
         },
         {
           "class": "Year 7C",
@@ -343,7 +345,7 @@
       ],
       "contribution": {
         "Food": 4,
-        "Monetary contribution": 6,
+        "Monetary contribution": 7,
         "Both": 0,
         "Not given": 0
       },
@@ -418,18 +420,19 @@
         }
       ],
       "unlisted_ticks": 0,
-      "last_response": "2026-10-05T19:22+05:30",
+      "last_response": "2026-10-05T20:46+05:30",
       "clicks": {
-        "total": 3,
-        "unique": 3,
+        "total": 4,
+        "unique": 4,
         "by_src": {
-          "g2": 3
+          "g2": 4
         },
         "by_device": {
-          "mobile": 3
+          "mobile": 3,
+          "desktop": 1
         }
       },
-      "conversion": 3.333
+      "conversion": 2.75
     },
     {
       "slug": "americas",
@@ -577,17 +580,18 @@
       "unlisted_ticks": 0,
       "last_response": "2026-10-05T17:01+05:30",
       "clicks": {
-        "total": 3,
-        "unique": 3,
+        "total": 4,
+        "unique": 4,
         "by_src": {
           "(none)": 2,
-          "g2": 1
+          "g2": 2
         },
         "by_device": {
-          "desktop": 3
+          "desktop": 3,
+          "mobile": 1
         }
       },
-      "conversion": 4.0
+      "conversion": 3.0
     },
     {
       "slug": "middle-east",
