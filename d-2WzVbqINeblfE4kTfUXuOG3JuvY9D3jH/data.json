@@ -1,12 +1,12 @@
 {
-  "updated": "2026-10-05T18:17+05:30",
-  "data_hash": "a85ad1243c15d0a6",
+  "updated": "2026-10-05T19:18+05:30",
+  "data_hash": "b0a39fae1d0fc957",
   "event": {
     "name": "UN Day 2026",
     "date": "2026-10-16",
     "leads_summary": "2026-10-06"
   },
-  "tracking": "off",
+  "tracking": "on",
   "summary": {
     "stalls": 9,
     "connected": 4,
@@ -22,8 +22,15 @@
     "menu_items": 70,
     "menu_items_unpledged": 51,
     "last_response": "2026-10-05T18:09+05:30",
-    "clicks": null,
-    "conversion": null
+    "clicks": {
+      "total": 10,
+      "unique": 10,
+      "all_links": {
+        "total": 27,
+        "unique": 21
+      }
+    },
+    "conversion": 10.8
   },
   "stalls": [
     {
@@ -213,7 +220,12 @@
       ],
       "unlisted_ticks": 0,
       "last_response": "2026-10-05T18:09+05:30",
-      "clicks": null,
+      "clicks": {
+        "total": 0,
+        "unique": 0,
+        "by_src": {},
+        "by_device": {}
+      },
       "conversion": null
     },
     {
@@ -228,7 +240,16 @@
       "menu": [],
       "unlisted_ticks": 0,
       "last_response": null,
-      "clicks": null,
+      "clicks": {
+        "total": 2,
+        "unique": 2,
+        "by_src": {
+          "g2": 2
+        },
+        "by_device": {
+          "mobile": 2
+        }
+      },
       "conversion": null
     },
     {
@@ -243,7 +264,12 @@
       "menu": [],
       "unlisted_ticks": 0,
       "last_response": null,
-      "clicks": null,
+      "clicks": {
+        "total": 0,
+        "unique": 0,
+        "by_src": {},
+        "by_device": {}
+      },
       "conversion": null
     },
     {
@@ -258,7 +284,16 @@
       "menu": [],
       "unlisted_ticks": 0,
       "last_response": null,
-      "clicks": null,
+      "clicks": {
+        "total": 3,
+        "unique": 3,
+        "by_src": {
+          "g2": 3
+        },
+        "by_device": {
+          "mobile": 3
+        }
+      },
       "conversion": null
     },
     {
@@ -372,8 +407,17 @@
       ],
       "unlisted_ticks": 0,
       "last_response": "2026-10-05T17:51+05:30",
-      "clicks": null,
-      "conversion": null
+      "clicks": {
+        "total": 3,
+        "unique": 3,
+        "by_src": {
+          "g2": 3
+        },
+        "by_device": {
+          "mobile": 3
+        }
+      },
+      "conversion": 3.0
     },
     {
       "slug": "americas",
@@ -442,7 +486,12 @@
       ],
       "unlisted_ticks": 0,
       "last_response": "2026-10-05T16:07+05:30",
-      "clicks": null,
+      "clicks": {
+        "total": 0,
+        "unique": 0,
+        "by_src": {},
+        "by_device": {}
+      },
       "conversion": null
     },
     {
@@ -515,7 +564,12 @@
       ],
       "unlisted_ticks": 0,
       "last_response": "2026-10-05T17:01+05:30",
-      "clicks": null,
+      "clicks": {
+        "total": 0,
+        "unique": 0,
+        "by_src": {},
+        "by_device": {}
+      },
       "conversion": null
     },
     {
@@ -600,8 +654,17 @@
       ],
       "unlisted_ticks": 0,
       "last_response": null,
-      "clicks": null,
-      "conversion": null
+      "clicks": {
+        "total": 2,
+        "unique": 2,
+        "by_src": {
+          "g2": 2
+        },
+        "by_device": {
+          "mobile": 2
+        }
+      },
+      "conversion": 0.0
     },
     {
       "slug": "maldives",
@@ -615,7 +678,12 @@
       "menu": [],
       "unlisted_ticks": 0,
       "last_response": null,
-      "clicks": null,
+      "clicks": {
+        "total": 0,
+        "unique": 0,
+        "by_src": {},
+        "by_device": {}
+      },
       "conversion": null
     }
   ]
