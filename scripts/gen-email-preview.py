@@ -163,7 +163,7 @@ WA_CONTACT = {
     "sri-lanka": "Avanthi (0777557800) or Melanie (0770657150)",
     "japan": "Tomo (0779851630)",
     "americas": "Mina (0778388388)",
-    "europe": "Dinusha \u201cDhinu\u201d (0776383877)",
+    "europe": "Dinusha (077 638 3877) or Gothami (071 271 2041)",
     "india": "Gaja (0773935886)",
     "middle-east": "Dil (0777368747)",
     "sea": "Anisha Mawzoon (077 956 7567) or Tina Lobo (076 033 3333)",
