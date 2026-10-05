@@ -151,6 +151,23 @@
       ]
     },
     {
+      "slug": "un-zone",
+      "form_id": "1FAIpQLSfeLByxwbI0-s0lV_7jbWmvD7kuaubMU7l-vNZ2gpSeDqKmMw",
+      "menu": [
+        "Mini chicken shawarma",
+        "Mini kebabs",
+        "Mini falafel wraps",
+        "Hummus",
+        "Palestinian Eclair",
+        "Mini iced-Palestinian flag cookies"
+      ],
+      "contribution_options": [
+        "Food",
+        "Monetary contribution",
+        "Both"
+      ]
+    },
+    {
       "slug": "maldives",
       "stall_managed": true,
       "form_id": null,

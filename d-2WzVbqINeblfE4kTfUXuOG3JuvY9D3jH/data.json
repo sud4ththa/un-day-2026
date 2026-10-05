@@ -1,6 +1,6 @@
 {
-  "updated": "2026-10-05T19:18+05:30",
-  "data_hash": "b0a39fae1d0fc957",
+  "updated": "2026-10-05T19:46+05:30",
+  "data_hash": "22d0169fd008da9c",
   "event": {
     "name": "UN Day 2026",
     "date": "2026-10-16",
@@ -8,29 +8,29 @@
   },
   "tracking": "on",
   "summary": {
-    "stalls": 9,
+    "stalls": 10,
     "connected": 4,
     "stall_managed": 4,
-    "responses": 54,
-    "families": 49,
+    "responses": 55,
+    "families": 50,
     "contribution": {
-      "Food": 22,
+      "Food": 23,
       "Monetary contribution": 17,
       "Both": 3,
       "Not given": 0
     },
-    "menu_items": 70,
-    "menu_items_unpledged": 51,
-    "last_response": "2026-10-05T18:09+05:30",
+    "menu_items": 76,
+    "menu_items_unpledged": 57,
+    "last_response": "2026-10-05T19:22+05:30",
     "clicks": {
-      "total": 10,
-      "unique": 10,
+      "total": 37,
+      "unique": 30,
       "all_links": {
-        "total": 27,
-        "unique": 21
+        "total": 37,
+        "unique": 30
       }
     },
-    "conversion": 10.8
+    "conversion": 2.5
   },
   "stalls": [
     {
@@ -221,12 +221,16 @@
       "unlisted_ticks": 0,
       "last_response": "2026-10-05T18:09+05:30",
       "clicks": {
-        "total": 0,
-        "unique": 0,
-        "by_src": {},
-        "by_device": {}
+        "total": 2,
+        "unique": 1,
+        "by_src": {
+          "g2": 2
+        },
+        "by_device": {
+          "mobile": 2
+        }
       },
-      "conversion": null
+      "conversion": 23.0
     },
     {
       "slug": "japan",
@@ -285,13 +289,13 @@
       "unlisted_ticks": 0,
       "last_response": null,
       "clicks": {
-        "total": 3,
-        "unique": 3,
+        "total": 4,
+        "unique": 4,
         "by_src": {
-          "g2": 3
+          "g2": 4
         },
         "by_device": {
-          "mobile": 3
+          "mobile": 4
         }
       },
       "conversion": null
@@ -301,8 +305,8 @@
       "name": "India",
       "year_groups": "Years 7 & 11",
       "status": "ok",
-      "responses": 9,
-      "families": 9,
+      "responses": 10,
+      "families": 10,
       "by_class": [
         {
           "class": "Year 7B",
@@ -310,7 +314,7 @@
         },
         {
           "class": "Year 7C",
-          "count": 1
+          "count": 2
         },
         {
           "class": "Year 7D",
@@ -330,7 +334,7 @@
         }
       ],
       "contribution": {
-        "Food": 3,
+        "Food": 4,
         "Monetary contribution": 6,
         "Both": 0,
         "Not given": 0
@@ -406,7 +410,7 @@
         }
       ],
       "unlisted_ticks": 0,
-      "last_response": "2026-10-05T17:51+05:30",
+      "last_response": "2026-10-05T19:22+05:30",
       "clicks": {
         "total": 3,
         "unique": 3,
@@ -417,7 +421,7 @@
           "mobile": 3
         }
       },
-      "conversion": 3.0
+      "conversion": 3.333
     },
     {
       "slug": "americas",
@@ -565,12 +569,16 @@
       "unlisted_ticks": 0,
       "last_response": "2026-10-05T17:01+05:30",
       "clicks": {
-        "total": 0,
-        "unique": 0,
-        "by_src": {},
-        "by_device": {}
+        "total": 1,
+        "unique": 1,
+        "by_src": {
+          "g2": 1
+        },
+        "by_device": {
+          "desktop": 1
+        }
       },
-      "conversion": null
+      "conversion": 12.0
     },
     {
       "slug": "middle-east",
@@ -655,13 +663,71 @@
       "unlisted_ticks": 0,
       "last_response": null,
       "clicks": {
-        "total": 2,
-        "unique": 2,
+        "total": 4,
+        "unique": 4,
         "by_src": {
+          "(none)": 2,
           "g2": 2
         },
         "by_device": {
+          "desktop": 2,
           "mobile": 2
+        }
+      },
+      "conversion": 0.0
+    },
+    {
+      "slug": "un-zone",
+      "name": "UN Zone / Palestine",
+      "year_groups": "Years 5 & 8",
+      "status": "not_connected",
+      "responses": 0,
+      "families": 0,
+      "by_class": [],
+      "contribution": {
+        "Food": 0,
+        "Monetary contribution": 0,
+        "Both": 0,
+        "Not given": 0
+      },
+      "menu": [
+        {
+          "item": "Mini chicken shawarma",
+          "count": 0
+        },
+        {
+          "item": "Mini kebabs",
+          "count": 0
+        },
+        {
+          "item": "Mini falafel wraps",
+          "count": 0
+        },
+        {
+          "item": "Hummus",
+          "count": 0
+        },
+        {
+          "item": "Palestinian Eclair",
+          "count": 0
+        },
+        {
+          "item": "Mini iced-Palestinian flag cookies",
+          "count": 0
+        }
+      ],
+      "unlisted_ticks": 0,
+      "last_response": null,
+      "clicks": {
+        "total": 19,
+        "unique": 13,
+        "by_src": {
+          "g2": 18,
+          "(none)": 1
+        },
+        "by_device": {
+          "mobile": 18,
+          "desktop": 1
         }
       },
       "conversion": 0.0
@@ -679,10 +745,14 @@
       "unlisted_ticks": 0,
       "last_response": null,
       "clicks": {
-        "total": 0,
-        "unique": 0,
-        "by_src": {},
-        "by_device": {}
+        "total": 2,
+        "unique": 2,
+        "by_src": {
+          "g2": 2
+        },
+        "by_device": {
+          "mobile": 2
+        }
       },
       "conversion": null
     }
