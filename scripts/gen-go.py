@@ -4,10 +4,11 @@
 Each /go/<slug>/ page is fully static. The form address (third column of
 forms.txt) and the click-tracker address (tracker.txt) are baked into the
 page when this script runs, so a page never fetches forms.txt or
-tracker.txt in the browser. A page with a form address fires the click
-beacon straight away (navigator.sendBeacon, which survives navigation),
-shows a short "Opening the form…" screen, and replaces itself with the
-form after REDIRECT_MS. It does not wait for the tracker.
+tracker.txt in the browser. Every stall page fires the click beacon straight away
+(navigator.sendBeacon, which survives navigation) when tracker.txt has an
+address. A page with a form address shows a short "Opening the form…"
+screen and replaces itself with the form after REDIRECT_MS. A holding
+page records the tap and stays put. Nothing waits for the tracker.
 
 Because the addresses are baked in, you MUST run this script and commit
 the regenerated go/ folder after any of these changes:
@@ -174,6 +175,13 @@ __TRACK__  setTimeout(function () { location.replace(FORM); }, __DELAY__);
 </script>
 """
 
+# Holding pages have no form. They still record the tap, then stay put.
+HOLD_HEAD_JS = """<script>
+(function () {
+__TRACK__})();
+</script>
+"""
+
 INDEX_HEAD_JS = """<script>
 var UNDAY_GO = (function () {
   var STALLS = __STALLS__;
@@ -182,8 +190,8 @@ var UNDAY_GO = (function () {
   for (var i = 0; i < STALLS.length; i++) {
     if (STALLS[i].s === requested) { match = STALLS[i]; break; }
   }
-__TRACK__  if (match && match.u) {
-    __SEND__setTimeout(function () { location.replace(match.u); }, __DELAY__);
+__TRACK__  __SEND__if (match && match.u) {
+    setTimeout(function () { location.replace(match.u); }, __DELAY__);
   }
   return { base: __BASE__, stalls: STALLS, requested: requested, match: match };
 })();
@@ -590,14 +598,16 @@ def render_page(*, head_js: str, og: str, title: str, content: str, body_js: str
 
 def render_stall(stall: Stall, endpoint: str, logos: dict[str, str]) -> str:
     head_js = ""
+    track = track_js(endpoint)
+    if track:
+        track += f"\n  sendClick({js(stall.slug)});\n"
     if stall.is_open:
-        track = track_js(endpoint)
-        if track:
-            track += f"\n  sendClick({js(stall.slug)});\n"
         head_js = fill(
             SLUG_HEAD_JS,
             {"FORM": js(stall.url), "TRACK": track, "DELAY": str(REDIRECT_MS)},
         )
+    elif track:
+        head_js = fill(HOLD_HEAD_JS, {"TRACK": track})
     page = render_page(
         head_js=head_js,
         og=og_tags(stall),
@@ -621,7 +631,7 @@ def render_index(stalls: list[Stall], endpoint: str, logos: dict[str, str]) -> s
         {
             "STALLS": js(table),
             "TRACK": track,
-            "SEND": "sendClick(match.s);\n    " if track else "",
+            "SEND": "if (match) sendClick(match.s);\n  " if track else "",
             "DELAY": str(REDIRECT_MS),
             "BASE": js(BASE),
         },

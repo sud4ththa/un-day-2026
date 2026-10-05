@@ -72,8 +72,8 @@ var UNDAY_GO = (function () {
       }
     } catch (err) {}
   }
+  if (match) sendClick(match.s);
   if (match && match.u) {
-    sendClick(match.s);
     setTimeout(function () { location.replace(match.u); }, 400);
   }
   return { base: "/un-day-2026", stalls: STALLS, requested: requested, match: match };

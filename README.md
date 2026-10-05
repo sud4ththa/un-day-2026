@@ -74,9 +74,9 @@ The pages are self-contained. `/go/?s=<slug>` uses a stall list baked into `go/i
 
 ## Click tracking (optional)
 
-Short links can record an anonymous tap. Tracking ships switched off.
+Short links can record an anonymous tap.
 
-`tracker.txt` is comments, plus at most one line: the Apps Script web app address that ends in `/exec`. The UN Day menu's Web dashboard link shows that address. Leave the line out, as the file does now, to keep tracking off. Clearing it later switches tracking off again. The address is copied into the short-link pages, so run `python3 scripts/gen-go.py` and commit after any change to `tracker.txt`. The short links open either way.
+`tracker.txt` is comments, plus at most one line: the Apps Script web app address that ends in `/exec`. The UN Day menu's Web dashboard link shows that address. Leave the line out to keep tracking off. Clearing it later switches tracking off again. The address is copied into the short-link pages, so run `python3 scripts/gen-go.py` and commit after any change to `tracker.txt`. The short links open either way.
 
 A tap sends the stall slug, a random id stored in that browser, a device type (mobile, tablet or desktop), and an optional source tag. No names and no form answers.
 
@@ -84,7 +84,7 @@ The tap is sent as soon as the page starts loading (`navigator.sendBeacon`, fall
 
 Add `?src=` when you want to tell taps apart, for example `https://sud4ththa.github.io/un-day-2026/go/japan/?src=whatsapp`. The tag keeps letters, numbers, dots, underscores and hyphens, up to 24 characters.
 
-A holding page ("opens soon") and `/go/` with no slug send nothing.
+Every `/go/<slug>/` page records the tap, including a holding page ("opens soon"). `/go/` with no slug sends nothing.
 
 ## Previewing locally
 
