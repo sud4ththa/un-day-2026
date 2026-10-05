@@ -12,3 +12,4 @@
 # Sent per tap: stall slug, a random ID kept in the visitor's browser,
 # device type (mobile/tablet/desktop) and an optional ?src= tag.
 # No names, no form answers.
+https://script.google.com/macros/s/AKfycbxBnkB93J377DTMtqC3DOKjXvJ5cSXm-evqSvm4zxvnBq8bkQR9TXv84MY_zRmVBu5i/exec

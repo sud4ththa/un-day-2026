@@ -5,6 +5,70 @@
 <script>
 (function () {
   var FORM = "https://docs.google.com/forms/d/e/1FAIpQLSejLTZy1IY5mP0vJQVmJ0EGA1nyDUo52Tb9a8FHfILUKVA-VA/viewform";
+  var ENDPOINT = "https://script.google.com/macros/s/AKfycbxBnkB93J377DTMtqC3DOKjXvJ5cSXm-evqSvm4zxvnBq8bkQR9TXv84MY_zRmVBu5i/exec";
+
+  function randomVid() {
+    var bytes = new Array(12);
+    var i;
+    try {
+      var buf = new Uint8Array(12);
+      crypto.getRandomValues(buf);
+      for (i = 0; i < 12; i++) bytes[i] = buf[i];
+    } catch (err) {
+      for (i = 0; i < 12; i++) bytes[i] = Math.floor(Math.random() * 256);
+    }
+    var hex = "";
+    for (i = 0; i < 12; i++) hex += ("0" + bytes[i].toString(16)).slice(-2);
+    return hex;
+  }
+
+  function visitorId() {
+    var key = "unday26.vid";
+    try {
+      var existing = localStorage.getItem(key);
+      if (existing && /^[A-Za-z0-9_-]{6,64}$/.test(existing)) return existing;
+      var id = randomVid();
+      try { localStorage.setItem(key, id); } catch (err) {}
+      return id;
+    } catch (err) {
+      return randomVid();
+    }
+  }
+
+  function deviceClass() {
+    var ua = navigator.userAgent || "";
+    if (/iPad|Tablet|PlayBook|Silk/i.test(ua)) return "tablet";
+    if (/Android/i.test(ua) && !/Mobile/i.test(ua)) return "tablet";
+    if (/Macintosh/i.test(ua) && navigator.maxTouchPoints > 1) return "tablet";
+    if (/Mobi|iPhone|iPod|Android|Windows Phone/i.test(ua)) return "mobile";
+    return "desktop";
+  }
+
+  function srcTag() {
+    var raw = new URLSearchParams(location.search).get("src") || "";
+    return raw.replace(/[^A-Za-z0-9_.-]/g, "").slice(0, 24);
+  }
+
+  function sendClick(slug) {
+    try {
+      var url = ENDPOINT + "?t=click&s=" + encodeURIComponent(slug)
+        + "&v=" + encodeURIComponent(visitorId())
+        + "&d=" + encodeURIComponent(deviceClass());
+      var src = srcTag();
+      if (src) url += "&src=" + encodeURIComponent(src);
+      var sent = false;
+      try {
+        if (navigator.sendBeacon) sent = navigator.sendBeacon(url);
+      } catch (err) {}
+      if (!sent) {
+        try {
+          fetch(url, { method: "POST", mode: "no-cors", keepalive: true, credentials: "omit" });
+        } catch (err2) {}
+      }
+    } catch (err) {}
+  }
+
+  sendClick("japan");
   setTimeout(function () { location.replace(FORM); }, 400);
 })();
 </script>
