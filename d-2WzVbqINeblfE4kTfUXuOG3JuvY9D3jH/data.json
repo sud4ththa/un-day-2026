@@ -1,6 +1,6 @@
 {
-  "updated": "2026-10-05T21:24+05:30",
-  "data_hash": "28eac37df267826d",
+  "updated": "2026-10-05T22:16+05:30",
+  "data_hash": "e044f92a49ac095b",
   "event": {
     "name": "UN Day 2026",
     "date": "2026-10-16",
@@ -11,26 +11,26 @@
     "stalls": 9,
     "connected": 4,
     "stall_managed": 4,
-    "responses": 56,
-    "families": 51,
+    "responses": 58,
+    "families": 53,
     "contribution": {
-      "Food": 23,
+      "Food": 24,
       "Monetary contribution": 18,
       "Both": 3,
       "Not given": 0
     },
     "menu_items": 70,
     "menu_items_unpledged": 51,
-    "last_response": "2026-10-05T20:46+05:30",
+    "last_response": "2026-10-05T21:58+05:30",
     "clicks": {
-      "total": 51,
-      "unique": 46,
+      "total": 67,
+      "unique": 59,
       "all_links": {
-        "total": 72,
-        "unique": 60
+        "total": 89,
+        "unique": 73
       }
     },
-    "conversion": 4.0
+    "conversion": 2.636
   },
   "stalls": [
     {
@@ -38,9 +38,13 @@
       "name": "Sri Lanka",
       "year_groups": "Playgroup & Reception",
       "status": "ok",
-      "responses": 23,
-      "families": 22,
+      "responses": 24,
+      "families": 23,
       "by_class": [
+        {
+          "class": "Playgroup A",
+          "count": 1
+        },
         {
           "class": "Playgroup B",
           "count": 2
@@ -67,7 +71,7 @@
         }
       ],
       "contribution": {
-        "Food": 16,
+        "Food": 17,
         "Monetary contribution": 6,
         "Both": 1,
         "Not given": 0
@@ -165,7 +169,7 @@
         },
         {
           "item": "Cake (5 kg)",
-          "count": 1,
+          "count": 2,
           "label": "Cake",
           "needed": "5 kg"
         },
@@ -219,18 +223,18 @@
         }
       ],
       "unlisted_ticks": 0,
-      "last_response": "2026-10-05T18:09+05:30",
+      "last_response": "2026-10-05T21:58+05:30",
       "clicks": {
-        "total": 2,
-        "unique": 1,
+        "total": 6,
+        "unique": 5,
         "by_src": {
-          "g2": 2
+          "g2": 6
         },
         "by_device": {
-          "mobile": 2
+          "mobile": 6
         }
       },
-      "conversion": 23.0
+      "conversion": 4.8
     },
     {
       "slug": "japan",
@@ -245,14 +249,14 @@
       "unlisted_ticks": 0,
       "last_response": null,
       "clicks": {
-        "total": 9,
-        "unique": 8,
+        "total": 14,
+        "unique": 12,
         "by_src": {
-          "g2": 6,
+          "g2": 11,
           "(none)": 3
         },
         "by_device": {
-          "mobile": 6,
+          "mobile": 11,
           "desktop": 3
         }
       },
@@ -271,15 +275,15 @@
       "unlisted_ticks": 0,
       "last_response": null,
       "clicks": {
-        "total": 6,
-        "unique": 6,
+        "total": 7,
+        "unique": 7,
         "by_src": {
           "(none)": 4,
-          "g2": 2
+          "g2": 3
         },
         "by_device": {
           "desktop": 4,
-          "mobile": 2
+          "mobile": 3
         }
       },
       "conversion": null
@@ -422,17 +426,17 @@
       "unlisted_ticks": 0,
       "last_response": "2026-10-05T20:46+05:30",
       "clicks": {
-        "total": 4,
-        "unique": 4,
+        "total": 7,
+        "unique": 5,
         "by_src": {
-          "g2": 4
+          "g2": 7
         },
         "by_device": {
-          "mobile": 3,
+          "mobile": 6,
           "desktop": 1
         }
       },
-      "conversion": 2.75
+      "conversion": 2.2
     },
     {
       "slug": "americas",
@@ -502,20 +506,24 @@
       "unlisted_ticks": 0,
       "last_response": "2026-10-05T16:07+05:30",
       "clicks": {
-        "total": 0,
-        "unique": 0,
-        "by_src": {},
-        "by_device": {}
+        "total": 2,
+        "unique": 2,
+        "by_src": {
+          "g2": 2
+        },
+        "by_device": {
+          "mobile": 2
+        }
       },
-      "conversion": null
+      "conversion": 5.0
     },
     {
       "slug": "europe",
       "name": "Europe",
       "year_groups": "Year 6",
       "status": "ok",
-      "responses": 12,
-      "families": 12,
+      "responses": 13,
+      "families": 13,
       "by_class": [
         {
           "class": "Year 6A",
@@ -527,7 +535,7 @@
         },
         {
           "class": "Year 6C",
-          "count": 5
+          "count": 6
         },
         {
           "class": "Year 6D",
@@ -546,7 +554,7 @@
         },
         {
           "item": "Fruits (grapes/strawberries)",
-          "count": 3
+          "count": 4
         },
         {
           "item": "Mini quiche/pie",
@@ -578,20 +586,20 @@
         }
       ],
       "unlisted_ticks": 0,
-      "last_response": "2026-10-05T17:01+05:30",
+      "last_response": "2026-10-05T21:27+05:30",
       "clicks": {
-        "total": 4,
-        "unique": 4,
+        "total": 5,
+        "unique": 5,
         "by_src": {
-          "(none)": 2,
-          "g2": 2
+          "g2": 3,
+          "(none)": 2
         },
         "by_device": {
           "desktop": 3,
-          "mobile": 1
+          "mobile": 2
         }
       },
-      "conversion": 3.0
+      "conversion": 2.6
     },
     {
       "slug": "middle-east",
