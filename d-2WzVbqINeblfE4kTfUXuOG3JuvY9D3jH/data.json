@@ -1,6 +1,6 @@
 {
-  "updated": "2026-10-05T19:18+05:30",
-  "data_hash": "b0a39fae1d0fc957",
+  "updated": "2026-10-05T20:19+05:30",
+  "data_hash": "bc16abc3267dcd22",
   "event": {
     "name": "UN Day 2026",
     "date": "2026-10-16",
@@ -11,26 +11,26 @@
     "stalls": 9,
     "connected": 4,
     "stall_managed": 4,
-    "responses": 54,
-    "families": 49,
+    "responses": 55,
+    "families": 50,
     "contribution": {
-      "Food": 22,
+      "Food": 23,
       "Monetary contribution": 17,
       "Both": 3,
       "Not given": 0
     },
     "menu_items": 70,
     "menu_items_unpledged": 51,
-    "last_response": "2026-10-05T18:09+05:30",
+    "last_response": "2026-10-05T19:22+05:30",
     "clicks": {
-      "total": 10,
-      "unique": 10,
+      "total": 40,
+      "unique": 36,
       "all_links": {
-        "total": 27,
-        "unique": 21
+        "total": 59,
+        "unique": 49
       }
     },
-    "conversion": 10.8
+    "conversion": 4.583
   },
   "stalls": [
     {
@@ -221,12 +221,16 @@
       "unlisted_ticks": 0,
       "last_response": "2026-10-05T18:09+05:30",
       "clicks": {
-        "total": 0,
-        "unique": 0,
-        "by_src": {},
-        "by_device": {}
+        "total": 2,
+        "unique": 1,
+        "by_src": {
+          "g2": 2
+        },
+        "by_device": {
+          "mobile": 2
+        }
       },
-      "conversion": null
+      "conversion": 23.0
     },
     {
       "slug": "japan",
@@ -241,13 +245,15 @@
       "unlisted_ticks": 0,
       "last_response": null,
       "clicks": {
-        "total": 2,
-        "unique": 2,
+        "total": 7,
+        "unique": 7,
         "by_src": {
-          "g2": 2
+          "g2": 4,
+          "(none)": 3
         },
         "by_device": {
-          "mobile": 2
+          "mobile": 4,
+          "desktop": 3
         }
       },
       "conversion": null
@@ -265,10 +271,14 @@
       "unlisted_ticks": 0,
       "last_response": null,
       "clicks": {
-        "total": 0,
-        "unique": 0,
-        "by_src": {},
-        "by_device": {}
+        "total": 4,
+        "unique": 4,
+        "by_src": {
+          "(none)": 4
+        },
+        "by_device": {
+          "desktop": 4
+        }
       },
       "conversion": null
     },
@@ -285,13 +295,15 @@
       "unlisted_ticks": 0,
       "last_response": null,
       "clicks": {
-        "total": 3,
-        "unique": 3,
+        "total": 11,
+        "unique": 9,
         "by_src": {
-          "g2": 3
+          "g2": 9,
+          "(none)": 2
         },
         "by_device": {
-          "mobile": 3
+          "mobile": 9,
+          "desktop": 2
         }
       },
       "conversion": null
@@ -301,8 +313,8 @@
       "name": "India",
       "year_groups": "Years 7 & 11",
       "status": "ok",
-      "responses": 9,
-      "families": 9,
+      "responses": 10,
+      "families": 10,
       "by_class": [
         {
           "class": "Year 7B",
@@ -310,7 +322,7 @@
         },
         {
           "class": "Year 7C",
-          "count": 1
+          "count": 2
         },
         {
           "class": "Year 7D",
@@ -330,7 +342,7 @@
         }
       ],
       "contribution": {
-        "Food": 3,
+        "Food": 4,
         "Monetary contribution": 6,
         "Both": 0,
         "Not given": 0
@@ -406,7 +418,7 @@
         }
       ],
       "unlisted_ticks": 0,
-      "last_response": "2026-10-05T17:51+05:30",
+      "last_response": "2026-10-05T19:22+05:30",
       "clicks": {
         "total": 3,
         "unique": 3,
@@ -417,7 +429,7 @@
           "mobile": 3
         }
       },
-      "conversion": 3.0
+      "conversion": 3.333
     },
     {
       "slug": "americas",
@@ -565,12 +577,17 @@
       "unlisted_ticks": 0,
       "last_response": "2026-10-05T17:01+05:30",
       "clicks": {
-        "total": 0,
-        "unique": 0,
-        "by_src": {},
-        "by_device": {}
+        "total": 3,
+        "unique": 3,
+        "by_src": {
+          "(none)": 2,
+          "g2": 1
+        },
+        "by_device": {
+          "desktop": 3
+        }
       },
-      "conversion": null
+      "conversion": 4.0
     },
     {
       "slug": "middle-east",
@@ -655,13 +672,15 @@
       "unlisted_ticks": 0,
       "last_response": null,
       "clicks": {
-        "total": 2,
-        "unique": 2,
+        "total": 6,
+        "unique": 5,
         "by_src": {
-          "g2": 2
+          "g2": 4,
+          "(none)": 2
         },
         "by_device": {
-          "mobile": 2
+          "mobile": 4,
+          "desktop": 2
         }
       },
       "conversion": 0.0
@@ -679,10 +698,16 @@
       "unlisted_ticks": 0,
       "last_response": null,
       "clicks": {
-        "total": 0,
-        "unique": 0,
-        "by_src": {},
-        "by_device": {}
+        "total": 4,
+        "unique": 4,
+        "by_src": {
+          "(none)": 2,
+          "g2": 2
+        },
+        "by_device": {
+          "desktop": 2,
+          "mobile": 2
+        }
       },
       "conversion": null
     }
