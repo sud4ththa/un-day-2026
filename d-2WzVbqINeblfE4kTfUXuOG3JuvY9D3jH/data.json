@@ -1,6 +1,6 @@
 {
-  "updated": "2026-10-04T23:07+05:30",
-  "data_hash": "132e36cd8a4247c9",
+  "updated": "2026-10-05T07:13+05:30",
+  "data_hash": "8a5e93eda1800a41",
   "event": {
     "name": "UN Day 2026",
     "date": "2026-10-16",
@@ -8,7 +8,7 @@
   },
   "tracking": "off",
   "summary": {
-    "stalls": 6,
+    "stalls": 7,
     "connected": 4,
     "stall_managed": 2,
     "responses": 0,
@@ -19,8 +19,8 @@
       "Both": 0,
       "Not given": 0
     },
-    "menu_items": 54,
-    "menu_items_unpledged": 54,
+    "menu_items": 65,
+    "menu_items_unpledged": 65,
     "last_response": null,
     "clicks": null,
     "conversion": null
@@ -411,6 +411,71 @@
         },
         {
           "item": "Pastries or other savoury items",
+          "count": 0
+        }
+      ],
+      "unlisted_ticks": 0,
+      "last_response": null,
+      "clicks": null,
+      "conversion": null
+    },
+    {
+      "slug": "middle-east",
+      "name": "Middle East",
+      "year_groups": "Years 5 & 8",
+      "status": "not_connected",
+      "responses": 0,
+      "families": 0,
+      "by_class": [],
+      "contribution": {
+        "Food": 0,
+        "Monetary contribution": 0,
+        "Both": 0,
+        "Not given": 0
+      },
+      "menu": [
+        {
+          "item": "Pita bread / Hummus & Tabbouleh",
+          "count": 0
+        },
+        {
+          "item": "Fatayer",
+          "count": 0
+        },
+        {
+          "item": "Arabic rice",
+          "count": 0
+        },
+        {
+          "item": "Mini kebabs",
+          "count": 0
+        },
+        {
+          "item": "Mini shawarma",
+          "count": 0
+        },
+        {
+          "item": "Baklava",
+          "count": 0
+        },
+        {
+          "item": "Date cake",
+          "count": 0
+        },
+        {
+          "item": "Basbousa",
+          "count": 0
+        },
+        {
+          "item": "Kunafa",
+          "count": 0
+        },
+        {
+          "item": "Dates (non-sticky, easy to handle)",
+          "count": 0
+        },
+        {
+          "item": "Variety of nuts (almonds, pistachios, cashews, walnuts)",
           "count": 0
         }
       ],
