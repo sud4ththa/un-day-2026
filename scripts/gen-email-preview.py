@@ -154,8 +154,8 @@ WA_BODY = {
         "contribution of LKR 5,000 per child. Please see the menu, bank details and form here:"
     ),
     "japan": (
-        "Thank you for supporting the {stall} stall! Please see the attached letter from "
-        "Team Japan for the menu and how to contribute."
+        "Thank you for supporting the {stall} stall! Please use the form below to let us know "
+        "how you can contribute."
     ),
 }
 # Who parents should ask, from Subs (4 Oct) and the Team Japan letter.
@@ -183,8 +183,7 @@ def stall_wa_text(stall) -> str | None:
 
 # Shown on the card only (not part of the message).
 WA_HINT = {
-    "japan": "Attach the Team Japan letter (PDF) when you send this.",
-    "australia": "The Year 2 team\u2019s own message, word for word; only the form link is our short link.",
+        "australia": "The Year 2 team\u2019s own message, word for word; only the form link is our short link.",
 }
 
 
