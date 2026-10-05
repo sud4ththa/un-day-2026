@@ -30,5 +30,5 @@ europe | Europe | https://docs.google.com/forms/d/e/1FAIpQLSdc0oyVcNHv475axdKNQL
 india | India | https://docs.google.com/forms/d/e/1FAIpQLScv1lkhUCwI8t587pc9nYLn6liwDGPztnVw6Max3aKh9aiPmA/viewform | Years 7 & 11
 un-zone | UN Zone / Palestine | |
 china | China | | Years 9, 12 & 13
-maldives | Maldives | | Year 10
+maldives | Maldives | https://docs.google.com/forms/d/e/1FAIpQLSdqx6KmESJB1HxpgVL_sf3jnUBjVyT7XADVt9NkOGog5gWEwA/viewform | Year 10 | We kindly request a minimum contribution of LKR 5,000.
 eco | Eco Warriors | |

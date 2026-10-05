@@ -167,6 +167,7 @@ WA_CONTACT = {
     "india": "Gaja (0773935886)",
     "middle-east": "Dil (077 769 8857)",
     "sea": "Anisha Mawzoon (077 956 7567) or Tina Lobo (076 033 3333)",
+    "maldives": "Sharu (077 629 4427) or Hawwa Shareefa (076 610 6776)",
 }
 # Message title where the stall's own wording differs from the forms.txt name.
 WA_TITLE = {"sea": "Singapore, Malaysia, Vietnam & Thailand"}
