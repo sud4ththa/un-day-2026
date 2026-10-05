@@ -1,6 +1,6 @@
 {
-  "updated": "2026-10-05T08:17+05:30",
-  "data_hash": "a72a42cb5be74c3a",
+  "updated": "2026-10-05T12:12+05:30",
+  "data_hash": "55edd1c668e8db5d",
   "event": {
     "name": "UN Day 2026",
     "date": "2026-10-16",
@@ -11,17 +11,17 @@
     "stalls": 7,
     "connected": 4,
     "stall_managed": 2,
-    "responses": 0,
-    "families": 0,
+    "responses": 21,
+    "families": 19,
     "contribution": {
-      "Food": 0,
-      "Monetary contribution": 0,
-      "Both": 0,
+      "Food": 6,
+      "Monetary contribution": 5,
+      "Both": 2,
       "Not given": 0
     },
     "menu_items": 70,
-    "menu_items_unpledged": 70,
-    "last_response": null,
+    "menu_items_unpledged": 61,
+    "last_response": "2026-10-05T12:04+05:30",
     "clicks": null,
     "conversion": null
   },
@@ -31,13 +31,30 @@
       "name": "Sri Lanka",
       "year_groups": "Playgroup & Reception",
       "status": "ok",
-      "responses": 0,
-      "families": 0,
-      "by_class": [],
+      "responses": 8,
+      "families": 8,
+      "by_class": [
+        {
+          "class": "Reception A",
+          "count": 4
+        },
+        {
+          "class": "Reception B",
+          "count": 1
+        },
+        {
+          "class": "Reception C",
+          "count": 1
+        },
+        {
+          "class": "Reception D",
+          "count": 2
+        }
+      ],
       "contribution": {
-        "Food": 0,
-        "Monetary contribution": 0,
-        "Both": 0,
+        "Food": 4,
+        "Monetary contribution": 3,
+        "Both": 1,
         "Not given": 0
       },
       "menu": [
@@ -109,7 +126,7 @@
         },
         {
           "item": "Milk toffee (100)",
-          "count": 0,
+          "count": 2,
           "label": "Milk toffee",
           "needed": "100"
         },
@@ -121,7 +138,7 @@
         },
         {
           "item": "Coconut toffee (50)",
-          "count": 0,
+          "count": 2,
           "label": "Coconut toffee",
           "needed": "50"
         },
@@ -139,7 +156,7 @@
         },
         {
           "item": "Thala karali (100)",
-          "count": 0,
+          "count": 3,
           "label": "Thala karali",
           "needed": "100"
         },
@@ -187,7 +204,7 @@
         }
       ],
       "unlisted_ticks": 0,
-      "last_response": null,
+      "last_response": "2026-10-05T12:03+05:30",
       "clicks": null,
       "conversion": null
     },
@@ -226,11 +243,16 @@
       "name": "India",
       "year_groups": "Years 7 & 11",
       "status": "ok",
-      "responses": 0,
-      "families": 0,
-      "by_class": [],
+      "responses": 2,
+      "families": 2,
+      "by_class": [
+        {
+          "class": "Year 11B",
+          "count": 2
+        }
+      ],
       "contribution": {
-        "Food": 0,
+        "Food": 2,
         "Monetary contribution": 0,
         "Both": 0,
         "Not given": 0
@@ -244,7 +266,7 @@
         },
         {
           "item": "Jalebi (300 pieces)",
-          "count": 0,
+          "count": 1,
           "label": "Jalebi",
           "needed": "300 pieces"
         },
@@ -306,7 +328,7 @@
         }
       ],
       "unlisted_ticks": 0,
-      "last_response": null,
+      "last_response": "2026-10-05T11:50+05:30",
       "clicks": null,
       "conversion": null
     },
@@ -315,13 +337,22 @@
       "name": "USA/Canada",
       "year_groups": "Year 4",
       "status": "ok",
-      "responses": 0,
-      "families": 0,
-      "by_class": [],
+      "responses": 3,
+      "families": 3,
+      "by_class": [
+        {
+          "class": "Year 4A",
+          "count": 2
+        },
+        {
+          "class": "Year 4B",
+          "count": 1
+        }
+      ],
       "contribution": {
         "Food": 0,
-        "Monetary contribution": 0,
-        "Both": 0,
+        "Monetary contribution": 2,
+        "Both": 1,
         "Not given": 0
       },
       "menu": [
@@ -343,7 +374,7 @@
         },
         {
           "item": "Cookies",
-          "count": 0
+          "count": 1
         },
         {
           "item": "Mini hotdogs",
@@ -359,7 +390,7 @@
         }
       ],
       "unlisted_ticks": 0,
-      "last_response": null,
+      "last_response": "2026-10-05T12:04+05:30",
       "clicks": null,
       "conversion": null
     },
@@ -368,14 +399,27 @@
       "name": "Europe",
       "year_groups": "Year 6",
       "status": "ok",
-      "responses": 0,
-      "families": 0,
-      "by_class": [],
+      "responses": 8,
+      "families": 8,
+      "by_class": [
+        {
+          "class": "Year 6B",
+          "count": 3
+        },
+        {
+          "class": "Year 6C",
+          "count": 4
+        },
+        {
+          "class": "Year 6D",
+          "count": 1
+        }
+      ],
       "contribution": null,
       "menu": [
         {
           "item": "Mini pizza (chicken/veg)",
-          "count": 0
+          "count": 2
         },
         {
           "item": "Macarons",
@@ -383,7 +427,7 @@
         },
         {
           "item": "Fruits (grapes/strawberries)",
-          "count": 0
+          "count": 3
         },
         {
           "item": "Mini quiche/pie",
@@ -391,7 +435,7 @@
         },
         {
           "item": "Chicken sausages",
-          "count": 0
+          "count": 2
         },
         {
           "item": "Chicken meatballs",
@@ -403,7 +447,7 @@
         },
         {
           "item": "Mini cupcakes",
-          "count": 0
+          "count": 1
         },
         {
           "item": "Chocolate fudge",
@@ -415,7 +459,7 @@
         }
       ],
       "unlisted_ticks": 0,
-      "last_response": null,
+      "last_response": "2026-10-05T12:04+05:30",
       "clicks": null,
       "conversion": null
     },
