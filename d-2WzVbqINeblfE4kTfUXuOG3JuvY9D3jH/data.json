@@ -1,6 +1,6 @@
 {
-  "updated": "2026-10-05T07:13+05:30",
-  "data_hash": "8a5e93eda1800a41",
+  "updated": "2026-10-05T08:17+05:30",
+  "data_hash": "a72a42cb5be74c3a",
   "event": {
     "name": "UN Day 2026",
     "date": "2026-10-16",
@@ -19,8 +19,8 @@
       "Both": 0,
       "Not given": 0
     },
-    "menu_items": 65,
-    "menu_items_unpledged": 65,
+    "menu_items": 70,
+    "menu_items_unpledged": 70,
     "last_response": null,
     "clicks": null,
     "conversion": null
@@ -435,7 +435,15 @@
       },
       "menu": [
         {
-          "item": "Pita bread / Hummus & Tabbouleh",
+          "item": "Pita bread",
+          "count": 0
+        },
+        {
+          "item": "Hummus",
+          "count": 0
+        },
+        {
+          "item": "Tabbouleh",
           "count": 0
         },
         {
@@ -475,7 +483,19 @@
           "count": 0
         },
         {
-          "item": "Variety of nuts (almonds, pistachios, cashews, walnuts)",
+          "item": "Almonds",
+          "count": 0
+        },
+        {
+          "item": "Pistachios",
+          "count": 0
+        },
+        {
+          "item": "Cashews",
+          "count": 0
+        },
+        {
+          "item": "Walnuts",
           "count": 0
         }
       ],
