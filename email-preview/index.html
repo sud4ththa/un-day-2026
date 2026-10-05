@@ -32,13 +32,15 @@
     line-height: 1.35;
   }
   .bar p { margin: 0; flex: 1 1 16rem; }
-  .bar button {
+  .bar button,
+  .bar a {
     font: inherit;
     color: #fff;
     background: #000;
     border: 1px solid #fff;
     padding: 4px 8px;
     cursor: pointer;
+    text-decoration: none;
   }
   .card {
     background: #fff;
@@ -147,6 +149,7 @@
 <body>
 <div class="bar">
   <p>Draft email preview, not sent. The Principal’s 2 Oct 2026 letter with FORM links added, in last year’s format.</p>
+  <a href="UN-Day-2026-parent-letter.docx" download="UN-Day-2026-parent-letter.docx">Download Word version</a>
   <button type="button" id="copy-email">Copy email</button>
   <button type="button" id="copy-source">Copy HTML source</button>
   <span id="status" role="status"></span>
