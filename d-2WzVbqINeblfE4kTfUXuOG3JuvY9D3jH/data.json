@@ -1,6 +1,6 @@
 {
-  "updated": "2026-10-06T14:12+05:30",
-  "data_hash": "7fc37c66fe65979d",
+  "updated": "2026-10-06T15:14+05:30",
+  "data_hash": "1575cbc7bb0c7127",
   "event": {
     "name": "UN Day 2026",
     "date": "2026-10-16",
@@ -11,26 +11,26 @@
     "stalls": 10,
     "connected": 5,
     "stall_managed": 4,
-    "responses": 76,
-    "families": 68,
+    "responses": 77,
+    "families": 69,
     "contribution": {
       "Food": 28,
-      "Monetary contribution": 31,
+      "Monetary contribution": 32,
       "Both": 3,
       "Not given": 0
     },
     "menu_items": 75,
     "menu_items_unpledged": 51,
-    "last_response": "2026-10-06T13:55+05:30",
+    "last_response": "2026-10-06T14:41+05:30",
     "clicks": {
-      "total": 341,
-      "unique": 261,
+      "total": 379,
+      "unique": 293,
       "all_links": {
-        "total": 386,
-        "unique": 268
+        "total": 429,
+        "unique": 293
       }
     },
-    "conversion": 0.539
+    "conversion": 0.487
   },
   "stalls": [
     {
@@ -225,17 +225,17 @@
       "unlisted_ticks": 0,
       "last_response": "2026-10-06T12:21+05:30",
       "clicks": {
-        "total": 27,
-        "unique": 21,
+        "total": 30,
+        "unique": 23,
         "by_src": {
-          "g2": 20,
-          "(none)": 7
+          "g2": 21,
+          "(none)": 9
         },
         "by_device": {
-          "mobile": 27
+          "mobile": 30
         }
       },
-      "conversion": 1.238
+      "conversion": 1.13
     },
     {
       "slug": "japan",
@@ -250,14 +250,14 @@
       "unlisted_ticks": 0,
       "last_response": null,
       "clicks": {
-        "total": 52,
-        "unique": 40,
+        "total": 55,
+        "unique": 43,
         "by_src": {
-          "g2": 29,
-          "(none)": 23
+          "g2": 30,
+          "(none)": 25
         },
         "by_device": {
-          "mobile": 48,
+          "mobile": 51,
           "desktop": 4
         }
       },
@@ -276,15 +276,15 @@
       "unlisted_ticks": 0,
       "last_response": null,
       "clicks": {
-        "total": 52,
-        "unique": 38,
+        "total": 63,
+        "unique": 47,
         "by_src": {
-          "g2": 39,
-          "(none)": 13
+          "g2": 48,
+          "(none)": 15
         },
         "by_device": {
-          "mobile": 46,
-          "desktop": 6
+          "mobile": 56,
+          "desktop": 7
         }
       },
       "conversion": null
@@ -302,14 +302,14 @@
       "unlisted_ticks": 0,
       "last_response": null,
       "clicks": {
-        "total": 38,
-        "unique": 29,
+        "total": 41,
+        "unique": 31,
         "by_src": {
-          "g2": 27,
-          "(none)": 11
+          "g2": 29,
+          "(none)": 12
         },
         "by_device": {
-          "mobile": 31,
+          "mobile": 34,
           "desktop": 7
         }
       },
@@ -427,30 +427,30 @@
       "unlisted_ticks": 0,
       "last_response": "2026-10-06T13:54+05:30",
       "clicks": {
-        "total": 18,
-        "unique": 16,
+        "total": 22,
+        "unique": 19,
         "by_src": {
-          "g2": 15,
-          "(none)": 3
+          "g2": 17,
+          "(none)": 5
         },
         "by_device": {
-          "mobile": 16,
+          "mobile": 20,
           "desktop": 2
         }
       },
-      "conversion": 0.875
+      "conversion": 0.737
     },
     {
       "slug": "americas",
       "name": "USA/Canada",
       "year_groups": "Year 4",
       "status": "ok",
-      "responses": 14,
-      "families": 13,
+      "responses": 15,
+      "families": 14,
       "by_class": [
         {
           "class": "Year 4A",
-          "count": 7
+          "count": 8
         },
         {
           "class": "Year 4B",
@@ -467,7 +467,7 @@
       ],
       "contribution": {
         "Food": 4,
-        "Monetary contribution": 8,
+        "Monetary contribution": 9,
         "Both": 2,
         "Not given": 0
       },
@@ -506,20 +506,20 @@
         }
       ],
       "unlisted_ticks": 0,
-      "last_response": "2026-10-06T13:55+05:30",
+      "last_response": "2026-10-06T14:41+05:30",
       "clicks": {
-        "total": 19,
-        "unique": 13,
+        "total": 22,
+        "unique": 15,
         "by_src": {
-          "g2": 14,
-          "(none)": 5
+          "g2": 15,
+          "(none)": 7
         },
         "by_device": {
-          "mobile": 15,
+          "mobile": 18,
           "desktop": 4
         }
       },
-      "conversion": 1.077
+      "conversion": 1.0
     },
     {
       "slug": "europe",
@@ -592,18 +592,18 @@
       "unlisted_ticks": 0,
       "last_response": "2026-10-06T10:24+05:30",
       "clicks": {
-        "total": 14,
-        "unique": 13,
+        "total": 15,
+        "unique": 14,
         "by_src": {
           "g2": 8,
-          "(none)": 6
+          "(none)": 7
         },
         "by_device": {
-          "mobile": 11,
+          "mobile": 12,
           "desktop": 3
         }
       },
-      "conversion": 1.077
+      "conversion": 1.0
     },
     {
       "slug": "middle-east",
@@ -688,14 +688,14 @@
       "unlisted_ticks": 0,
       "last_response": null,
       "clicks": {
-        "total": 26,
-        "unique": 21,
+        "total": 30,
+        "unique": 25,
         "by_src": {
-          "(none)": 15,
-          "g2": 11
+          "(none)": 17,
+          "g2": 13
         },
         "by_device": {
-          "mobile": 23,
+          "mobile": 27,
           "desktop": 3
         }
       },
@@ -757,18 +757,18 @@
       "unlisted_ticks": 0,
       "last_response": "2026-10-06T13:42+05:30",
       "clicks": {
-        "total": 82,
-        "unique": 57,
+        "total": 87,
+        "unique": 62,
         "by_src": {
-          "(none)": 80,
+          "(none)": 85,
           "group": 2
         },
         "by_device": {
-          "mobile": 77,
+          "mobile": 82,
           "desktop": 5
         }
       },
-      "conversion": 0.14
+      "conversion": 0.129
     },
     {
       "slug": "maldives",
@@ -783,14 +783,14 @@
       "unlisted_ticks": 0,
       "last_response": null,
       "clicks": {
-        "total": 13,
-        "unique": 13,
+        "total": 14,
+        "unique": 14,
         "by_src": {
           "g2": 9,
-          "(none)": 4
+          "(none)": 5
         },
         "by_device": {
-          "mobile": 11,
+          "mobile": 12,
           "desktop": 2
         }
       },
