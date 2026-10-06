@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <script>
 (function () {
+  var FORM = "https://docs.google.com/forms/d/e/1FAIpQLSco8ykP4kgFFYm5ROpKmo9GBnASMK-4yuYpIRure9CF0wivDw/viewform";
   var ENDPOINT = "https://script.google.com/macros/s/AKfycbxBnkB93J377DTMtqC3DOKjXvJ5cSXm-evqSvm4zxvnBq8bkQR9TXv84MY_zRmVBu5i/exec";
 
   function randomVid() {
@@ -68,6 +69,7 @@
   }
 
   sendClick("china");
+  setTimeout(function () { location.replace(FORM); }, 400);
 })();
 </script>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -217,9 +219,10 @@
   <h1>China</h1>
   <p class="detail">Years 9, 12 &amp; 13</p>
   <p class="detail">Friday 16 October</p>
-  <div class="status">
-    <p class="lead">This contribution form opens soon.</p>
-    <p class="sub">Please check back later.</p>
+  <div class="status" role="status">
+    <p class="lead">Opening the form…</p>
+    <div class="bar" aria-hidden="true"><span></span></div>
+    <p class="actions"><a class="continue" href="https://docs.google.com/forms/d/e/1FAIpQLSco8ykP4kgFFYm5ROpKmo9GBnASMK-4yuYpIRure9CF0wivDw/viewform">Continue to form</a></p>
   </div>
 </main>
 <footer>The British School in Colombo · PTC</footer>
