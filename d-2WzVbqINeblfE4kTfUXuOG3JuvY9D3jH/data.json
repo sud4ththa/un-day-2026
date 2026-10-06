@@ -1,6 +1,6 @@
 {
-  "updated": "2026-10-06T07:05+05:30",
-  "data_hash": "acc4ba38379e1ca3",
+  "updated": "2026-10-06T07:19+05:30",
+  "data_hash": "cad4affef341cc97",
   "event": {
     "name": "UN Day 2026",
     "date": "2026-10-16",
@@ -9,28 +9,28 @@
   "tracking": "on",
   "summary": {
     "stalls": 10,
-    "connected": 4,
+    "connected": 5,
     "stall_managed": 4,
-    "responses": 58,
-    "families": 53,
+    "responses": 59,
+    "families": 54,
     "contribution": {
       "Food": 24,
-      "Monetary contribution": 18,
+      "Monetary contribution": 19,
       "Both": 3,
       "Not given": 0
     },
     "menu_items": 75,
     "menu_items_unpledged": 56,
-    "last_response": "2026-10-05T21:58+05:30",
+    "last_response": "2026-10-06T00:49+05:30",
     "clicks": {
-      "total": 80,
-      "unique": 71,
+      "total": 87,
+      "unique": 76,
       "all_links": {
-        "total": 104,
-        "unique": 86
+        "total": 112,
+        "unique": 91
       }
     },
-    "conversion": 2.148
+    "conversion": 1.967
   },
   "stalls": [
     {
@@ -426,29 +426,29 @@
       "unlisted_ticks": 0,
       "last_response": "2026-10-05T20:46+05:30",
       "clicks": {
-        "total": 7,
-        "unique": 5,
+        "total": 8,
+        "unique": 6,
         "by_src": {
-          "g2": 7
+          "g2": 8
         },
         "by_device": {
-          "mobile": 6,
+          "mobile": 7,
           "desktop": 1
         }
       },
-      "conversion": 2.2
+      "conversion": 1.833
     },
     {
       "slug": "americas",
       "name": "USA/Canada",
       "year_groups": "Year 4",
       "status": "ok",
-      "responses": 10,
-      "families": 10,
+      "responses": 11,
+      "families": 11,
       "by_class": [
         {
           "class": "Year 4A",
-          "count": 5
+          "count": 6
         },
         {
           "class": "Year 4B",
@@ -465,7 +465,7 @@
       ],
       "contribution": {
         "Food": 3,
-        "Monetary contribution": 5,
+        "Monetary contribution": 6,
         "Both": 2,
         "Not given": 0
       },
@@ -504,7 +504,7 @@
         }
       ],
       "unlisted_ticks": 0,
-      "last_response": "2026-10-05T16:07+05:30",
+      "last_response": "2026-10-06T00:49+05:30",
       "clicks": {
         "total": 4,
         "unique": 3,
@@ -515,7 +515,7 @@
           "mobile": 4
         }
       },
-      "conversion": 3.333
+      "conversion": 3.667
     },
     {
       "slug": "europe",
@@ -588,18 +588,18 @@
       "unlisted_ticks": 0,
       "last_response": "2026-10-05T21:27+05:30",
       "clicks": {
-        "total": 5,
-        "unique": 5,
+        "total": 7,
+        "unique": 6,
         "by_src": {
-          "g2": 3,
+          "g2": 5,
           "(none)": 2
         },
         "by_device": {
-          "desktop": 3,
-          "mobile": 2
+          "mobile": 4,
+          "desktop": 3
         }
       },
-      "conversion": 2.6
+      "conversion": 2.167
     },
     {
       "slug": "middle-east",
@@ -684,14 +684,14 @@
       "unlisted_ticks": 0,
       "last_response": null,
       "clicks": {
-        "total": 6,
-        "unique": 5,
+        "total": 7,
+        "unique": 6,
         "by_src": {
-          "g2": 4,
+          "g2": 5,
           "(none)": 2
         },
         "by_device": {
-          "mobile": 4,
+          "mobile": 5,
           "desktop": 2
         }
       },
@@ -701,7 +701,7 @@
       "slug": "china",
       "name": "China",
       "year_groups": "Years 9, 12 & 13",
-      "status": "not_connected",
+      "status": "ok",
       "responses": 0,
       "families": 0,
       "by_class": [],
@@ -736,14 +736,15 @@
       "unlisted_ticks": 0,
       "last_response": null,
       "clicks": {
-        "total": 2,
+        "total": 3,
         "unique": 2,
         "by_src": {
-          "(none)": 2
+          "(none)": 2,
+          "group": 1
         },
         "by_device": {
-          "desktop": 1,
-          "mobile": 1
+          "mobile": 2,
+          "desktop": 1
         }
       },
       "conversion": 0.0
@@ -761,14 +762,14 @@
       "unlisted_ticks": 0,
       "last_response": null,
       "clicks": {
-        "total": 5,
-        "unique": 5,
+        "total": 7,
+        "unique": 7,
         "by_src": {
-          "g2": 3,
+          "g2": 5,
           "(none)": 2
         },
         "by_device": {
-          "mobile": 3,
+          "mobile": 5,
           "desktop": 2
         }
       },
