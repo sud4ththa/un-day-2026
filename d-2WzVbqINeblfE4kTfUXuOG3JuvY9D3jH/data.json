@@ -1,6 +1,6 @@
 {
-  "updated": "2026-10-06T13:18+05:30",
-  "data_hash": "f860f417e6b64b96",
+  "updated": "2026-10-06T14:12+05:30",
+  "data_hash": "7fc37c66fe65979d",
   "event": {
     "name": "UN Day 2026",
     "date": "2026-10-16",
@@ -11,26 +11,26 @@
     "stalls": 10,
     "connected": 5,
     "stall_managed": 4,
-    "responses": 69,
-    "families": 64,
+    "responses": 76,
+    "families": 68,
     "contribution": {
       "Food": 28,
-      "Monetary contribution": 24,
+      "Monetary contribution": 31,
       "Both": 3,
       "Not given": 0
     },
     "menu_items": 75,
-    "menu_items_unpledged": 52,
-    "last_response": "2026-10-06T12:47+05:30",
+    "menu_items_unpledged": 51,
+    "last_response": "2026-10-06T13:55+05:30",
     "clicks": {
-      "total": 319,
-      "unique": 249,
+      "total": 341,
+      "unique": 261,
       "all_links": {
-        "total": 361,
-        "unique": 258
+        "total": 386,
+        "unique": 268
       }
     },
-    "conversion": 0.515
+    "conversion": 0.539
   },
   "stalls": [
     {
@@ -250,14 +250,14 @@
       "unlisted_ticks": 0,
       "last_response": null,
       "clicks": {
-        "total": 49,
-        "unique": 38,
+        "total": 52,
+        "unique": 40,
         "by_src": {
-          "g2": 27,
-          "(none)": 22
+          "g2": 29,
+          "(none)": 23
         },
         "by_device": {
-          "mobile": 45,
+          "mobile": 48,
           "desktop": 4
         }
       },
@@ -276,14 +276,14 @@
       "unlisted_ticks": 0,
       "last_response": null,
       "clicks": {
-        "total": 47,
-        "unique": 35,
+        "total": 52,
+        "unique": 38,
         "by_src": {
-          "g2": 35,
-          "(none)": 12
+          "g2": 39,
+          "(none)": 13
         },
         "by_device": {
-          "mobile": 41,
+          "mobile": 46,
           "desktop": 6
         }
       },
@@ -320,12 +320,12 @@
       "name": "India",
       "year_groups": "Years 7 & 11",
       "status": "ok",
-      "responses": 11,
-      "families": 11,
+      "responses": 14,
+      "families": 14,
       "by_class": [
         {
           "class": "Year 7B",
-          "count": 2
+          "count": 3
         },
         {
           "class": "Year 7C",
@@ -333,7 +333,7 @@
         },
         {
           "class": "Year 7D",
-          "count": 1
+          "count": 3
         },
         {
           "class": "Year 11A",
@@ -350,7 +350,7 @@
       ],
       "contribution": {
         "Food": 4,
-        "Monetary contribution": 7,
+        "Monetary contribution": 10,
         "Both": 0,
         "Not given": 0
       },
@@ -399,7 +399,7 @@
         },
         {
           "item": "Chicken/potato cutlets (300)",
-          "count": 0,
+          "count": 1,
           "label": "Chicken/potato cutlets",
           "needed": "300"
         },
@@ -425,28 +425,28 @@
         }
       ],
       "unlisted_ticks": 0,
-      "last_response": "2026-10-05T20:46+05:30",
+      "last_response": "2026-10-06T13:54+05:30",
       "clicks": {
-        "total": 15,
-        "unique": 13,
+        "total": 18,
+        "unique": 16,
         "by_src": {
-          "g2": 13,
-          "(none)": 2
+          "g2": 15,
+          "(none)": 3
         },
         "by_device": {
-          "mobile": 14,
-          "desktop": 1
+          "mobile": 16,
+          "desktop": 2
         }
       },
-      "conversion": 0.846
+      "conversion": 0.875
     },
     {
       "slug": "americas",
       "name": "USA/Canada",
       "year_groups": "Year 4",
       "status": "ok",
-      "responses": 12,
-      "families": 12,
+      "responses": 14,
+      "families": 13,
       "by_class": [
         {
           "class": "Year 4A",
@@ -454,7 +454,7 @@
         },
         {
           "class": "Year 4B",
-          "count": 1
+          "count": 3
         },
         {
           "class": "Year 4C",
@@ -467,7 +467,7 @@
       ],
       "contribution": {
         "Food": 4,
-        "Monetary contribution": 6,
+        "Monetary contribution": 8,
         "Both": 2,
         "Not given": 0
       },
@@ -506,19 +506,20 @@
         }
       ],
       "unlisted_ticks": 0,
-      "last_response": "2026-10-06T12:47+05:30",
+      "last_response": "2026-10-06T13:55+05:30",
       "clicks": {
-        "total": 13,
-        "unique": 11,
+        "total": 19,
+        "unique": 13,
         "by_src": {
-          "g2": 8,
+          "g2": 14,
           "(none)": 5
         },
         "by_device": {
-          "mobile": 13
+          "mobile": 15,
+          "desktop": 4
         }
       },
-      "conversion": 1.091
+      "conversion": 1.077
     },
     {
       "slug": "europe",
@@ -687,15 +688,15 @@
       "unlisted_ticks": 0,
       "last_response": null,
       "clicks": {
-        "total": 25,
-        "unique": 20,
+        "total": 26,
+        "unique": 21,
         "by_src": {
-          "(none)": 14,
+          "(none)": 15,
           "g2": 11
         },
         "by_device": {
           "mobile": 23,
-          "desktop": 2
+          "desktop": 3
         }
       },
       "conversion": 0.0
@@ -705,8 +706,8 @@
       "name": "China",
       "year_groups": "Years 9, 12 & 13",
       "status": "ok",
-      "responses": 6,
-      "families": 6,
+      "responses": 8,
+      "families": 8,
       "by_class": [
         {
           "class": "Year 9B",
@@ -714,7 +715,7 @@
         },
         {
           "class": "Year 9C",
-          "count": 1
+          "count": 2
         },
         {
           "class": "Year 12",
@@ -722,12 +723,12 @@
         },
         {
           "class": "Year 13",
-          "count": 1
+          "count": 2
         }
       ],
       "contribution": {
         "Food": 1,
-        "Monetary contribution": 5,
+        "Monetary contribution": 7,
         "Both": 0,
         "Not given": 0
       },
@@ -754,20 +755,20 @@
         }
       ],
       "unlisted_ticks": 0,
-      "last_response": "2026-10-06T12:46+05:30",
+      "last_response": "2026-10-06T13:42+05:30",
       "clicks": {
-        "total": 78,
-        "unique": 56,
+        "total": 82,
+        "unique": 57,
         "by_src": {
-          "(none)": 76,
+          "(none)": 80,
           "group": 2
         },
         "by_device": {
-          "mobile": 73,
+          "mobile": 77,
           "desktop": 5
         }
       },
-      "conversion": 0.107
+      "conversion": 0.14
     },
     {
       "slug": "maldives",
