@@ -1,6 +1,6 @@
 {
-  "updated": "2026-10-06T07:19+05:30",
-  "data_hash": "cad4affef341cc97",
+  "updated": "2026-10-06T08:13+05:30",
+  "data_hash": "1b58d5ed505cc5cc",
   "event": {
     "name": "UN Day 2026",
     "date": "2026-10-16",
@@ -23,14 +23,14 @@
     "menu_items_unpledged": 56,
     "last_response": "2026-10-06T00:49+05:30",
     "clicks": {
-      "total": 87,
-      "unique": 76,
+      "total": 96,
+      "unique": 80,
       "all_links": {
-        "total": 112,
-        "unique": 91
+        "total": 126,
+        "unique": 98
       }
     },
-    "conversion": 1.967
+    "conversion": 1.788
   },
   "stalls": [
     {
@@ -249,14 +249,14 @@
       "unlisted_ticks": 0,
       "last_response": null,
       "clicks": {
-        "total": 16,
+        "total": 19,
         "unique": 14,
         "by_src": {
-          "g2": 13,
+          "g2": 16,
           "(none)": 3
         },
         "by_device": {
-          "mobile": 13,
+          "mobile": 16,
           "desktop": 3
         }
       },
@@ -301,14 +301,14 @@
       "unlisted_ticks": 0,
       "last_response": null,
       "clicks": {
-        "total": 19,
-        "unique": 17,
+        "total": 20,
+        "unique": 18,
         "by_src": {
-          "g2": 16,
+          "g2": 17,
           "(none)": 3
         },
         "by_device": {
-          "mobile": 13,
+          "mobile": 14,
           "desktop": 6
         }
       },
@@ -426,17 +426,17 @@
       "unlisted_ticks": 0,
       "last_response": "2026-10-05T20:46+05:30",
       "clicks": {
-        "total": 8,
-        "unique": 6,
+        "total": 9,
+        "unique": 7,
         "by_src": {
-          "g2": 8
+          "g2": 9
         },
         "by_device": {
-          "mobile": 7,
+          "mobile": 8,
           "desktop": 1
         }
       },
-      "conversion": 1.833
+      "conversion": 1.571
     },
     {
       "slug": "americas",
@@ -684,14 +684,14 @@
       "unlisted_ticks": 0,
       "last_response": null,
       "clicks": {
-        "total": 7,
-        "unique": 6,
+        "total": 10,
+        "unique": 7,
         "by_src": {
-          "g2": 5,
+          "g2": 8,
           "(none)": 2
         },
         "by_device": {
-          "mobile": 5,
+          "mobile": 8,
           "desktop": 2
         }
       },
@@ -736,14 +736,14 @@
       "unlisted_ticks": 0,
       "last_response": null,
       "clicks": {
-        "total": 3,
-        "unique": 2,
+        "total": 4,
+        "unique": 3,
         "by_src": {
-          "(none)": 2,
+          "(none)": 3,
           "group": 1
         },
         "by_device": {
-          "mobile": 2,
+          "mobile": 3,
           "desktop": 1
         }
       },
