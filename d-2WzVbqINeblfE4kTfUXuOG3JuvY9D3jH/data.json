@@ -1,6 +1,6 @@
 {
-  "updated": "2026-10-06T19:19+05:30",
-  "data_hash": "41cee0e0bdde0786",
+  "updated": "2026-10-06T20:18+05:30",
+  "data_hash": "be76e8df0b3c7d85",
   "event": {
     "name": "UN Day 2026",
     "date": "2026-10-16",
@@ -23,14 +23,14 @@
     "menu_items_unpledged": 51,
     "last_response": "2026-10-06T14:41+05:30",
     "clicks": {
-      "total": 410,
-      "unique": 315,
+      "total": 418,
+      "unique": 323,
       "all_links": {
-        "total": 465,
-        "unique": 309
+        "total": 473,
+        "unique": 315
       }
     },
-    "conversion": 0.456
+    "conversion": 0.445
   },
   "stalls": [
     {
@@ -225,17 +225,17 @@
       "unlisted_ticks": 0,
       "last_response": "2026-10-06T12:21+05:30",
       "clicks": {
-        "total": 30,
-        "unique": 23,
+        "total": 31,
+        "unique": 24,
         "by_src": {
           "g2": 21,
-          "(none)": 9
+          "(none)": 10
         },
         "by_device": {
-          "mobile": 30
+          "mobile": 31
         }
       },
-      "conversion": 1.13
+      "conversion": 1.083
     },
     {
       "slug": "japan",
@@ -250,14 +250,14 @@
       "unlisted_ticks": 0,
       "last_response": null,
       "clicks": {
-        "total": 61,
-        "unique": 47,
+        "total": 64,
+        "unique": 50,
         "by_src": {
-          "g2": 32,
-          "(none)": 29
+          "g2": 34,
+          "(none)": 30
         },
         "by_device": {
-          "mobile": 56,
+          "mobile": 59,
           "desktop": 5
         }
       },
@@ -276,14 +276,14 @@
       "unlisted_ticks": 0,
       "last_response": null,
       "clicks": {
-        "total": 72,
-        "unique": 51,
+        "total": 73,
+        "unique": 52,
         "by_src": {
-          "g2": 54,
+          "g2": 55,
           "(none)": 18
         },
         "by_device": {
-          "mobile": 65,
+          "mobile": 66,
           "desktop": 7
         }
       },
@@ -427,18 +427,18 @@
       "unlisted_ticks": 0,
       "last_response": "2026-10-06T13:54+05:30",
       "clicks": {
-        "total": 24,
-        "unique": 21,
+        "total": 26,
+        "unique": 23,
         "by_src": {
-          "g2": 17,
+          "g2": 19,
           "(none)": 7
         },
         "by_device": {
-          "mobile": 21,
+          "mobile": 23,
           "desktop": 3
         }
       },
-      "conversion": 0.667
+      "conversion": 0.609
     },
     {
       "slug": "americas",
@@ -592,18 +592,18 @@
       "unlisted_ticks": 0,
       "last_response": "2026-10-06T10:24+05:30",
       "clicks": {
-        "total": 20,
-        "unique": 18,
+        "total": 21,
+        "unique": 19,
         "by_src": {
-          "g2": 11,
+          "g2": 12,
           "(none)": 9
         },
         "by_device": {
-          "mobile": 17,
+          "mobile": 18,
           "desktop": 3
         }
       },
-      "conversion": 0.778
+      "conversion": 0.737
     },
     {
       "slug": "middle-east",
