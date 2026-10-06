@@ -1,6 +1,6 @@
 {
-  "updated": "2026-10-06T20:18+05:30",
-  "data_hash": "be76e8df0b3c7d85",
+  "updated": "2026-10-06T21:17+05:30",
+  "data_hash": "f4f1a6c9ba8b9ade",
   "event": {
     "name": "UN Day 2026",
     "date": "2026-10-16",
@@ -11,26 +11,26 @@
     "stalls": 10,
     "connected": 5,
     "stall_managed": 4,
-    "responses": 77,
-    "families": 69,
+    "responses": 78,
+    "families": 70,
     "contribution": {
-      "Food": 28,
+      "Food": 29,
       "Monetary contribution": 32,
       "Both": 3,
       "Not given": 0
     },
     "menu_items": 75,
-    "menu_items_unpledged": 51,
-    "last_response": "2026-10-06T14:41+05:30",
+    "menu_items_unpledged": 50,
+    "last_response": "2026-10-06T21:12+05:30",
     "clicks": {
       "total": 418,
       "unique": 323,
       "all_links": {
-        "total": 473,
-        "unique": 315
+        "total": 418,
+        "unique": 323
       }
     },
-    "conversion": 0.445
+    "conversion": 0.451
   },
   "stalls": [
     {
@@ -445,8 +445,8 @@
       "name": "USA/Canada",
       "year_groups": "Year 4",
       "status": "ok",
-      "responses": 15,
-      "families": 14,
+      "responses": 16,
+      "families": 15,
       "by_class": [
         {
           "class": "Year 4A",
@@ -458,7 +458,7 @@
         },
         {
           "class": "Year 4C",
-          "count": 1
+          "count": 2
         },
         {
           "class": "Year 4D",
@@ -466,7 +466,7 @@
         }
       ],
       "contribution": {
-        "Food": 4,
+        "Food": 5,
         "Monetary contribution": 9,
         "Both": 2,
         "Not given": 0
@@ -486,7 +486,7 @@
         },
         {
           "item": "Waffles/pancakes with syrup",
-          "count": 0
+          "count": 1
         },
         {
           "item": "Cookies",
@@ -506,7 +506,7 @@
         }
       ],
       "unlisted_ticks": 0,
-      "last_response": "2026-10-06T14:41+05:30",
+      "last_response": "2026-10-06T21:12+05:30",
       "clicks": {
         "total": 25,
         "unique": 17,
@@ -519,7 +519,7 @@
           "desktop": 4
         }
       },
-      "conversion": 0.882
+      "conversion": 0.941
     },
     {
       "slug": "europe",
