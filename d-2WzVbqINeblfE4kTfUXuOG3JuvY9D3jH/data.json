@@ -1,6 +1,6 @@
 {
-  "updated": "2026-10-05T22:16+05:30",
-  "data_hash": "e044f92a49ac095b",
+  "updated": "2026-10-06T07:05+05:30",
+  "data_hash": "acc4ba38379e1ca3",
   "event": {
     "name": "UN Day 2026",
     "date": "2026-10-16",
@@ -8,7 +8,7 @@
   },
   "tracking": "on",
   "summary": {
-    "stalls": 9,
+    "stalls": 10,
     "connected": 4,
     "stall_managed": 4,
     "responses": 58,
@@ -19,18 +19,18 @@
       "Both": 3,
       "Not given": 0
     },
-    "menu_items": 70,
-    "menu_items_unpledged": 51,
+    "menu_items": 75,
+    "menu_items_unpledged": 56,
     "last_response": "2026-10-05T21:58+05:30",
     "clicks": {
-      "total": 67,
-      "unique": 59,
+      "total": 80,
+      "unique": 71,
       "all_links": {
-        "total": 89,
-        "unique": 73
+        "total": 104,
+        "unique": 86
       }
     },
-    "conversion": 2.636
+    "conversion": 2.148
   },
   "stalls": [
     {
@@ -225,16 +225,16 @@
       "unlisted_ticks": 0,
       "last_response": "2026-10-05T21:58+05:30",
       "clicks": {
-        "total": 6,
-        "unique": 5,
+        "total": 8,
+        "unique": 7,
         "by_src": {
-          "g2": 6
+          "g2": 8
         },
         "by_device": {
-          "mobile": 6
+          "mobile": 8
         }
       },
-      "conversion": 4.8
+      "conversion": 3.429
     },
     {
       "slug": "japan",
@@ -249,14 +249,14 @@
       "unlisted_ticks": 0,
       "last_response": null,
       "clicks": {
-        "total": 14,
-        "unique": 12,
+        "total": 16,
+        "unique": 14,
         "by_src": {
-          "g2": 11,
+          "g2": 13,
           "(none)": 3
         },
         "by_device": {
-          "mobile": 11,
+          "mobile": 13,
           "desktop": 3
         }
       },
@@ -275,15 +275,15 @@
       "unlisted_ticks": 0,
       "last_response": null,
       "clicks": {
-        "total": 7,
-        "unique": 7,
+        "total": 8,
+        "unique": 8,
         "by_src": {
           "(none)": 4,
-          "g2": 3
+          "g2": 4
         },
         "by_device": {
           "desktop": 4,
-          "mobile": 3
+          "mobile": 4
         }
       },
       "conversion": null
@@ -301,15 +301,15 @@
       "unlisted_ticks": 0,
       "last_response": null,
       "clicks": {
-        "total": 16,
-        "unique": 14,
+        "total": 19,
+        "unique": 17,
         "by_src": {
-          "g2": 14,
-          "(none)": 2
+          "g2": 16,
+          "(none)": 3
         },
         "by_device": {
-          "mobile": 11,
-          "desktop": 5
+          "mobile": 13,
+          "desktop": 6
         }
       },
       "conversion": null
@@ -506,16 +506,16 @@
       "unlisted_ticks": 0,
       "last_response": "2026-10-05T16:07+05:30",
       "clicks": {
-        "total": 2,
-        "unique": 2,
+        "total": 4,
+        "unique": 3,
         "by_src": {
-          "g2": 2
+          "g2": 4
         },
         "by_device": {
-          "mobile": 2
+          "mobile": 4
         }
       },
-      "conversion": 5.0
+      "conversion": 3.333
     },
     {
       "slug": "europe",
@@ -698,6 +698,57 @@
       "conversion": 0.0
     },
     {
+      "slug": "china",
+      "name": "China",
+      "year_groups": "Years 9, 12 & 13",
+      "status": "not_connected",
+      "responses": 0,
+      "families": 0,
+      "by_class": [],
+      "contribution": {
+        "Food": 0,
+        "Monetary contribution": 0,
+        "Both": 0,
+        "Not given": 0
+      },
+      "menu": [
+        {
+          "item": "Chicken Fried Dumplings",
+          "count": 0
+        },
+        {
+          "item": "Spring Rolls (Vegetarian)",
+          "count": 0
+        },
+        {
+          "item": "Fried Chicken Bites (Chicken Popcorn)",
+          "count": 0
+        },
+        {
+          "item": "Chicken Fried Noodles",
+          "count": 0
+        },
+        {
+          "item": "Red Bean Pumpkin Cakes / Mooncakes",
+          "count": 0
+        }
+      ],
+      "unlisted_ticks": 0,
+      "last_response": null,
+      "clicks": {
+        "total": 2,
+        "unique": 2,
+        "by_src": {
+          "(none)": 2
+        },
+        "by_device": {
+          "desktop": 1,
+          "mobile": 1
+        }
+      },
+      "conversion": 0.0
+    },
+    {
       "slug": "maldives",
       "name": "Maldives",
       "year_groups": "Year 10",
@@ -710,15 +761,15 @@
       "unlisted_ticks": 0,
       "last_response": null,
       "clicks": {
-        "total": 4,
-        "unique": 4,
+        "total": 5,
+        "unique": 5,
         "by_src": {
-          "(none)": 2,
-          "g2": 2
+          "g2": 3,
+          "(none)": 2
         },
         "by_device": {
-          "desktop": 2,
-          "mobile": 2
+          "mobile": 3,
+          "desktop": 2
         }
       },
       "conversion": null

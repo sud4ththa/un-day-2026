@@ -151,6 +151,22 @@
       ]
     },
     {
+      "slug": "china",
+      "form_id": "1FAIpQLSco8ykP4kgFFYm5ROpKmo9GBnASMK-4yuYpIRure9CF0wivDw",
+      "menu": [
+        "Chicken Fried Dumplings",
+        "Spring Rolls (Vegetarian)",
+        "Fried Chicken Bites (Chicken Popcorn)",
+        "Chicken Fried Noodles",
+        "Red Bean Pumpkin Cakes / Mooncakes"
+      ],
+      "contribution_options": [
+        "Food",
+        "Monetary contribution",
+        "Both"
+      ]
+    },
+    {
       "slug": "maldives",
       "stall_managed": true,
       "form_id": null,
