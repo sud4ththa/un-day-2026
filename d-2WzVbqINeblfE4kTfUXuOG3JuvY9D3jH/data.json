@@ -1,6 +1,6 @@
 {
-  "updated": "2026-10-06T21:17+05:30",
-  "data_hash": "f4f1a6c9ba8b9ade",
+  "updated": "2026-10-06T22:15+05:30",
+  "data_hash": "350eb1641a57ca75",
   "event": {
     "name": "UN Day 2026",
     "date": "2026-10-16",
@@ -11,26 +11,26 @@
     "stalls": 10,
     "connected": 5,
     "stall_managed": 4,
-    "responses": 78,
-    "families": 70,
+    "responses": 81,
+    "families": 72,
     "contribution": {
-      "Food": 29,
-      "Monetary contribution": 32,
+      "Food": 30,
+      "Monetary contribution": 34,
       "Both": 3,
       "Not given": 0
     },
     "menu_items": 75,
     "menu_items_unpledged": 50,
-    "last_response": "2026-10-06T21:12+05:30",
+    "last_response": "2026-10-06T22:12+05:30",
     "clicks": {
-      "total": 418,
-      "unique": 323,
+      "total": 461,
+      "unique": 353,
       "all_links": {
-        "total": 418,
-        "unique": 323
+        "total": 518,
+        "unique": 344
       }
     },
-    "conversion": 0.451
+    "conversion": 0.429
   },
   "stalls": [
     {
@@ -38,8 +38,8 @@
       "name": "Sri Lanka",
       "year_groups": "Playgroup & Reception",
       "status": "ok",
-      "responses": 26,
-      "families": 25,
+      "responses": 27,
+      "families": 26,
       "by_class": [
         {
           "class": "Playgroup A",
@@ -51,7 +51,7 @@
         },
         {
           "class": "Playgroup C",
-          "count": 2
+          "count": 3
         },
         {
           "class": "Reception A",
@@ -71,7 +71,7 @@
         }
       ],
       "contribution": {
-        "Food": 19,
+        "Food": 20,
         "Monetary contribution": 6,
         "Both": 1,
         "Not given": 0
@@ -85,7 +85,7 @@
         },
         {
           "item": "Konda kavum (200)",
-          "count": 1,
+          "count": 2,
           "label": "Konda kavum",
           "needed": "200"
         },
@@ -223,19 +223,19 @@
         }
       ],
       "unlisted_ticks": 0,
-      "last_response": "2026-10-06T12:21+05:30",
+      "last_response": "2026-10-06T21:38+05:30",
       "clicks": {
-        "total": 31,
+        "total": 32,
         "unique": 24,
         "by_src": {
-          "g2": 21,
+          "g2": 22,
           "(none)": 10
         },
         "by_device": {
-          "mobile": 31
+          "mobile": 32
         }
       },
-      "conversion": 1.083
+      "conversion": 1.125
     },
     {
       "slug": "japan",
@@ -250,14 +250,14 @@
       "unlisted_ticks": 0,
       "last_response": null,
       "clicks": {
-        "total": 64,
-        "unique": 50,
+        "total": 75,
+        "unique": 58,
         "by_src": {
-          "g2": 34,
+          "g2": 45,
           "(none)": 30
         },
         "by_device": {
-          "mobile": 59,
+          "mobile": 70,
           "desktop": 5
         }
       },
@@ -276,14 +276,14 @@
       "unlisted_ticks": 0,
       "last_response": null,
       "clicks": {
-        "total": 73,
-        "unique": 52,
+        "total": 77,
+        "unique": 56,
         "by_src": {
-          "g2": 55,
+          "g2": 59,
           "(none)": 18
         },
         "by_device": {
-          "mobile": 66,
+          "mobile": 70,
           "desktop": 7
         }
       },
@@ -302,14 +302,14 @@
       "unlisted_ticks": 0,
       "last_response": null,
       "clicks": {
-        "total": 43,
-        "unique": 33,
+        "total": 45,
+        "unique": 35,
         "by_src": {
-          "g2": 30,
-          "(none)": 13
+          "g2": 31,
+          "(none)": 14
         },
         "by_device": {
-          "mobile": 36,
+          "mobile": 38,
           "desktop": 7
         }
       },
@@ -508,18 +508,18 @@
       "unlisted_ticks": 0,
       "last_response": "2026-10-06T21:12+05:30",
       "clicks": {
-        "total": 25,
-        "unique": 17,
+        "total": 28,
+        "unique": 19,
         "by_src": {
           "g2": 16,
-          "(none)": 9
+          "(none)": 12
         },
         "by_device": {
-          "mobile": 21,
+          "mobile": 24,
           "desktop": 4
         }
       },
-      "conversion": 0.941
+      "conversion": 0.842
     },
     {
       "slug": "europe",
@@ -592,18 +592,18 @@
       "unlisted_ticks": 0,
       "last_response": "2026-10-06T10:24+05:30",
       "clicks": {
-        "total": 21,
-        "unique": 19,
+        "total": 29,
+        "unique": 21,
         "by_src": {
-          "g2": 12,
-          "(none)": 9
+          "(none)": 15,
+          "g2": 14
         },
         "by_device": {
-          "mobile": 18,
+          "mobile": 26,
           "desktop": 3
         }
       },
-      "conversion": 0.737
+      "conversion": 0.667
     },
     {
       "slug": "middle-east",
@@ -688,14 +688,14 @@
       "unlisted_ticks": 0,
       "last_response": null,
       "clicks": {
-        "total": 31,
-        "unique": 26,
+        "total": 38,
+        "unique": 31,
         "by_src": {
-          "(none)": 18,
-          "g2": 13
+          "g2": 20,
+          "(none)": 18
         },
         "by_device": {
-          "mobile": 27,
+          "mobile": 34,
           "desktop": 4
         }
       },
@@ -706,8 +706,8 @@
       "name": "China",
       "year_groups": "Years 9, 12 & 13",
       "status": "ok",
-      "responses": 8,
-      "families": 8,
+      "responses": 10,
+      "families": 9,
       "by_class": [
         {
           "class": "Year 9B",
@@ -723,12 +723,12 @@
         },
         {
           "class": "Year 13",
-          "count": 2
+          "count": 4
         }
       ],
       "contribution": {
         "Food": 1,
-        "Monetary contribution": 7,
+        "Monetary contribution": 9,
         "Both": 0,
         "Not given": 0
       },
@@ -755,20 +755,20 @@
         }
       ],
       "unlisted_ticks": 0,
-      "last_response": "2026-10-06T13:42+05:30",
+      "last_response": "2026-10-06T22:12+05:30",
       "clicks": {
-        "total": 89,
-        "unique": 64,
+        "total": 96,
+        "unique": 71,
         "by_src": {
-          "(none)": 87,
+          "(none)": 94,
           "group": 2
         },
         "by_device": {
-          "mobile": 83,
-          "desktop": 6
+          "mobile": 89,
+          "desktop": 7
         }
       },
-      "conversion": 0.125
+      "conversion": 0.141
     },
     {
       "slug": "maldives",
