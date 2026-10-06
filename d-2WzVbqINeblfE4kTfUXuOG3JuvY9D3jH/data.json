@@ -1,6 +1,6 @@
 {
-  "updated": "2026-10-06T17:11+05:30",
-  "data_hash": "1b534545a9c902d7",
+  "updated": "2026-10-06T18:22+05:30",
+  "data_hash": "2f80ff014d4e7139",
   "event": {
     "name": "UN Day 2026",
     "date": "2026-10-16",
@@ -23,14 +23,14 @@
     "menu_items_unpledged": 51,
     "last_response": "2026-10-06T14:41+05:30",
     "clicks": {
-      "total": 395,
-      "unique": 302,
+      "total": 404,
+      "unique": 309,
       "all_links": {
-        "total": 450,
-        "unique": 302
+        "total": 459,
+        "unique": 303
       }
     },
-    "conversion": 0.47
+    "conversion": 0.461
   },
   "stalls": [
     {
@@ -250,14 +250,14 @@
       "unlisted_ticks": 0,
       "last_response": null,
       "clicks": {
-        "total": 57,
-        "unique": 44,
+        "total": 59,
+        "unique": 45,
         "by_src": {
           "g2": 31,
-          "(none)": 26
+          "(none)": 28
         },
         "by_device": {
-          "mobile": 53,
+          "mobile": 55,
           "desktop": 4
         }
       },
@@ -276,14 +276,14 @@
       "unlisted_ticks": 0,
       "last_response": null,
       "clicks": {
-        "total": 69,
-        "unique": 49,
+        "total": 71,
+        "unique": 50,
         "by_src": {
-          "g2": 51,
+          "g2": 53,
           "(none)": 18
         },
         "by_device": {
-          "mobile": 62,
+          "mobile": 64,
           "desktop": 7
         }
       },
@@ -302,14 +302,14 @@
       "unlisted_ticks": 0,
       "last_response": null,
       "clicks": {
-        "total": 41,
-        "unique": 31,
+        "total": 42,
+        "unique": 32,
         "by_src": {
           "g2": 29,
-          "(none)": 12
+          "(none)": 13
         },
         "by_device": {
-          "mobile": 34,
+          "mobile": 35,
           "desktop": 7
         }
       },
@@ -427,18 +427,18 @@
       "unlisted_ticks": 0,
       "last_response": "2026-10-06T13:54+05:30",
       "clicks": {
-        "total": 22,
-        "unique": 19,
+        "total": 23,
+        "unique": 20,
         "by_src": {
           "g2": 17,
-          "(none)": 5
+          "(none)": 6
         },
         "by_device": {
-          "mobile": 20,
+          "mobile": 21,
           "desktop": 2
         }
       },
-      "conversion": 0.737
+      "conversion": 0.7
     },
     {
       "slug": "americas",
@@ -508,18 +508,18 @@
       "unlisted_ticks": 0,
       "last_response": "2026-10-06T14:41+05:30",
       "clicks": {
-        "total": 24,
-        "unique": 16,
+        "total": 25,
+        "unique": 17,
         "by_src": {
           "g2": 16,
-          "(none)": 8
+          "(none)": 9
         },
         "by_device": {
-          "mobile": 20,
+          "mobile": 21,
           "desktop": 4
         }
       },
-      "conversion": 0.938
+      "conversion": 0.882
     },
     {
       "slug": "europe",
@@ -592,18 +592,18 @@
       "unlisted_ticks": 0,
       "last_response": "2026-10-06T10:24+05:30",
       "clicks": {
-        "total": 19,
-        "unique": 17,
+        "total": 20,
+        "unique": 18,
         "by_src": {
           "g2": 11,
-          "(none)": 8
+          "(none)": 9
         },
         "by_device": {
-          "mobile": 16,
+          "mobile": 17,
           "desktop": 3
         }
       },
-      "conversion": 0.824
+      "conversion": 0.778
     },
     {
       "slug": "middle-east",
@@ -783,14 +783,14 @@
       "unlisted_ticks": 0,
       "last_response": null,
       "clicks": {
-        "total": 14,
-        "unique": 14,
+        "total": 15,
+        "unique": 15,
         "by_src": {
           "g2": 9,
-          "(none)": 5
+          "(none)": 6
         },
         "by_device": {
-          "mobile": 12,
+          "mobile": 13,
           "desktop": 2
         }
       },
