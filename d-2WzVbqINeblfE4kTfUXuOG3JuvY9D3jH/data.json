@@ -1,6 +1,6 @@
 {
-  "updated": "2026-10-06T08:13+05:30",
-  "data_hash": "1b58d5ed505cc5cc",
+  "updated": "2026-10-06T09:11+05:30",
+  "data_hash": "d74c6499c1fe7ed3",
   "event": {
     "name": "UN Day 2026",
     "date": "2026-10-16",
@@ -11,26 +11,26 @@
     "stalls": 10,
     "connected": 5,
     "stall_managed": 4,
-    "responses": 59,
-    "families": 54,
+    "responses": 60,
+    "families": 55,
     "contribution": {
-      "Food": 24,
+      "Food": 25,
       "Monetary contribution": 19,
       "Both": 3,
       "Not given": 0
     },
     "menu_items": 75,
-    "menu_items_unpledged": 56,
-    "last_response": "2026-10-06T00:49+05:30",
+    "menu_items_unpledged": 55,
+    "last_response": "2026-10-06T08:55+05:30",
     "clicks": {
       "total": 96,
       "unique": 80,
       "all_links": {
-        "total": 126,
-        "unique": 98
+        "total": 96,
+        "unique": 80
       }
     },
-    "conversion": 1.788
+    "conversion": 1.818
   },
   "stalls": [
     {
@@ -702,11 +702,16 @@
       "name": "China",
       "year_groups": "Years 9, 12 & 13",
       "status": "ok",
-      "responses": 0,
-      "families": 0,
-      "by_class": [],
+      "responses": 1,
+      "families": 1,
+      "by_class": [
+        {
+          "class": "Year 9B",
+          "count": 1
+        }
+      ],
       "contribution": {
-        "Food": 0,
+        "Food": 1,
         "Monetary contribution": 0,
         "Both": 0,
         "Not given": 0
@@ -714,7 +719,7 @@
       "menu": [
         {
           "item": "Chicken Fried Dumplings",
-          "count": 0
+          "count": 1
         },
         {
           "item": "Spring Rolls (Vegetarian)",
@@ -734,7 +739,7 @@
         }
       ],
       "unlisted_ticks": 0,
-      "last_response": null,
+      "last_response": "2026-10-06T08:55+05:30",
       "clicks": {
         "total": 4,
         "unique": 3,
@@ -747,7 +752,7 @@
           "desktop": 1
         }
       },
-      "conversion": 0.0
+      "conversion": 0.333
     },
     {
       "slug": "maldives",
