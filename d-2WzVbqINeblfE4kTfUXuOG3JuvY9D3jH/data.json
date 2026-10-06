@@ -1,6 +1,6 @@
 {
-  "updated": "2026-10-06T16:13+05:30",
-  "data_hash": "b9ed2be842e7cf70",
+  "updated": "2026-10-06T17:11+05:30",
+  "data_hash": "1b534545a9c902d7",
   "event": {
     "name": "UN Day 2026",
     "date": "2026-10-16",
@@ -23,14 +23,14 @@
     "menu_items_unpledged": 51,
     "last_response": "2026-10-06T14:41+05:30",
     "clicks": {
-      "total": 389,
-      "unique": 298,
+      "total": 395,
+      "unique": 302,
       "all_links": {
-        "total": 441,
-        "unique": 296
+        "total": 450,
+        "unique": 302
       }
     },
-    "conversion": 0.481
+    "conversion": 0.47
   },
   "stalls": [
     {
@@ -276,14 +276,14 @@
       "unlisted_ticks": 0,
       "last_response": null,
       "clicks": {
-        "total": 68,
+        "total": 69,
         "unique": 49,
         "by_src": {
           "g2": 51,
-          "(none)": 17
+          "(none)": 18
         },
         "by_device": {
-          "mobile": 61,
+          "mobile": 62,
           "desktop": 7
         }
       },
@@ -508,14 +508,14 @@
       "unlisted_ticks": 0,
       "last_response": "2026-10-06T14:41+05:30",
       "clicks": {
-        "total": 23,
+        "total": 24,
         "unique": 16,
         "by_src": {
           "g2": 16,
-          "(none)": 7
+          "(none)": 8
         },
         "by_device": {
-          "mobile": 19,
+          "mobile": 20,
           "desktop": 4
         }
       },
@@ -592,18 +592,18 @@
       "unlisted_ticks": 0,
       "last_response": "2026-10-06T10:24+05:30",
       "clicks": {
-        "total": 17,
-        "unique": 15,
+        "total": 19,
+        "unique": 17,
         "by_src": {
-          "g2": 9,
+          "g2": 11,
           "(none)": 8
         },
         "by_device": {
-          "mobile": 14,
+          "mobile": 16,
           "desktop": 3
         }
       },
-      "conversion": 0.933
+      "conversion": 0.824
     },
     {
       "slug": "middle-east",
@@ -688,15 +688,15 @@
       "unlisted_ticks": 0,
       "last_response": null,
       "clicks": {
-        "total": 30,
-        "unique": 25,
+        "total": 31,
+        "unique": 26,
         "by_src": {
-          "(none)": 17,
+          "(none)": 18,
           "g2": 13
         },
         "by_device": {
           "mobile": 27,
-          "desktop": 3
+          "desktop": 4
         }
       },
       "conversion": 0.0
@@ -757,18 +757,18 @@
       "unlisted_ticks": 0,
       "last_response": "2026-10-06T13:42+05:30",
       "clicks": {
-        "total": 87,
-        "unique": 62,
+        "total": 88,
+        "unique": 63,
         "by_src": {
-          "(none)": 85,
+          "(none)": 86,
           "group": 2
         },
         "by_device": {
-          "mobile": 82,
+          "mobile": 83,
           "desktop": 5
         }
       },
-      "conversion": 0.129
+      "conversion": 0.127
     },
     {
       "slug": "maldives",
