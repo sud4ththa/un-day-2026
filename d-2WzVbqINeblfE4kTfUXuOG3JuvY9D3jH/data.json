@@ -1,6 +1,6 @@
 {
-  "updated": "2026-10-06T10:18+05:30",
-  "data_hash": "2cc51e86b823a439",
+  "updated": "2026-10-06T11:18+05:30",
+  "data_hash": "bf289005251646a6",
   "event": {
     "name": "UN Day 2026",
     "date": "2026-10-16",
@@ -11,26 +11,26 @@
     "stalls": 10,
     "connected": 5,
     "stall_managed": 4,
-    "responses": 63,
-    "families": 58,
+    "responses": 66,
+    "families": 61,
     "contribution": {
       "Food": 26,
-      "Monetary contribution": 21,
+      "Monetary contribution": 23,
       "Both": 3,
       "Not given": 0
     },
     "menu_items": 75,
-    "menu_items_unpledged": 54,
-    "last_response": "2026-10-06T09:38+05:30",
+    "menu_items_unpledged": 53,
+    "last_response": "2026-10-06T11:01+05:30",
     "clicks": {
-      "total": 174,
-      "unique": 137,
+      "total": 208,
+      "unique": 161,
       "all_links": {
-        "total": 210,
-        "unique": 155
+        "total": 246,
+        "unique": 181
       }
     },
-    "conversion": 0.778
+    "conversion": 0.71
   },
   "stalls": [
     {
@@ -225,16 +225,16 @@
       "unlisted_ticks": 0,
       "last_response": "2026-10-06T09:11+05:30",
       "clicks": {
-        "total": 14,
-        "unique": 12,
+        "total": 16,
+        "unique": 13,
         "by_src": {
-          "g2": 14
+          "g2": 16
         },
         "by_device": {
-          "mobile": 14
+          "mobile": 16
         }
       },
-      "conversion": 2.083
+      "conversion": 1.923
     },
     {
       "slug": "japan",
@@ -249,14 +249,14 @@
       "unlisted_ticks": 0,
       "last_response": null,
       "clicks": {
-        "total": 21,
-        "unique": 16,
+        "total": 25,
+        "unique": 19,
         "by_src": {
-          "g2": 18,
+          "g2": 22,
           "(none)": 3
         },
         "by_device": {
-          "mobile": 18,
+          "mobile": 22,
           "desktop": 3
         }
       },
@@ -275,15 +275,15 @@
       "unlisted_ticks": 0,
       "last_response": null,
       "clicks": {
-        "total": 12,
-        "unique": 10,
+        "total": 25,
+        "unique": 18,
         "by_src": {
-          "g2": 8,
+          "g2": 21,
           "(none)": 4
         },
         "by_device": {
-          "mobile": 8,
-          "desktop": 4
+          "mobile": 20,
+          "desktop": 5
         }
       },
       "conversion": null
@@ -301,14 +301,14 @@
       "unlisted_ticks": 0,
       "last_response": null,
       "clicks": {
-        "total": 24,
-        "unique": 20,
+        "total": 25,
+        "unique": 21,
         "by_src": {
-          "g2": 21,
+          "g2": 22,
           "(none)": 3
         },
         "by_device": {
-          "mobile": 17,
+          "mobile": 18,
           "desktop": 7
         }
       },
@@ -506,24 +506,24 @@
       "unlisted_ticks": 0,
       "last_response": "2026-10-06T00:49+05:30",
       "clicks": {
-        "total": 4,
-        "unique": 3,
+        "total": 8,
+        "unique": 6,
         "by_src": {
-          "g2": 4
+          "g2": 8
         },
         "by_device": {
-          "mobile": 4
+          "mobile": 8
         }
       },
-      "conversion": 3.667
+      "conversion": 1.833
     },
     {
       "slug": "europe",
       "name": "Europe",
       "year_groups": "Year 6",
       "status": "ok",
-      "responses": 13,
-      "families": 13,
+      "responses": 14,
+      "families": 14,
       "by_class": [
         {
           "class": "Year 6A",
@@ -539,7 +539,7 @@
         },
         {
           "class": "Year 6D",
-          "count": 3
+          "count": 4
         }
       ],
       "contribution": null,
@@ -582,24 +582,24 @@
         },
         {
           "item": "Pastries or other savoury items",
-          "count": 0
+          "count": 1
         }
       ],
       "unlisted_ticks": 0,
-      "last_response": "2026-10-05T21:27+05:30",
+      "last_response": "2026-10-06T10:24+05:30",
       "clicks": {
-        "total": 8,
-        "unique": 7,
+        "total": 9,
+        "unique": 8,
         "by_src": {
-          "g2": 6,
+          "g2": 7,
           "(none)": 2
         },
         "by_device": {
-          "mobile": 5,
+          "mobile": 6,
           "desktop": 3
         }
       },
-      "conversion": 1.857
+      "conversion": 1.75
     },
     {
       "slug": "middle-east",
@@ -684,14 +684,14 @@
       "unlisted_ticks": 0,
       "last_response": null,
       "clicks": {
-        "total": 10,
-        "unique": 7,
+        "total": 11,
+        "unique": 8,
         "by_src": {
-          "g2": 8,
+          "g2": 9,
           "(none)": 2
         },
         "by_device": {
-          "mobile": 8,
+          "mobile": 9,
           "desktop": 2
         }
       },
@@ -702,12 +702,12 @@
       "name": "China",
       "year_groups": "Years 9, 12 & 13",
       "status": "ok",
-      "responses": 3,
-      "families": 3,
+      "responses": 5,
+      "families": 5,
       "by_class": [
         {
           "class": "Year 9B",
-          "count": 1
+          "count": 2
         },
         {
           "class": "Year 9C",
@@ -716,11 +716,15 @@
         {
           "class": "Year 12",
           "count": 1
+        },
+        {
+          "class": "Year 13",
+          "count": 1
         }
       ],
       "contribution": {
         "Food": 1,
-        "Monetary contribution": 2,
+        "Monetary contribution": 4,
         "Both": 0,
         "Not given": 0
       },
@@ -747,20 +751,20 @@
         }
       ],
       "unlisted_ticks": 0,
-      "last_response": "2026-10-06T09:38+05:30",
+      "last_response": "2026-10-06T11:01+05:30",
       "clicks": {
-        "total": 60,
-        "unique": 43,
+        "total": 68,
+        "unique": 49,
         "by_src": {
-          "(none)": 58,
+          "(none)": 66,
           "group": 2
         },
         "by_device": {
-          "mobile": 57,
-          "desktop": 3
+          "mobile": 63,
+          "desktop": 5
         }
       },
-      "conversion": 0.07
+      "conversion": 0.102
     },
     {
       "slug": "maldives",
