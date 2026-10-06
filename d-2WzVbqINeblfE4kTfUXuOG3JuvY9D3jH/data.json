@@ -1,6 +1,6 @@
 {
-  "updated": "2026-10-06T15:14+05:30",
-  "data_hash": "1575cbc7bb0c7127",
+  "updated": "2026-10-06T16:13+05:30",
+  "data_hash": "b9ed2be842e7cf70",
   "event": {
     "name": "UN Day 2026",
     "date": "2026-10-16",
@@ -23,14 +23,14 @@
     "menu_items_unpledged": 51,
     "last_response": "2026-10-06T14:41+05:30",
     "clicks": {
-      "total": 379,
-      "unique": 293,
+      "total": 389,
+      "unique": 298,
       "all_links": {
-        "total": 429,
-        "unique": 293
+        "total": 441,
+        "unique": 296
       }
     },
-    "conversion": 0.487
+    "conversion": 0.481
   },
   "stalls": [
     {
@@ -250,14 +250,14 @@
       "unlisted_ticks": 0,
       "last_response": null,
       "clicks": {
-        "total": 55,
-        "unique": 43,
+        "total": 57,
+        "unique": 44,
         "by_src": {
-          "g2": 30,
-          "(none)": 25
+          "g2": 31,
+          "(none)": 26
         },
         "by_device": {
-          "mobile": 51,
+          "mobile": 53,
           "desktop": 4
         }
       },
@@ -276,14 +276,14 @@
       "unlisted_ticks": 0,
       "last_response": null,
       "clicks": {
-        "total": 63,
-        "unique": 47,
+        "total": 68,
+        "unique": 49,
         "by_src": {
-          "g2": 48,
-          "(none)": 15
+          "g2": 51,
+          "(none)": 17
         },
         "by_device": {
-          "mobile": 56,
+          "mobile": 61,
           "desktop": 7
         }
       },
@@ -508,18 +508,18 @@
       "unlisted_ticks": 0,
       "last_response": "2026-10-06T14:41+05:30",
       "clicks": {
-        "total": 22,
-        "unique": 15,
+        "total": 23,
+        "unique": 16,
         "by_src": {
-          "g2": 15,
+          "g2": 16,
           "(none)": 7
         },
         "by_device": {
-          "mobile": 18,
+          "mobile": 19,
           "desktop": 4
         }
       },
-      "conversion": 1.0
+      "conversion": 0.938
     },
     {
       "slug": "europe",
@@ -592,18 +592,18 @@
       "unlisted_ticks": 0,
       "last_response": "2026-10-06T10:24+05:30",
       "clicks": {
-        "total": 15,
-        "unique": 14,
+        "total": 17,
+        "unique": 15,
         "by_src": {
-          "g2": 8,
-          "(none)": 7
+          "g2": 9,
+          "(none)": 8
         },
         "by_device": {
-          "mobile": 12,
+          "mobile": 14,
           "desktop": 3
         }
       },
-      "conversion": 1.0
+      "conversion": 0.933
     },
     {
       "slug": "middle-east",
