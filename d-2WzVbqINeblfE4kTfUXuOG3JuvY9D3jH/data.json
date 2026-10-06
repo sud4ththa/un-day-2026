@@ -1,6 +1,6 @@
 {
-  "updated": "2026-10-06T11:18+05:30",
-  "data_hash": "bf289005251646a6",
+  "updated": "2026-10-06T12:12+05:30",
+  "data_hash": "7c97931e782a178a",
   "event": {
     "name": "UN Day 2026",
     "date": "2026-10-16",
@@ -23,14 +23,14 @@
     "menu_items_unpledged": 53,
     "last_response": "2026-10-06T11:01+05:30",
     "clicks": {
-      "total": 208,
-      "unique": 161,
+      "total": 243,
+      "unique": 189,
       "all_links": {
-        "total": 246,
-        "unique": 181
+        "total": 284,
+        "unique": 208
       }
     },
-    "conversion": 0.71
+    "conversion": 0.635
   },
   "stalls": [
     {
@@ -225,16 +225,17 @@
       "unlisted_ticks": 0,
       "last_response": "2026-10-06T09:11+05:30",
       "clicks": {
-        "total": 16,
-        "unique": 13,
+        "total": 19,
+        "unique": 16,
         "by_src": {
-          "g2": 16
+          "g2": 17,
+          "(none)": 2
         },
         "by_device": {
-          "mobile": 16
+          "mobile": 19
         }
       },
-      "conversion": 1.923
+      "conversion": 1.562
     },
     {
       "slug": "japan",
@@ -249,15 +250,15 @@
       "unlisted_ticks": 0,
       "last_response": null,
       "clicks": {
-        "total": 25,
-        "unique": 19,
+        "total": 34,
+        "unique": 26,
         "by_src": {
-          "g2": 22,
-          "(none)": 3
+          "g2": 26,
+          "(none)": 8
         },
         "by_device": {
-          "mobile": 22,
-          "desktop": 3
+          "mobile": 30,
+          "desktop": 4
         }
       },
       "conversion": null
@@ -275,15 +276,15 @@
       "unlisted_ticks": 0,
       "last_response": null,
       "clicks": {
-        "total": 25,
-        "unique": 18,
+        "total": 34,
+        "unique": 25,
         "by_src": {
-          "g2": 21,
-          "(none)": 4
+          "g2": 26,
+          "(none)": 8
         },
         "by_device": {
-          "mobile": 20,
-          "desktop": 5
+          "mobile": 28,
+          "desktop": 6
         }
       },
       "conversion": null
@@ -301,14 +302,14 @@
       "unlisted_ticks": 0,
       "last_response": null,
       "clicks": {
-        "total": 25,
-        "unique": 21,
+        "total": 28,
+        "unique": 23,
         "by_src": {
-          "g2": 22,
-          "(none)": 3
+          "g2": 23,
+          "(none)": 5
         },
         "by_device": {
-          "mobile": 18,
+          "mobile": 21,
           "desktop": 7
         }
       },
@@ -426,17 +427,18 @@
       "unlisted_ticks": 0,
       "last_response": "2026-10-05T20:46+05:30",
       "clicks": {
-        "total": 11,
-        "unique": 9,
+        "total": 12,
+        "unique": 10,
         "by_src": {
-          "g2": 11
+          "g2": 11,
+          "(none)": 1
         },
         "by_device": {
-          "mobile": 10,
+          "mobile": 11,
           "desktop": 1
         }
       },
-      "conversion": 1.222
+      "conversion": 1.1
     },
     {
       "slug": "americas",
@@ -684,14 +686,14 @@
       "unlisted_ticks": 0,
       "last_response": null,
       "clicks": {
-        "total": 11,
-        "unique": 8,
+        "total": 15,
+        "unique": 12,
         "by_src": {
-          "g2": 9,
-          "(none)": 2
+          "g2": 10,
+          "(none)": 5
         },
         "by_device": {
-          "mobile": 9,
+          "mobile": 13,
           "desktop": 2
         }
       },
@@ -753,18 +755,18 @@
       "unlisted_ticks": 0,
       "last_response": "2026-10-06T11:01+05:30",
       "clicks": {
-        "total": 68,
-        "unique": 49,
+        "total": 73,
+        "unique": 52,
         "by_src": {
-          "(none)": 66,
+          "(none)": 71,
           "group": 2
         },
         "by_device": {
-          "mobile": 63,
+          "mobile": 68,
           "desktop": 5
         }
       },
-      "conversion": 0.102
+      "conversion": 0.096
     },
     {
       "slug": "maldives",
@@ -779,14 +781,14 @@
       "unlisted_ticks": 0,
       "last_response": null,
       "clicks": {
-        "total": 10,
-        "unique": 10,
+        "total": 11,
+        "unique": 11,
         "by_src": {
-          "g2": 8,
+          "g2": 9,
           "(none)": 2
         },
         "by_device": {
-          "mobile": 8,
+          "mobile": 9,
           "desktop": 2
         }
       },
