@@ -1,6 +1,6 @@
 {
-  "updated": "2026-10-07T21:24+05:30",
-  "data_hash": "acc929ad3427b845",
+  "updated": "2026-10-07T22:19+05:30",
+  "data_hash": "4523cdf94b10d251",
   "event": {
     "name": "UN Day 2026",
     "date": "2026-10-16",
@@ -23,14 +23,14 @@
     "menu_items_unpledged": 52,
     "last_response": "2026-10-07T21:14+05:30",
     "clicks": {
-      "total": 744,
-      "unique": 527,
+      "total": 747,
+      "unique": 530,
       "all_links": {
-        "total": 744,
-        "unique": 449
+        "total": 747,
+        "unique": 452
       }
     },
-    "conversion": 0.397
+    "conversion": 0.394
   },
   "stalls": [
     {
@@ -610,18 +610,18 @@
       "money_line": "",
       "last_response": "2026-10-07T15:15+05:30",
       "clicks": {
-        "total": 121,
-        "unique": 72,
+        "total": 123,
+        "unique": 74,
         "by_src": {
-          "g2": 98,
+          "g2": 100,
           "(none)": 23
         },
         "by_device": {
-          "mobile": 111,
+          "mobile": 113,
           "desktop": 10
         }
       },
-      "conversion": 0.347,
+      "conversion": 0.338,
       "data_as_of": "2026-10-07T19:18+05:30"
     },
     {
@@ -1534,18 +1534,18 @@
       "money_line": "Money: 7 families (1 also bringing food). No amounts stated on the sheet, so no money % is shown.",
       "last_response": "2026-10-07T18:34+05:30",
       "clicks": {
-        "total": 69,
-        "unique": 53,
+        "total": 70,
+        "unique": 54,
         "by_src": {
-          "g2": 60,
+          "g2": 61,
           "(none)": 9
         },
         "by_device": {
-          "mobile": 65,
+          "mobile": 66,
           "desktop": 4
         }
       },
-      "conversion": 0.151
+      "conversion": 0.148
     }
   ]
 }
