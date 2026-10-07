@@ -1,6 +1,6 @@
 {
-  "updated": "2026-10-06T22:15+05:30",
-  "data_hash": "350eb1641a57ca75",
+  "updated": "2026-10-07T07:15+05:30",
+  "data_hash": "3179f1eac2243fc9",
   "event": {
     "name": "UN Day 2026",
     "date": "2026-10-16",
@@ -11,26 +11,26 @@
     "stalls": 10,
     "connected": 5,
     "stall_managed": 4,
-    "responses": 81,
-    "families": 72,
+    "responses": 83,
+    "families": 74,
     "contribution": {
-      "Food": 30,
-      "Monetary contribution": 34,
+      "Food": 31,
+      "Monetary contribution": 35,
       "Both": 3,
       "Not given": 0
     },
     "menu_items": 75,
     "menu_items_unpledged": 50,
-    "last_response": "2026-10-06T22:12+05:30",
+    "last_response": "2026-10-07T06:22+05:30",
     "clicks": {
-      "total": 461,
-      "unique": 353,
+      "total": 504,
+      "unique": 377,
       "all_links": {
-        "total": 518,
-        "unique": 344
+        "total": 561,
+        "unique": 364
       }
     },
-    "conversion": 0.429
+    "conversion": 0.419
   },
   "stalls": [
     {
@@ -38,8 +38,8 @@
       "name": "Sri Lanka",
       "year_groups": "Playgroup & Reception",
       "status": "ok",
-      "responses": 27,
-      "families": 26,
+      "responses": 29,
+      "families": 28,
       "by_class": [
         {
           "class": "Playgroup A",
@@ -55,7 +55,7 @@
         },
         {
           "class": "Reception A",
-          "count": 5
+          "count": 6
         },
         {
           "class": "Reception B",
@@ -63,7 +63,7 @@
         },
         {
           "class": "Reception C",
-          "count": 6
+          "count": 7
         },
         {
           "class": "Reception D",
@@ -71,8 +71,8 @@
         }
       ],
       "contribution": {
-        "Food": 20,
-        "Monetary contribution": 6,
+        "Food": 21,
+        "Monetary contribution": 7,
         "Both": 1,
         "Not given": 0
       },
@@ -145,7 +145,7 @@
         },
         {
           "item": "Milk toffee (100)",
-          "count": 7,
+          "count": 8,
           "label": "Milk toffee",
           "needed": "100"
         },
@@ -223,19 +223,19 @@
         }
       ],
       "unlisted_ticks": 0,
-      "last_response": "2026-10-06T21:38+05:30",
+      "last_response": "2026-10-07T06:22+05:30",
       "clicks": {
-        "total": 32,
-        "unique": 24,
+        "total": 37,
+        "unique": 28,
         "by_src": {
-          "g2": 22,
-          "(none)": 10
+          "g2": 24,
+          "(none)": 13
         },
         "by_device": {
-          "mobile": 32
+          "mobile": 37
         }
       },
-      "conversion": 1.125
+      "conversion": 1.036
     },
     {
       "slug": "japan",
@@ -250,14 +250,14 @@
       "unlisted_ticks": 0,
       "last_response": null,
       "clicks": {
-        "total": 75,
-        "unique": 58,
+        "total": 77,
+        "unique": 60,
         "by_src": {
           "g2": 45,
-          "(none)": 30
+          "(none)": 32
         },
         "by_device": {
-          "mobile": 70,
+          "mobile": 72,
           "desktop": 5
         }
       },
@@ -276,14 +276,14 @@
       "unlisted_ticks": 0,
       "last_response": null,
       "clicks": {
-        "total": 77,
-        "unique": 56,
+        "total": 82,
+        "unique": 58,
         "by_src": {
-          "g2": 59,
+          "g2": 64,
           "(none)": 18
         },
         "by_device": {
-          "mobile": 70,
+          "mobile": 75,
           "desktop": 7
         }
       },
@@ -302,15 +302,15 @@
       "unlisted_ticks": 0,
       "last_response": null,
       "clicks": {
-        "total": 45,
-        "unique": 35,
+        "total": 69,
+        "unique": 45,
         "by_src": {
-          "g2": 31,
-          "(none)": 14
+          "g2": 52,
+          "(none)": 17
         },
         "by_device": {
-          "mobile": 38,
-          "desktop": 7
+          "mobile": 60,
+          "desktop": 9
         }
       },
       "conversion": null
@@ -688,14 +688,14 @@
       "unlisted_ticks": 0,
       "last_response": null,
       "clicks": {
-        "total": 38,
+        "total": 39,
         "unique": 31,
         "by_src": {
-          "g2": 20,
+          "g2": 21,
           "(none)": 18
         },
         "by_device": {
-          "mobile": 34,
+          "mobile": 35,
           "desktop": 4
         }
       },
@@ -757,18 +757,18 @@
       "unlisted_ticks": 0,
       "last_response": "2026-10-06T22:12+05:30",
       "clicks": {
-        "total": 96,
-        "unique": 71,
+        "total": 101,
+        "unique": 76,
         "by_src": {
-          "(none)": 94,
-          "group": 2
+          "(none)": 98,
+          "group": 3
         },
         "by_device": {
-          "mobile": 89,
+          "mobile": 94,
           "desktop": 7
         }
       },
-      "conversion": 0.141
+      "conversion": 0.132
     },
     {
       "slug": "maldives",
@@ -783,15 +783,15 @@
       "unlisted_ticks": 0,
       "last_response": null,
       "clicks": {
-        "total": 15,
-        "unique": 15,
+        "total": 16,
+        "unique": 16,
         "by_src": {
           "g2": 9,
-          "(none)": 6
+          "(none)": 7
         },
         "by_device": {
           "mobile": 13,
-          "desktop": 2
+          "desktop": 3
         }
       },
       "conversion": null
