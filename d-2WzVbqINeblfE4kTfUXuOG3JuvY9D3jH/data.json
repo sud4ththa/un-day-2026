@@ -1,6 +1,6 @@
 {
-  "updated": "2026-10-07T10:38+05:30",
-  "data_hash": "f4e698c1ec97a5c1",
+  "updated": "2026-10-07T10:44+05:30",
+  "data_hash": "945573236db4cfc5",
   "event": {
     "name": "UN Day 2026",
     "date": "2026-10-16",
@@ -474,8 +474,8 @@
       "money": {
         "families": 24,
         "both": 0,
-        "known": 0,
-        "total": 0,
+        "known": 27,
+        "total": 116500,
         "buckets": {
           "received": 17,
           "pending": 1,
@@ -488,7 +488,28 @@
           "uploaded": 22,
           "written": 2
         },
-        "by_amount": [],
+        "by_amount": [
+          {
+            "amount": "Rs 3,000",
+            "children": 7
+          },
+          {
+            "amount": "Rs 3,500",
+            "children": 5
+          },
+          {
+            "amount": "Rs 4,000",
+            "children": 2
+          },
+          {
+            "amount": "Rs 5,000",
+            "children": 12
+          },
+          {
+            "amount": "Rs 10,000",
+            "children": 1
+          }
+        ],
         "line": ""
       },
       "money_line": "",
@@ -547,8 +568,8 @@
       "money": {
         "families": 19,
         "both": 0,
-        "known": 0,
-        "total": 0,
+        "known": 19,
+        "total": 120000,
         "buckets": {
           "received": 0,
           "pending": 0,
@@ -561,7 +582,24 @@
           "uploaded": 19,
           "written": 0
         },
-        "by_amount": [],
+        "by_amount": [
+          {
+            "amount": "Rs 5,000",
+            "children": 13
+          },
+          {
+            "amount": "Rs 7,000",
+            "children": 1
+          },
+          {
+            "amount": "Rs 8,000",
+            "children": 1
+          },
+          {
+            "amount": "Rs 10,000",
+            "children": 4
+          }
+        ],
         "line": ""
       },
       "money_line": "",
