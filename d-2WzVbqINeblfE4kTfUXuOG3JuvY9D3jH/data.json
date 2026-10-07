@@ -1,6 +1,6 @@
 {
-  "updated": "2026-10-07T08:15+05:30",
-  "data_hash": "78ecece25f35bc16",
+  "updated": "2026-10-07T09:15+05:30",
+  "data_hash": "a5419ed70c28dbb1",
   "event": {
     "name": "UN Day 2026",
     "date": "2026-10-16",
@@ -11,8 +11,8 @@
     "stalls": 10,
     "connected": 5,
     "stall_managed": 4,
-    "responses": 83,
-    "families": 74,
+    "responses": 84,
+    "families": 75,
     "contribution": {
       "Food": 31,
       "Monetary contribution": 35,
@@ -21,16 +21,16 @@
     },
     "menu_items": 75,
     "menu_items_unpledged": 50,
-    "last_response": "2026-10-07T06:22+05:30",
+    "last_response": "2026-10-07T08:43+05:30",
     "clicks": {
-      "total": 530,
-      "unique": 389,
+      "total": 540,
+      "unique": 395,
       "all_links": {
-        "total": 587,
-        "unique": 374
+        "total": 597,
+        "unique": 379
       }
     },
-    "conversion": 0.407
+    "conversion": 0.406
   },
   "stalls": [
     {
@@ -225,17 +225,17 @@
       "unlisted_ticks": 0,
       "last_response": "2026-10-07T06:22+05:30",
       "clicks": {
-        "total": 42,
-        "unique": 29,
+        "total": 44,
+        "unique": 31,
         "by_src": {
-          "g2": 29,
+          "g2": 31,
           "(none)": 13
         },
         "by_device": {
-          "mobile": 42
+          "mobile": 44
         }
       },
-      "conversion": 1.0
+      "conversion": 0.935
     },
     {
       "slug": "japan",
@@ -250,15 +250,15 @@
       "unlisted_ticks": 0,
       "last_response": null,
       "clicks": {
-        "total": 82,
-        "unique": 62,
+        "total": 84,
+        "unique": 63,
         "by_src": {
-          "g2": 47,
+          "g2": 49,
           "(none)": 35
         },
         "by_device": {
-          "mobile": 77,
-          "desktop": 5
+          "mobile": 78,
+          "desktop": 6
         }
       },
       "conversion": null
@@ -276,15 +276,15 @@
       "unlisted_ticks": 0,
       "last_response": null,
       "clicks": {
-        "total": 83,
-        "unique": 59,
+        "total": 87,
+        "unique": 61,
         "by_src": {
-          "g2": 65,
+          "g2": 69,
           "(none)": 18
         },
         "by_device": {
-          "mobile": 76,
-          "desktop": 7
+          "mobile": 77,
+          "desktop": 10
         }
       },
       "conversion": null
@@ -526,8 +526,8 @@
       "name": "Europe",
       "year_groups": "Year 6",
       "status": "ok",
-      "responses": 14,
-      "families": 14,
+      "responses": 15,
+      "families": 15,
       "by_class": [
         {
           "class": "Year 6A",
@@ -535,7 +535,7 @@
         },
         {
           "class": "Year 6B",
-          "count": 3
+          "count": 4
         },
         {
           "class": "Year 6C",
@@ -558,7 +558,7 @@
         },
         {
           "item": "Fruits (grapes/strawberries)",
-          "count": 4
+          "count": 5
         },
         {
           "item": "Mini quiche/pie",
@@ -590,20 +590,20 @@
         }
       ],
       "unlisted_ticks": 0,
-      "last_response": "2026-10-06T10:24+05:30",
+      "last_response": "2026-10-07T08:43+05:30",
       "clicks": {
-        "total": 29,
-        "unique": 21,
+        "total": 31,
+        "unique": 22,
         "by_src": {
-          "(none)": 15,
-          "g2": 14
+          "g2": 16,
+          "(none)": 15
         },
         "by_device": {
           "mobile": 26,
-          "desktop": 3
+          "desktop": 5
         }
       },
-      "conversion": 0.667
+      "conversion": 0.682
     },
     {
       "slug": "middle-east",
