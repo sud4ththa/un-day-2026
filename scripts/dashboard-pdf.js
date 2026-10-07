@@ -1,6 +1,6 @@
 /* Builds the all-stalls PDF from the counts already on the page.
    No network calls. Names, phone numbers, and emails are not read.
-   Per-stall sheets, which do include contacts, are written by scripts/stall_sheet.py. */
+   Per-stall contact PDFs are not part of this page. */
 (function () {
   "use strict";
 

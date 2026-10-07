@@ -7,31 +7,31 @@ Inputs (all outside the repo, never committed):
   click counts                           JSON from the click logger's /exec URL
                                          (read from tracker.txt), or --clicks FILE
 
-Outputs (counts page, safe to keep publishing):
-  <out>/data.json      counts only
+Outputs:
+  <out>/data.json      counts only: responses, families, family Food/Money/Both,
+                       item quantities, and money totals
   <out>/index.html     counts page. Download all stalls is counts only.
+                       There is no per-stall download on this page.
   <out>/report-pdf.js  browser script copied from scripts/dashboard-pdf.js.
                        It reads the rendered page only (no names, phones, or emails).
   <out>/og.jpg         1200×630 link-preview image (branding and totals only)
-
---contacts (signed-in site only; <out> must be outside this repo):
-  the files above, plus
-  <out>/sheets/*.pdf   one PDF per stall.
-                       Page 1 is targets or money totals, with no names.
-                       Page 2 is parent, child, class, item or amount, notes, phone.
-  <out>/private-bundle.json
-                       marker so scripts/publish-dashboard.py will accept the folder.
-  Upload that folder with scripts/publish-dashboard.py. Do not commit it.
-  The counts page has no per-stall download, and this script deletes any
-  sheets/*.pdf left in a counts-page folder.
-
-  --private FILE     optional local Markdown list for the PTC (names, classes,
-                     items, notes, phones). Never write it inside the repo.
+  --private-sheets-dir
+                     one two-page PDF per stall. Outside the repo and outside
+                     the dashboard folder. Page 1 is the totals in data.json.
+                     Page 2 is contacts from the private pledges file.
+                     The PDF is refused if that file's hash is not data.json's hash.
+                     Nothing under --out may be a PDF.
+  --pledges FILE     row-level contacts plus the data.json hash. Outside the
+                     repo and outside the dashboard folder. Not committed.
+  --overrides FILE   optional fixes keyed by stall and response timestamp.
+                     Outside the repo. Not committed.
+  --private FILE     optional local Markdown list for the PTC. Never write it
+                     inside the repo.
 
 data.json and index.html never contain parent names, phone numbers, emails,
 children's names or free-text notes. A check refuses to write them if any of
-those values would show on the counts page. Stall PDFs are the exception, and
-only in a --contacts folder outside the repo.
+those values would show on the counts page. Contact PDFs are not written
+into the public folder.
 
 "Last updated" is the time the published figures last changed, so re-running
 with the same data leaves data.json byte-for-byte unchanged.
@@ -42,15 +42,10 @@ totals; unchanged totals keep og.jpg byte-for-byte the same. The image and
 the preview text stay counts and event branding only.
 
 Usage:
-  python3 scripts/build-dashboard.py --data-dir DIR --out FOLDER [--private FILE]
-         [--clicks FILE] [--update-menus] [--now ISO] [--contacts]
-
-  Counts page (no contact PDFs):
-    python3 scripts/build-dashboard.py --data-dir DIR --out FOLDER
-
-  Signed-in site (contact PDFs). FOLDER must be outside the repo:
-    python3 scripts/build-dashboard.py --data-dir DIR --out /var/tmp/undash-private --contacts
-    python3 scripts/publish-dashboard.py /var/tmp/undash-private
+  python3 scripts/build-dashboard.py --data-dir DIR --out FOLDER
+         --private-sheets-dir DIR
+         [--pledges FILE] [--overrides FILE] [--private FILE]
+         [--clicks FILE] [--update-menus] [--now ISO] [--self-test]
 """
 from __future__ import annotations
 
@@ -104,6 +99,17 @@ def load_stall_sheet():
 SHEET = load_stall_sheet()
 
 
+def load_counts():
+    spec = importlib.util.spec_from_file_location("count_pledges", ROOT / "scripts" / "count_pledges.py")
+    mod = importlib.util.module_from_spec(spec)
+    sys.modules["count_pledges"] = mod
+    spec.loader.exec_module(mod)
+    return mod
+
+
+COUNTS = load_counts()
+
+
 # ---------------------------------------------------------------- inputs
 
 def norm(s: str) -> str:
@@ -113,17 +119,31 @@ def norm(s: str) -> str:
 FIELDS = [
     ("timestamp", lambda h: h.startswith("timestamp")),
     ("parent", lambda h: "parent" in h and "name" in h),
-    ("phone", lambda h: any(k in h for k in ("mobile", "whatsapp", "phone"))),
+    ("phone", lambda h: any(k in h for k in ("mobile", "whatsapp", "phone", "contact number"))),
     ("email", lambda h: h.startswith("email")),
     ("child", lambda h: "child" in h and "name" in h),
     ("class", lambda h: "class" in h),
     ("contrib", lambda h: "contribute" in h),
     ("food", lambda h: h.startswith("food you can bring")),
     ("notes", lambda h: "quantity" in h or "notes" in h),
-    ("amount", lambda h: "amount" in h or "lkr" in h),
+    ("amount", lambda h: is_amount_header(h)),
     ("pay_status", lambda h: h == "status" or "payment status" in h),
     ("slip", lambda h: "slip" in h or "receipt" in h or "deposit" in h),
 ]
+
+
+def is_amount_header(h: str) -> bool:
+    """Amount columns on the money stalls do not say "amount".
+
+    SEA uses "Contribution Value (Minimum Rs 5,000)". Australia uses
+    "Child's Contribution Value (Minimum Rs 3,000-5,000)". Food stalls
+    still use "Monetary contribution (optional)".
+    """
+    if "amount" in h or "lkr" in h or h.startswith("monetary"):
+        return True
+    if "contribution" in h and "value" in h:
+        return True
+    return "minimum rs" in h
 
 
 def map_headers(headers: list[str]) -> dict[str, int]:
@@ -178,8 +198,17 @@ def parse_time(raw: str, now: datetime) -> datetime | None:
     return (plausible or cands or [None])[0]
 
 
+def child_amount_token(child: str, klass: str, amt: int) -> tuple[str, str, int]:
+    """One contribution is a child in a class at one amount.
+
+    A second submission of that same child, class, and amount is a duplicate.
+    A different child, a different class, or a different amount is added.
+    """
+    return (norm(child).casefold(), norm(klass).casefold(), amt)
+
+
 def family_key(r: dict) -> str:
-    digits = re.sub(r"\D", "", r.get("phone", ""))
+    digits = COUNTS.phone_digits(r.get("phone", ""))
     if len(digits) >= 7:
         return "p:" + digits[-9:]
     if r.get("email"):
@@ -277,58 +306,204 @@ def load_clicks(args) -> tuple[dict | None, str]:
 
 # ---------------------------------------------------------------- aggregate
 
-def ingest_responses(path: Path, slug: str, menu: list[str], aliases: dict, has_contrib: bool, money_only: bool, now: datetime):
-    """Read one response file. Counts stay in the returned dict; the caller
-    decides whether they are published. Contact fields stay out of data.json."""
+def load_overrides(path) -> dict:
+    if not path:
+        return {}
+    file = Path(path)
+    if not file.exists():
+        raise SystemExit(f"--overrides file not found: {file}")
+    data = json.loads(file.read_text(encoding="utf-8"))
+    if not isinstance(data, dict) or any(not isinstance(v, dict) for v in data.values()):
+        raise SystemExit("--overrides must be an object keyed by stall, then by response timestamp")
+    return data
+
+
+def outside_repo(path: Path) -> None:
+    resolved = path.resolve()
+    if resolved == ROOT or ROOT in resolved.parents:
+        rel = resolved.relative_to(ROOT).as_posix()
+        # Local ops files live next to the checkout and are gitignored.
+        if rel == "un-day-dashboard" or rel.startswith("un-day-dashboard/"):
+            return
+        raise SystemExit(f"{path} must be outside the repo")
+
+
+def outside_out(path: Path, out: Path) -> None:
+    resolved = path.resolve()
+    if resolved == out or out in resolved.parents:
+        raise SystemExit("pledges must be written outside the dashboard folder")
+
+
+def pdfs_from_snapshot(data: dict, pledges: dict, pdf_names: dict[str, str]) -> list[tuple[str, bytes]]:
+    """Page 1 is the public totals. Page 2 is the private contact rows.
+    The two files must be the same snapshot."""
+    if pledges.get("data_hash") != data.get("data_hash"):
+        raise SystemExit("refusing stall PDFs: pledges hash does not match data.json")
+    by_slug = {s.get("slug"): s for s in pledges.get("stalls") or []}
+    blobs = []
+    for st in data["stalls"]:
+        priv = by_slug.get(st["slug"]) or {}
+        targets = []
+        for m in st.get("menu") or []:
+            label = m.get("label") or split_need(m["item"])[0]
+            if m.get("closed"):
+                label = f"{label} (closed)"
+            targets.append({
+                "label": label,
+                "needed": m.get("needed") or "—",
+                "total": m.get("pledged") or "0",
+                "pct": m.get("pct") or "—",
+                "status": m.get("status") or "Open",
+            })
+        model = {
+            "snapshot": True,
+            "name": st["name"],
+            "years": st.get("year_groups") or "",
+            "kind": "money" if st.get("money_only") else "food",
+            "connected": st.get("status") == "ok",
+            "managed": False,
+            "as_of": fmt_time(data.get("updated")),
+            "responses": st.get("responses"),
+            "families": st.get("families"),
+            "last_response": fmt_time(st.get("last_response")) if st.get("last_response") else "—",
+            "contribution": st.get("contribution"),
+            "menu": targets,
+            "targets": targets,
+            "money": st.get("money"),
+            "money_line": st.get("money_line") or "",
+            "contacts": list(priv.get("contacts") or []),
+            "unlisted_ticks": st.get("unlisted_ticks") or 0,
+            "minimum_note": st.get("minimum_note") or "",
+        }
+        blobs.append((pdf_names[st["slug"]], SHEET.render_pdf(model)))
+    return blobs
+
+
+def row_override(table: dict, slug: str, raw_ts: str, parsed: datetime | None) -> dict:
+    stall = table.get(slug) or {}
+    if not stall:
+        return {}
+    wanted = set()
+    if raw_ts:
+        wanted.add(norm(raw_ts))
+    if parsed:
+        wanted.add(parsed.isoformat(timespec="minutes"))
+        wanted.add(parsed.strftime("%Y-%m-%d %H:%M"))
+    for key, fix in stall.items():
+        if norm(str(key)) in wanted:
+            return fix or {}
+    return {}
+
+
+def coerce_type(raw: str) -> str:
+    s = norm(raw)
+    if s.lower() in ("money", "monetary", "monetary contribution"):
+        return MONEY
+    return contrib_type(s) if s else s
+
+
+def ingest_responses(path: Path, slug: str, menu: list[str], aliases: dict, closed: set[str],
+                     has_contrib: bool, money_only: bool, now: datetime, overrides: dict):
+    """Read one response file. Public totals are families and quantities.
+    Contact fields stay out of data.json; the caller writes them to pledges.json."""
     headers, rows = read_rows(path)
     col = map_headers(headers)
-    fams, classes, unlisted = set(), {}, {}
-    counts = {m: 0 for m in menu}
+    classes: dict[str, int] = {}
+    unlisted: dict[str, int] = {}
     lookup = {norm(m).lower(): m for m in menu}
     label_of = {}
     for m in menu:
         label, _needed = split_need(m)
         label_of[m] = label
         lookup.setdefault(norm(label).lower(), m)
-    for old, new in (aliases or {}).items():
-        if new in counts:
-            lookup.setdefault(norm(old).lower(), new)
-    known = list(menu) + list((aliases or {}).keys())
-    contribution = {k: 0 for k in CONTRIB_KEYS} if has_contrib else None
+    aliases = COUNTS.filter_aliases(aliases, menu)
+    for old, new in aliases.items():
+        lookup.setdefault(norm(old).lower(), new)
+    known = list(menu) + list(aliases.keys())
     found_pii: set[str] = set()
     contacts = []
     last = None
+    fam_types: dict[str, set[str]] = {}
+    fam_items: dict[str, dict[str, tuple]] = {}
+    fam_parts: dict[str, list[int]] = {}
+    fam_seen: dict[str, set[tuple]] = {}
+    fam_pay: dict[str, list[str]] = {}
+    fam_slip: dict[str, str] = {}
+    response_contrib = {k: 0 for k in CONTRIB_KEYS} if (has_contrib or money_only) else None
+    extras: dict[str, set[str]] = {}
     for n, row in enumerate(rows, 1):
         r = {k: norm(row[i]) if i < len(row) else "" for k, i in col.items()}
         r["_row"] = f"{slug}:{n}"
         for k in ("parent", "phone", "email", "child", "notes"):
-            if len(r.get(k, "")) >= 3:
+            if len(r.get(k, "")) >= 3 and not (k == "notes" and COUNTS.parse_qty(r[k]) is not None):
                 found_pii.add(r[k])
-        fams.add(family_key(r))
+        fam = family_key(r)
+        t = parse_time(r.get("timestamp", ""), now)
+        ov = row_override(overrides, slug, r.get("timestamp", ""), t)
         cl = norm_class(r.get("class", ""))
         classes[cl] = classes.get(cl, 0) + 1
-        if has_contrib:
-            ct = contrib_type(r.get("contrib", "")) if "contrib" in col else "Not given"
-            contribution[ct] += 1
-        else:
-            ct = MONEY if money_only else "Food"
+        note = r.get("notes", "")
+        kn = COUNTS.note_key(note)
         items = match_items(r.get("food", ""), known)
-        ticked = set()
+        ticked = []
         row_unlisted = []
         for it in items:
             m = lookup.get(it.lower())
-            if m:
-                ticked.add(m)
-            else:
+            if m and m not in ticked:
+                ticked.append(m)
+            elif not m:
                 unlisted[it] = unlisted.get(it, 0) + 1
                 row_unlisted.append(it)
+        if has_contrib:
+            ct = contrib_type(r.get("contrib", "")) if "contrib" in col else "Not given"
+        else:
+            ct = MONEY if money_only else "Food"
+        if ct in ("Food", "Both") and not ticked:
+            mapped = None
+            if ov.get("add_items"):
+                mapped = [lookup.get(norm(x).lower(), x) for x in ov["add_items"]]
+            else:
+                mapped = COUNTS.NOTE_ITEM.get((slug, kn))
+            if mapped:
+                for m in mapped:
+                    if m in lookup.values() and m not in ticked:
+                        ticked.append(m)
+        for food, _txt in COUNTS.NOTE_OTHER.get((slug, kn), []):
+            extras.setdefault(food, set()).add(fam)
+        if ct == MONEY and ticked:
+            ct = "Both"
+        if ov.get("type"):
+            ct = coerce_type(ov["type"])
+        if response_contrib is not None:
+            response_contrib[ct] = response_contrib.get(ct, 0) + 1
+        fam_types.setdefault(fam, set()).add(ct)
+        chosen = fam_items.setdefault(fam, {})
         for m in ticked:
-            counts[m] += 1
-        t = parse_time(r.get("timestamp", ""), now)
+            base = split_need(m)[0]
+            qty = COUNTS.resolve_qty(slug, note, base, ov)
+            prev = chosen.get(m)
+            if prev is None or (prev[0] is None and qty is not None):
+                chosen[m] = (qty,)
+        amt = SHEET.parse_rupees(r.get("amount", "")) if r.get("amount") else None
+        if amt is None and (money_only or not ticked):
+            amt = SHEET.money_from_notes(note)
+        if "amount" in ov and ov["amount"] is not None:
+            amt = int(ov["amount"])
+        fam_parts.setdefault(fam, [])
+        if amt is not None:
+            token = child_amount_token(r.get("child", ""), cl, amt)
+            seen = fam_seen.setdefault(fam, set())
+            if token not in seen:
+                seen.add(token)
+                fam_parts[fam].append(amt)
+        fam_pay.setdefault(fam, []).append(r.get("pay_status", ""))
+        slip = r.get("slip", "")
+        if slip and not fam_slip.get(fam):
+            fam_slip[fam] = slip
         if t and (last is None or t > last):
             last = t
         contacts.append({
-            "time": t,
+            "time": t.isoformat(timespec="minutes") if t else "",
             "parent": r.get("parent", ""),
             "child": r.get("child", ""),
             "phone": r.get("phone", ""),
@@ -337,31 +512,110 @@ def ingest_responses(path: Path, slug: str, menu: list[str], aliases: dict, has_
             "items": items,
             "labels": [label_of[m] for m in menu if m in ticked],
             "unlisted": row_unlisted,
-            "notes": r.get("notes", ""),
+            "notes": note,
             "amount": r.get("amount", ""),
             "pay_status": r.get("pay_status", ""),
-            "slip": r.get("slip", ""),
+            "slip": slip,
         })
+    pledges = {m: [] for m in menu}
+    for chosen in fam_items.values():
+        for m, (qty,) in chosen.items():
+            pledges[m].append(qty)
+    menu_rows, headline = COUNTS.summarize_items(menu, closed, pledges, split_need)
+    fam_contrib = {k: 0 for k in CONTRIB_KEYS}
+    if has_contrib or money_only:
+        for types in fam_types.values():
+            fam_contrib[COUNTS.family_type(types, MONEY)] += 1
+    else:
+        fam_contrib = None
+    money = family_money(fam_parts, fam_pay, fam_slip, money_only, fam_contrib)
     return {
         "responses": len(rows),
-        "families": fams,
+        "families": set(fam_types) or set(),
         "by_class": [{"class": c, "count": classes[c]} for c in sorted(classes, key=class_sort)],
-        "menu": [menu_entry(m, counts[m]) for m in menu],
-        "unlisted": unlisted,
+        "menu": menu_rows,
+        "headline": headline,
         "unlisted_ticks": sum(unlisted.values()),
+        "extras": [{"item": name, "families": len(fams)} for name, fams in extras.items()],
         "last": last,
-        "contribution": contribution,
+        "contribution": fam_contrib,
+        "contribution_responses": response_contrib,
+        "money": money,
         "contacts": contacts,
         "pii": found_pii,
     }
 
 
-def menu_entry(option: str, count: int) -> dict:
-    label, needed = split_need(option)
-    entry = {"item": option, "count": count}
-    if needed:
-        entry.update(label=label, needed=needed)
-    return entry
+def family_money(parts: dict, pays: dict, slips: dict, money_only: bool, contribution: dict | None) -> dict | None:
+    """Add each child's amount. Payment marks and slips stay once per family.
+
+    parts maps a family to the amounts already deduped by child, class, and
+    amount. Two children in one family are both included. A repeated
+    submission of the same child, class, and amount is not.
+    """
+    stated_rows: list[int] = []
+    stated_fams: set[str] = set()
+    for fam, amounts in parts.items():
+        if amounts:
+            stated_fams.add(fam)
+            stated_rows.extend(amounts)
+    if not money_only and not stated_rows and not (contribution and (contribution.get(MONEY) or contribution.get("Both"))):
+        return None
+    buckets = {"received": 0, "pending": 0, "unmarked": 0, "other": 0}
+    other: dict[str, int] = {}
+    slip_counts = {"filled": 0, "uploaded": 0, "written": 0}
+    families = set(parts) | set(pays) | set(slips)
+    if money_only:
+        pool = families
+    else:
+        pool = stated_fams
+    for fam in pool:
+        bucket = COUNTS.best_pay(pays.get(fam) or [""], SHEET.pay_bucket) if money_only else "unmarked"
+        if money_only:
+            buckets[bucket] = buckets.get(bucket, 0) + 1
+            if bucket == "other":
+                label = norm(next((s for s in pays.get(fam) or [] if SHEET.pay_bucket(s) == "other"), ""))
+                if label:
+                    other[label] = other.get(label, 0) + 1
+        slip = slips.get(fam) or ""
+        if slip:
+            slip_counts["filled"] += 1
+            if "upload" in slip.lower() or slip.lower().startswith("http"):
+                slip_counts["uploaded"] += 1
+            else:
+                slip_counts["written"] += 1
+    bands: dict[int, int] = {}
+    for amt in stated_rows:
+        bands[amt] = bands.get(amt, 0) + 1
+    total = sum(stated_rows)
+    both = (contribution or {}).get("Both", 0)
+    money_families = (contribution or {}).get(MONEY, 0) + both
+    line = ""
+    if not money_only:
+        if money_families or stated_rows:
+            line = f"Money: {money_families} {'family' if money_families == 1 else 'families'}"
+            if both:
+                line += f" ({both} also bringing food)"
+            if stated_rows:
+                line += f". Amounts stated add up to {SHEET.rs(total)}."
+            else:
+                line += ". No amounts stated on the sheet, so no money % is shown."
+    return {
+        "families": len(pool) if money_only else money_families,
+        "both": both,
+        "known": len(stated_rows),
+        "total": total,
+        "buckets": buckets,
+        "other": other,
+        "slips": slip_counts,
+        "by_amount": [{"amount": SHEET.rs(n), "children": bands[n]} for n in sorted(bands)],
+        "line": line,
+    }
+
+
+def blank_menu(menu: list[str], closed: set[str]) -> list[dict]:
+    rows, _headline = COUNTS.summarize_items(menu, closed, {m: [] for m in menu}, split_need)
+    return rows
 
 
 def build(args, now: datetime):
@@ -374,73 +628,64 @@ def build(args, now: datetime):
         previous = json.loads(out_json.read_text(encoding="utf-8"))
     prev_clicks = {s["slug"]: s.get("clicks") for s in previous.get("stalls", [])}
 
-    stalls, private, pii, sheets = [], [], set(), []
+    overrides = load_overrides(getattr(args, "overrides", None))
+    stalls, private, pii, pledge_stalls = [], [], set(), []
     all_families: set[str] = set()
     for sc in cfg["stalls"]:
         slug = sc["slug"]
         meta = forms.get(slug)
-        menu = sc["menu"]
-        managed = bool(sc.get("stall_managed"))
+        menu = list(sc["menu"])
+        closed = set(sc.get("closed") or [])
         money_only = bool(sc.get("money_only"))
-        has_contrib = bool(sc.get("contribution_options"))
+        has_contrib = bool(sc.get("contribution_options")) or money_only
         entry = {
             "slug": slug,
             "name": meta.name if meta else slug,
             "year_groups": meta.years if meta else "",
-            "status": "stall_managed" if managed else "not_connected",
+            "minimum_note": (meta.note if meta else "") or "",
+            "status": "not_connected",
+            "money_only": money_only,
             "responses": 0,
             "families": 0,
             "by_class": [],
             "contribution": ({k: 0 for k in CONTRIB_KEYS} if has_contrib else None),
-            "menu": [menu_entry(m, 0) for m in menu],
+            "menu": blank_menu(menu, closed),
+            "headline_pct": None,
             "unlisted_ticks": 0,
+            "extras": [],
+            "money": None,
+            "money_line": "",
             "last_response": None,
             "clicks": None,
             "conversion": None,
         }
-        # Stall-managed sheets are read for the per-stall PDF only. Their
-        # counts stay off the public page, which still shows clicks.
         src = next((p for p in (Path(args.data_dir) / f"{slug}.csv", Path(args.data_dir) / f"{slug}.json") if p.exists()), None)
         rows_out = []
-        unlisted = {}
         got = None
         if src:
-            got = ingest_responses(src, slug, menu, sc.get("aliases") or {}, has_contrib, money_only, now)
+            got = ingest_responses(
+                src, slug, menu, sc.get("aliases") or {}, closed,
+                bool(sc.get("contribution_options")), money_only, now, overrides,
+            )
             pii |= got["pii"]
             rows_out = got["contacts"]
-            unlisted = got["unlisted"]
-            if not managed:
-                all_families |= got["families"]
-                entry["status"] = "ok"
-                entry.update(
-                    responses=got["responses"],
-                    families=len(got["families"]),
-                    by_class=got["by_class"],
-                    menu=got["menu"],
-                    # Ticks that match no current menu item (e.g. an option renamed later). Only the
-                    # number is published: the text could be free text and stays in the private list.
-                    unlisted_ticks=got["unlisted_ticks"],
-                    last_response=got["last"].isoformat(timespec="minutes") if got["last"] else None,
-                )
-                if has_contrib:
-                    entry["contribution"] = got["contribution"]
-        kind = "money" if money_only or (not menu and any(r.get("amount") for r in rows_out)) else "food"
-        sheets.append({
-            "slug": slug,
-            "name": entry["name"],
-            "years": entry["year_groups"],
-            "kind": kind,
-            "connected": src is not None,
-            "managed": managed,
-            "responses": got["responses"] if got else None,
-            "families": len(got["families"]) if got else None,
-            "last_iso": got["last"].isoformat(timespec="minutes") if got and got["last"] else None,
-            "contribution": None if managed else entry["contribution"],
-            "menu": [{"label": m.get("label") or split_need(m["item"])[0], "needed": m.get("needed")} for m in entry["menu"]],
-            "contacts": rows_out,
-            "unlisted": unlisted,
-            "minimum_note": (meta.note if meta else "") or "",
-        })
+            all_families |= got["families"]
+            entry["status"] = "ok"
+            entry.update(
+                responses=got["responses"],
+                families=len(got["families"]),
+                by_class=got["by_class"],
+                menu=got["menu"],
+                headline_pct=(got["headline"] or {}).get("pcs"),
+                unlisted_ticks=got["unlisted_ticks"],
+                extras=got["extras"],
+                money=got["money"] if money_only else None,
+                money_line="" if money_only else ((got["money"] or {}).get("line") or ""),
+                last_response=got["last"].isoformat(timespec="minutes") if got["last"] else None,
+            )
+            if has_contrib:
+                entry["contribution"] = got["contribution"]
+        pledge_stalls.append({"slug": slug, "contacts": rows_out})
         if clicks is not None:
             c = (clicks.get("stalls") or {}).get(slug) or {}
             entry["clicks"] = {
@@ -451,7 +696,7 @@ def build(args, now: datetime):
             }
         elif click_mode == "unavailable":
             entry["clicks"] = prev_clicks.get(slug)
-        if entry["clicks"] and entry["clicks"]["unique"] and not managed:
+        if entry["clicks"] and entry["clicks"]["unique"] and entry["status"] == "ok":
             entry["conversion"] = round(entry["responses"] / entry["clicks"]["unique"], 3)
         stalls.append(entry)
         private.append((entry, rows_out))
@@ -482,9 +727,7 @@ def build(args, now: datetime):
         summary["clicks"] = {"total": sum(s["clicks"]["total"] for s in with_clicks),
                              "unique": stall_unique,
                              "all_links": {"total": total, "unique": unique}}
-        # Stall-managed forms have no response count here, so their visitors
-        # stay out of the conversion figure.
-        conv_unique = sum(s["clicks"]["unique"] for s in with_clicks if s["status"] != "stall_managed")
+        conv_unique = sum(s["clicks"]["unique"] for s in with_clicks if s["status"] == "ok")
         if conv_unique:
             summary["conversion"] = round(summary["responses"] / conv_unique, 3)
 
@@ -500,7 +743,8 @@ def build(args, now: datetime):
     else:
         updated = now.isoformat(timespec="minutes")
     data = {"updated": updated, "data_hash": digest, **payload}
-    return data, private, pii, sheets
+    pledges = {"data_hash": digest, "stalls": pledge_stalls}
+    return data, private, pii, pledges
 
 
 # ---------------------------------------------------------------- render
@@ -600,15 +844,9 @@ a.pdf { display: inline-block; text-align: center; text-decoration: none; }
 """
 
 
-def stall_open(st: dict, pdf_name: str | None) -> str:
-    link = ""
-    if pdf_name:
-        href = "sheets/" + pdf_name
-        link = f'\n    <a class="pdf" href="{esc(href)}" download="{esc(pdf_name)}">Download this stall</a>'
+def stall_open(st: dict) -> str:
     return f"""<section id="{esc(st["slug"])}">
-  <div class="stall-head">
-    <h2>{GEN.heading(st["name"])}</h2>{link}
-  </div>
+  <h2>{GEN.heading(st["name"])}</h2>
   <p class="sub">{esc(st["year_groups"])}</p>"""
 
 
@@ -723,16 +961,47 @@ def write_og_image(path: Path, data: dict) -> None:
     image.save(path, "JPEG", quality=85, optimize=True, subsampling=2)
 
 
-def render(data: dict, logos: dict, pdf_names: dict[str, str], page_url: str | None) -> str:
+def fmb_cell(st: dict, ok: bool) -> str:
+    if st.get("money_only"):
+        money = st.get("money") or {}
+        if ok and money.get("known"):
+            return SHEET.rs(money["total"])
+        return "money" if ok else "—"
+    c = st.get("contribution")
+    if ok and c:
+        return f'{c["Food"]} · {c[MONEY]} · {c["Both"]}'
+    return "food only" if ok else "—"
+
+
+def item_meta(m: dict) -> str:
+    bits = []
+    if m.get("needed"):
+        bits.append(f'needed {m["needed"]}')
+    if m.get("status") != "Open" and m.get("pledged"):
+        bits.append(str(m["pledged"]))
+    if m.get("pct") and m.get("pct") not in ("—", "–"):
+        bits.append(str(m["pct"]))
+    if m.get("status"):
+        bits.append(m["status"])
+    if m.get("closed"):
+        bits.append("closed")
+    return " · ".join(bits)
+
+
+def bar_width(m: dict, mx: int) -> float:
+    found = re.search(r"(\d+)", str(m.get("pct") or ""))
+    if m.get("needed") and found and m.get("pct") not in ("—", "–"):
+        return min(100, int(found.group(1)))
+    return round(100 * m["count"] / mx, 1)
+
+
+def render(data: dict, logos: dict, page_url: str | None) -> str:
     s = data["summary"]
     tracking = data["tracking"] == "on"
     rows = []
     for st in data["stalls"]:
         ok = st["status"] == "ok"
-        c = st["contribution"]
-        fmb = f'{c["Food"]} · {c[MONEY]} · {c["Both"]}' if (ok and c) else ("food only" if ok else "—")
-        if st["status"] == "stall_managed":
-            fmb = "stall form"
+        fmb = fmb_cell(st, ok)
         rows.append(
             f'<tr><td><a href="#{esc(st["slug"])}">{esc(st["name"])}</a></td>'
             f'<td>{num(st["responses"]) if ok else "—"}</td><td>{num(st["families"]) if ok else "—"}</td>'
@@ -750,13 +1019,12 @@ def render(data: dict, logos: dict, pdf_names: dict[str, str], page_url: str | N
     head = ('<tr><th>Stall</th><th>Responses</th><th>Families</th><th class="hide-xs wrap">Food · Monetary contribution · Both</th>'
             + ("<th>Clicks</th><th>Conv.</th>" if tracking else "") + "</tr>")
     not_conn = sum(1 for st in data["stalls"] if st["status"] == "not_connected")
-    summary_notes = [f'{s["menu_items_unpledged"]} of {s["menu_items"]} menu items have no pledge yet.']
+    summary_notes = [
+        f'{s["menu_items_unpledged"]} of {s["menu_items"]} menu items have no pledge yet.',
+        "Food, money, and both are families, counted once. A family that chose money and also ticked food is counted under both. Money-only stalls show their rupee total in that column.",
+    ]
     if not_conn:
         summary_notes.append(f'{not_conn} of {s["stalls"]} response sheets not connected yet, shown as “—”.')
-    managed = [st["name"] for st in data["stalls"] if st["status"] == "stall_managed"]
-    if managed:
-        summary_notes.append(f'Stall-managed form{"s" if len(managed) > 1 else ""} ({", ".join(managed)}): '
-                             'the stall team keeps its own responses, so only short-link clicks are shown.')
     if not tracking:
         summary_notes.append("Click tracking off.")
     else:
@@ -768,18 +1036,26 @@ def render(data: dict, logos: dict, pdf_names: dict[str, str], page_url: str | N
         mx = max([m["count"] for m in st["menu"]] + [1])
         bars = "".join(
             f'<li class="{"zero" if m["count"] == 0 else ""}"><span class="label">{esc(m.get("label", m["item"]))}'
-            + (f' <span class="need">needed {esc(m["needed"])}</span>' if m.get("needed") else "")
-            + f'</span><span class="n">{m["count"]}</span><span class="track"><span class="fill" style="width:{round(100 * m["count"] / mx, 1)}%"></span></span></li>'
+            + (f' <span class="need">{esc(item_meta(m))}</span>' if item_meta(m) else "")
+            + f'</span><span class="n">{m["count"]}</span><span class="track"><span class="fill" style="width:{bar_width(m, mx)}%"></span></span></li>'
             for m in st["menu"]
         )
         has_need = any(m.get("needed") for m in st["menu"])
-        need_note = ('<p class="note">The number on the right is families pledging the item; “needed” is the '
-                     'total quantity the stall needs. A family can send several pieces, so the two are not '
-                     'directly comparable.</p>') if has_need else ""
+        need_note = ('<p class="note">The number on the right is families pledging that item, once each. '
+                     'Needed is the menu target. Total pledged adds quantities in the same unit (grams as kilograms). '
+                     'A >= mark means some pledges had no comparable number. Covered means that total meets the target. '
+                     'Closed items have left the form and are still counted.</p>') if has_need else ""
+        if st.get("headline_pct"):
+            need_note += f'<p class="note">Piece targets: {esc(st["headline_pct"])} pledged, each item capped at its target. Open items count as zero.</p>'
         gaps = sum(1 for m in st["menu"] if m["count"] == 0)
         unlisted = ""
         if st["unlisted_ticks"]:
             unlisted = f'<p class="note">{st["unlisted_ticks"]} other tick(s) not on the current menu.</p>'
+        if st.get("money_line"):
+            unlisted += f'<p class="note">{esc(st["money_line"])}</p>'
+        if st.get("extras"):
+            bits = ", ".join(f'{esc(x["item"])} ({x["families"]})' for x in st["extras"])
+            unlisted += f'<p class="note">Also offered: {bits}.</p>'
         c = st["contribution"]
         stats = [("Responses", num(st["responses"]) if ok else "—", ""), ("Families", num(st["families"]) if ok else "—", "")]
         stats.append(("Last response", fmt_time(st["last_response"]) if ok else "—", "small"))
@@ -792,28 +1068,6 @@ def render(data: dict, logos: dict, pdf_names: dict[str, str], page_url: str | N
             classes = ("<ul class=\"chips\">" + "".join(f'<li>{esc(x["class"])}<b>{x["count"]}</b></li>' for x in st["by_class"]) + "</ul>") if st["by_class"] else '<p class="note">No responses yet.</p>'
         else:
             classes = '<p class="note">Response sheet not connected yet.</p>'
-        follow_up = (
-            " Download this stall for the follow-up sheet when a response file was included in the build."
-            if pdf_names.get(st["slug"]) else ""
-        )
-        if st["status"] == "stall_managed":
-            if st["clicks"]:
-                ck = st["clicks"]
-                cdl = "".join(f'<div><dt>{a}</dt><dd>{b}</dd></div>' for a, b in
-                              [("Clicks", num(ck["total"])), ("Unique visitors", num(ck["unique"]))])
-                src = "".join(f'<li>{esc(k)}<b>{v}</b></li>' for k, v in ck["by_src"].items()) or "<li>none yet</li>"
-                dev = "".join(f'<li>{esc(k)}<b>{v}</b></li>' for k, v in ck["by_device"].items()) or "<li>none yet</li>"
-                clicks_html = (f'<dl class="stats">{cdl}</dl><h3>By source</h3><ul class="chips">{src}</ul>'
-                               f'<h3>By device</h3><ul class="chips">{dev}</ul>')
-            else:
-                clicks_html = '<p class="off">Click tracking off</p>'
-            sections.append(f"""
-{stall_open(st, pdf_names.get(st["slug"]))}
-  <p class="note">Stall-managed form. The stall team keeps its own responses, so only short-link clicks are shown here.{follow_up}</p>
-  <h3>Short-link clicks</h3>
-  {clicks_html}
-</section>""")
-            continue
         if st["clicks"]:
             ck = st["clicks"]
             cstats = [("Clicks", num(ck["total"])), ("Unique visitors", num(ck["unique"])), ("Conversion", pct(st["conversion"]))]
@@ -824,8 +1078,34 @@ def render(data: dict, logos: dict, pdf_names: dict[str, str], page_url: str | N
                            f'<h3>By device</h3><ul class="chips">{dev}</ul>')
         else:
             clicks_html = '<p class="off">Click tracking off</p>'
+        if st.get("money_only"):
+            money = st.get("money") or {}
+            buckets = money.get("buckets") or {}
+            if ok and money.get("known"):
+                total_rs = SHEET.rs(money["total"])
+            else:
+                total_rs = "—" if not ok else SHEET.rs(0)
+            mstats = [
+                ("Families", num(st["families"]) if ok else "—", ""),
+                ("Total pledged", total_rs if ok else "—", ""),
+                ("Last response", fmt_time(st["last_response"]) if ok else "—", "small"),
+                ("Received", num(buckets.get("received", 0)) if ok else "—", ""),
+                ("Pending", num(buckets.get("pending", 0)) if ok else "—", ""),
+                ("Not marked", num(buckets.get("unmarked", 0)) if ok else "—", ""),
+            ]
+            mdl = "".join(f'<div><dt>{a}</dt><dd class="{k}">{b}</dd></div>' for a, b, k in mstats)
+            sections.append(f"""
+{stall_open(st)}
+  <dl class="stats">{mdl}</dl>
+  <p class="note">Money-only stall. Families and payment marks are counted once per family. The rupee total adds each child's amount. A repeated submission of the same child, class, and amount is counted once.</p>
+  <h3>Responses by class</h3>
+  {classes}
+  <h3>Short-link clicks</h3>
+  {clicks_html}
+</section>""")
+            continue
         sections.append(f"""
-{stall_open(st, pdf_names.get(st["slug"]))}
+{stall_open(st)}
   <dl class="stats">{dl}</dl>
   <h3>Menu · {gaps} of {len(st["menu"])} with no pledge</h3>
   <ul class="bars">{bars}</ul>{need_note}{unlisted}
@@ -836,11 +1116,6 @@ def render(data: dict, logos: dict, pdf_names: dict[str, str], page_url: str | N
 </section>""")
 
     meta = (og_meta(data, page_url) + "\n") if page_url else ""
-    closing = (
-        "Counts only on this page. Each stall PDF adds the contact list for PTC follow-up."
-        if pdf_names
-        else "Counts only. No names or phone numbers on this page."
-    )
     return f"""<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -877,7 +1152,7 @@ def render(data: dict, logos: dict, pdf_names: dict[str, str], page_url: str | N
     {"".join(f'<p class="note">{esc(n)}</p>' for n in summary_notes)}
   </section>
   {"".join(sections)}
-  <p class="note sans">{closing}</p>
+  <p class="note sans">Counts only on this page. No names or phone numbers.</p>
 </main>
 <footer>The British School in Colombo · PTC</footer>
 <script src="report-pdf.js"></script>
@@ -895,22 +1170,16 @@ def md(s: str) -> str:
 def render_private(data: dict, private: list, now: datetime) -> str:
     out = [f"# UN Day 2026 · stall responses (PRIVATE, PTC only)", "",
            f"Generated {now.strftime('%a %-d %b %Y, %-I:%M %p')} (Colombo). Not for the public site.",
-           "The same contacts are in each stall PDF from a --contacts build. They are not on the counts page.", ""]
+           "Contact PDFs are written outside the public site. They are not on the counts page.", ""]
     for entry, rows in private:
         out.append(f"## {entry['name']} ({entry['year_groups']})")
-        if not rows and entry["status"] == "stall_managed":
-            out += ["", "Stall-managed form: no response file in this build. The stall team keeps its own responses.", ""]
-            continue
         if not rows and entry["status"] != "ok":
             out += ["", "Response sheet not connected yet.", ""]
             continue
-        if entry["status"] == "stall_managed":
-            out += ["", "Included for the stall PDF and this list. The counts page still shows clicks only.", ""]
         gaps = [m["item"] for m in entry["menu"] if m["count"] == 0]
-        responses = len(rows) if entry["status"] != "ok" else entry["responses"]
-        families = len({family_key({"phone": r.get("phone", ""), "email": "", "parent": r.get("parent", ""), "child": r.get("child", ""), "_row": str(i)}) for i, r in enumerate(rows)}) if entry["status"] != "ok" else entry["families"]
-        last = max((r["time"] for r in rows if r.get("time")), default=None)
-        last_s = fmt_time(last.isoformat(timespec="minutes")) if last and entry["status"] != "ok" else fmt_time(entry["last_response"])
+        responses = entry["responses"] if entry["status"] == "ok" else len(rows)
+        families = entry["families"] if entry["status"] == "ok" else len({family_key({"phone": r.get("phone", ""), "email": "", "parent": r.get("parent", ""), "child": r.get("child", ""), "_row": str(i)}) for i, r in enumerate(rows)})
+        last_s = fmt_time(entry["last_response"])
         out += ["", f"{responses} responses · {families} families · last {last_s}",
                 "", "No pledge yet: " + (", ".join(gaps) if gaps else "none"), ""]
         if not rows:
@@ -918,8 +1187,12 @@ def render_private(data: dict, private: list, now: datetime) -> str:
             continue
         out += ["| # | Time | Parent | Child | Class | Type | Items | Amount | Notes | Phone |",
                 "|---|---|---|---|---|---|---|---|---|---|"]
-        for i, r in enumerate(sorted(rows, key=lambda r: r["time"] or datetime.min.replace(tzinfo=COLOMBO)), 1):
-            t = r["time"].strftime("%-d %b %-I:%M %p") if r["time"] else ""
+        for i, r in enumerate(sorted(rows, key=lambda r: r.get("time") or ""), 1):
+            raw = r.get("time") or ""
+            if raw:
+                t = datetime.fromisoformat(raw).strftime("%-d %b %-I:%M %p")
+            else:
+                t = ""
             out.append(
                 f"| {i} | {t} | {md(r['parent'])} | {md(r.get('child', ''))} | {md(r['class'])} | {r['type']} | "
                 f"{md(', '.join(r['items']))} | {md(r.get('amount', ''))} | {md(r['notes'])} | {md(r.get('phone', ''))} |"
@@ -945,35 +1218,25 @@ def assert_no_pii(texts: list[str], pii: set[str], safe: str) -> None:
         raise SystemExit(f"refusing to write: {len(leaks)} personal value(s) would appear on the public page")
 
 
-BUNDLE_MARKER = "private-bundle.json"
+def assert_no_public_pdfs(out: Path) -> None:
+    """The public dashboard folder must not contain a PDF."""
+    if not out.exists():
+        return
+    found = [p for p in out.rglob("*") if p.is_file() and p.suffix.lower() == ".pdf"]
+    if found:
+        raise SystemExit(f"refusing to publish: {len(found)} PDF file(s) under the public dashboard folder")
 
 
-def inside_repo(path: Path) -> bool:
-    try:
-        path.resolve().relative_to(ROOT.resolve())
-    except ValueError:
-        return False
-    return True
-
-
-def write_bundle_marker(path: Path) -> None:
-    path.write_text(
-        json.dumps({"kind": "stall-dashboard-private", "contacts": True}, indent=2) + "\n",
-        encoding="utf-8",
-    )
-
-
-def clear_contact_files(out: Path) -> None:
-    """Counts-page builds must not leave contact PDFs behind."""
+def sweep_public_pdfs(out: Path) -> None:
+    """Drop contact PDFs left in the public folder by an older build."""
+    if not out.exists():
+        return
+    for pdf in list(out.rglob("*")):
+        if pdf.is_file() and pdf.suffix.lower() == ".pdf":
+            pdf.unlink()
     sheets = out / "sheets"
-    if sheets.is_dir():
-        for old in sheets.glob("*.pdf"):
-            old.unlink()
-        if not any(sheets.iterdir()):
-            sheets.rmdir()
-    marker = out / BUNDLE_MARKER
-    if marker.exists():
-        marker.unlink()
+    if sheets.is_dir() and not any(sheets.iterdir()):
+        sheets.rmdir()
 
 
 def publish_sheets(folder: Path, files: list[tuple[str, bytes]]) -> None:
@@ -992,94 +1255,296 @@ def publish_sheets(folder: Path, files: list[tuple[str, bytes]]) -> None:
 def update_menus() -> None:
     cfg = json.loads(CONFIG.read_text(encoding="utf-8"))
     for sc in cfg["stalls"]:
-        if sc.get("stall_managed") or not sc.get("form_id"):
+        if sc.get("money_only") or not sc.get("form_id"):
             continue
         url = f"https://docs.google.com/forms/d/e/{sc['form_id']}/viewform"
         req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
-        page = urllib.request.urlopen(req, timeout=30).read().decode("utf-8")
+        try:
+            page = urllib.request.urlopen(req, timeout=30).read().decode("utf-8")
+        except Exception as err:
+            print(f"{sc['slug']}: form not read ({err}), menu left as is", file=sys.stderr)
+            continue
         m = re.search(r"FB_PUBLIC_LOAD_DATA_ = (.*?);</script>", page, re.S)
         if not m:
             print(f"{sc['slug']}: form data not found, menu left as is", file=sys.stderr)
             continue
         items = json.loads(m.group(1))[1][1]
+        live = None
         for it in items:
             title = norm(it[1]).lower()
             opts = [o[0] for o in it[4][0][1]] if it[4] and it[4][0][1] else []
             if title.startswith("food you can bring"):
-                sc["menu"] = opts
+                live = opts
             elif "contribute" in title:
                 sc["contribution_options"] = opts
-        print(f"{sc['slug']}: {len(sc['menu'])} menu items")
+        if live is not None:
+            menu, closed = COUNTS.merge_live_menu(sc.get("menu") or [], sc.get("closed") or [], live)
+            sc["menu"] = menu
+            if closed:
+                sc["closed"] = closed
+            elif "closed" in sc:
+                del sc["closed"]
+            if sc.get("aliases"):
+                sc["aliases"] = COUNTS.filter_aliases(sc.get("aliases"), menu)
+        closed_n = len(sc.get("closed") or [])
+        print(f"{sc['slug']}: {len(sc.get('menu') or [])} menu items, {closed_n} closed")
     CONFIG.write_text(json.dumps(cfg, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+
+
+def _self_test() -> None:
+    assert COUNTS.phone_digits("0771234567.0") == "0771234567"
+    assert COUNTS.phone_digits("0771234567.0") != re.sub(r"\D", "", "0771234567.0")
+    same = family_key({"phone": "0771234567.0", "email": "", "parent": "A", "child": ""})
+    assert same == family_key({"phone": "0771234567", "email": "", "parent": "B", "child": ""})
+    assert SHEET.parse_rupees("10,000.00") == 10000
+    assert SHEET.parse_rupees("5,000") == 5000
+    assert SHEET.parse_rupees("5000") == 5000
+    assert SHEET.parse_rupees("10,000.00") != int(re.sub(r"\D", "", "10,000.00"))
+    twelve = ["10,000.00"] * 12
+    if sum(SHEET.parse_rupees(x) for x in twelve) != 120_000:
+        raise SystemExit("10,000.00 did not add up to Rs 120,000")
+    if sum(int(re.sub(r"\D", "", x)) for x in twelve) == 120_000:
+        raise SystemExit("stripping non-digits was treated as a rupee amount")
+    assert SHEET.money_from_notes("25 pieces") is None
+    menu, closed = COUNTS.merge_live_menu(
+        ["Kokis (500)", "Milk toffee (100)", "Coconut toffee (50)", "Thala karali (100)",
+         "Fish bun, please order from Paan Paan (75)"],
+        [],
+        ["Kokis (500)"],
+    )
+    for kept in ("Milk toffee (100)", "Coconut toffee (50)", "Thala karali (100)",
+                 "Fish bun, please order from Paan Paan (75)"):
+        if kept not in menu or kept not in closed:
+            raise SystemExit(f"closed item dropped: {kept}")
+    aliases = COUNTS.filter_aliases({
+        "Fish bun": "Fish bun, please order from Paan Paan (75)",
+        "Gone": "Not a menu item",
+    }, menu)
+    if "Fish bun" not in aliases or "Gone" in aliases:
+        raise SystemExit(f"alias filter wrong: {aliases}")
+    joined = match_items("Fish bun, please order from Paan Paan (75), Kokis (500)", menu + list(aliases))
+    if joined != ["Fish bun, please order from Paan Paan (75)", "Kokis (500)"]:
+        raise SystemExit(f"multi-word option split: {joined}")
+    try:
+        pdfs_from_snapshot({"data_hash": "aaa", "stalls": []}, {"data_hash": "bbb", "stalls": []}, {})
+    except SystemExit as err:
+        if "does not match" not in str(err):
+            raise
+    else:
+        raise SystemExit("hash mismatch was accepted")
+    sea_headers = ["Timestamp", "Parent name", "Mobile number", "Child's name", "Class",
+                   "Contribution Value (Minimum Rs 5,000)", "Status", "Slip / receipt"]
+    sea_col = map_headers(sea_headers)
+    if sea_col.get("amount") != 5 or sea_col.get("child") != 3 or "contrib" in sea_col:
+        raise SystemExit(f"SEA amount heading not recognised: {sea_col}")
+    aus_only = map_headers(["Child's Contribution Value (Minimum Rs 3,000-5,000)"])
+    if aus_only != {"amount": 0}:
+        raise SystemExit(f"Australia amount heading not recognised: {aus_only}")
+    now = datetime(2026, 10, 7, 9, 15, tzinfo=COLOMBO)
+    folder = Path("/tmp/undash-selftest")
+    folder.mkdir(parents=True, exist_ok=True)
+    sl_header = ["Timestamp", "Parent name", "Mobile number", "Email", "Child's name", "Class",
+                 "How would you like to contribute?", "Food you can bring", "Quantity / notes",
+                 "Monetary contribution (optional)", "Status", "Slip / receipt"]
+    with (folder / "sri-lanka.csv").open("w", encoding="utf-8", newline="") as fh:
+        writer = csv.writer(fh)
+        writer.writerow(sl_header)
+        writer.writerow(["2/10/2026 9:00:00", "Parent One", "0771234567.0", "a@example.com", "Child One",
+                         "Playgroup A", "Food", "Milk toffee (100), Coconut toffee (50)", "25 pieces", "", "", ""])
+        writer.writerow(["2/10/2026 9:05:00", "Parent One again", "0771234567", "a@example.com", "Child One",
+                         "Playgroup A", "Food", "Milk toffee (100)", "20.0", "", "", ""])
+        writer.writerow(["2/10/2026 9:10:00", "Parent Two", "0779999999", "b@example.com", "Child Two",
+                         "Reception A", "Monetary contribution", "Kokis (500)", "", "10,000.00", "", ""])
+        writer.writerow(["2/10/2026 9:20:00", "Parent Three", "0778888888", "c@example.com", "Child Three",
+                         "Reception B", "Monetary contribution", "", "", "", "", ""])
+    with (folder / "sea.csv").open("w", encoding="utf-8", newline="") as fh:
+        writer = csv.writer(fh)
+        writer.writerow(sea_headers)
+        writer.writerow(["2/10/2026 8:00:00", "Parent S", "0772000001", "Child S", "Year 3A", "10,000.00", "Received", "https://example.test/slip"])
+        writer.writerow(["2/10/2026 8:05:00", "Parent S again", "0772000001.0", "Child S", "Year 3A", "10,000.00", "Pending", ""])
+        writer.writerow(["3/10/2026 8:00:00", "Parent T", "0772000002", "Child T", "Year 3B", "5,000", "Pending", ""])
+        writer.writerow(["4/10/2026 8:00:00", "Parent U", "0772000003", "Child U", "Year 3A", "5000", "", ""])
+        writer.writerow(["4/10/2026 8:10:00", "Parent V", "0772000004", "Child V1", "Year 3A", "5,000", "", ""])
+        writer.writerow(["4/10/2026 8:12:00", "Parent V", "0772000004", "Child V2", "Year 3A", "5,000", "", ""])
+    with (folder / "australia.csv").open("w", encoding="utf-8", newline="") as fh:
+        writer = csv.writer(fh)
+        writer.writerow(["Timestamp", "Parent name", "WhatsApp number", "Email address", "Child's name", "Class",
+                         "Child's Contribution Value (Minimum Rs 3,000-5,000)", "Payment status", "Deposit slip"])
+        writer.writerow(["2/10/2026 8:00:00", "Parent A", "0773100001", "a@example.com", "Ann", "Year 2A", "3,000", "Received", "https://example.test/a"])
+        writer.writerow(["2/10/2026 8:01:00", "Parent A", "0773100001", "a@example.com", "Ben", "Year 2A", "3,000", "Received", ""])
+        writer.writerow(["2/10/2026 8:02:00", "Parent A", "0773100001.0", "a@example.com", "Ann", "Year 2A", "3,000", "Received", ""])
+        writer.writerow(["2/10/2026 8:10:00", "Parent B", "0773100002", "b@example.com", "Cat", "Year 2B", "3000", "Pending", "written"])
+        writer.writerow(["2/10/2026 8:11:00", "Parent B", "0773100002", "b@example.com", "Dan", "Year 2B", "3000", "Pending", ""])
+        writer.writerow(["2/10/2026 8:20:00", "Parent C", "0773100003", "c@example.com", "Eve", "2A", "3,500", "Received", "https://example.test/c"])
+        writer.writerow(["2/10/2026 8:21:00", "Parent C", "0773100003", "c@example.com", "Fay", "Year 2C", "3500", "", ""])
+        writer.writerow(["2/10/2026 8:30:00", "Parent D", "0773100004", "d@example.com", "Gus", "Year 2A", "5,000", "", ""])
+        writer.writerow(["2/10/2026 8:31:00", "Parent D", "0773100004", "d@example.com", "Gus", "Year 2B", "5,000", "", ""])
+        writer.writerow(["2/10/2026 8:40:00", "Parent E", "0773100005", "e@example.com", "Hal", "Year 2A", "3,000", "", ""])
+        writer.writerow(["2/10/2026 8:41:00", "Parent E", "0773100005", "e@example.com", "Hal", "Year 2A", "4,000", "", ""])
+    with (folder / "food-money.csv").open("w", encoding="utf-8", newline="") as fh:
+        writer = csv.writer(fh)
+        writer.writerow(sl_header)
+        writer.writerow(["2/10/2026 9:30:00", "Parent F", "0773200001", "f@example.com", "Child A",
+                         "Year 1A", "Monetary contribution", "", "", "2,000", "", ""])
+        writer.writerow(["2/10/2026 9:31:00", "Parent F", "0773200001", "f@example.com", "Child B",
+                         "Year 1A", "Monetary contribution", "", "", "1,500", "", ""])
+        writer.writerow(["2/10/2026 9:32:00", "Parent F", "0773200001", "f@example.com", "Child A",
+                         "Year 1A", "Monetary contribution", "", "", "2,000", "", ""])
+        writer.writerow(["2/10/2026 9:33:00", "Parent F", "0773200001", "f@example.com", "Child A",
+                         "Year 1B", "Monetary contribution", "", "", "2,000", "", ""])
+    overrides = {
+        "sri-lanka": {
+            "2026-10-02T09:20+05:30": {"type": "Both", "amount": 6000},
+        }
+    }
+    ov_path = folder / "overrides.json"
+    ov_path.write_text(json.dumps(overrides), encoding="utf-8")
+    sl_menu = [
+        "Milk toffee (100)", "Coconut toffee (50)", "Kokis (500)",
+        "Fish bun, please order from Paan Paan (75)",
+    ]
+    got = ingest_responses(
+        folder / "sri-lanka.csv", "sri-lanka", sl_menu,
+        {"Fish bun": "Fish bun, please order from Paan Paan (75)"},
+        {"Fish bun, please order from Paan Paan (75)"},
+        True, False, now, json.loads(ov_path.read_text(encoding="utf-8")),
+    )
+    if len(got["families"]) != 3:
+        raise SystemExit(f"family key did not collapse .0 phones: {len(got['families'])}")
+    by_item = {m["item"]: m for m in got["menu"]}
+    milk = by_item["Milk toffee (100)"]
+    if milk["count"] != 1 or milk["pledged"] != "25 pcs" or milk["status"] != "Partial":
+        raise SystemExit(f"milk counted per response or wrong qty: {milk}")
+    coconut = by_item["Coconut toffee (50)"]
+    if coconut["count"] != 1 or coconut["pledged"] != "25 pcs":
+        raise SystemExit(f"coconut not once per family: {coconut}")
+    if got["contribution"]["Both"] != 2 or got["contribution"][MONEY] != 0:
+        raise SystemExit(f"money plus food was not Both: {got['contribution']}")
+    if not got["money"] or got["money"]["total"] != 16000:
+        raise SystemExit(f"amounts were not Rs 10000 plus override 6000: {got['money']}")
+    fish = by_item["Fish bun, please order from Paan Paan (75)"]
+    if not fish.get("closed") or fish["count"] != 0:
+        raise SystemExit(f"closed fish bun missing: {fish}")
+    sea = ingest_responses(folder / "sea.csv", "sea", [], {}, set(), False, True, now, {})
+    if len(sea["families"]) != 4 or sea["money"]["total"] != 30000 or sea["money"]["known"] != 5:
+        raise SystemExit(f"SEA-style amounts wrong: families={len(sea['families'])} money={sea['money']}")
+    if sea["money"]["buckets"] != {"received": 1, "pending": 1, "unmarked": 2, "other": 0}:
+        raise SystemExit(f"payment buckets not once per family: {sea['money']['buckets']}")
+    if sea["money"]["by_amount"] != [{"amount": "Rs 5,000", "children": 4}, {"amount": "Rs 10,000", "children": 1}]:
+        raise SystemExit(f"SEA amount bands counted a duplicate or missed a child: {sea['money']['by_amount']}")
+    aus = ingest_responses(folder / "australia.csv", "australia", [], {}, set(), False, True, now, {})
+    if len(aus["families"]) != 5 or aus["money"]["total"] != 36000:
+        raise SystemExit(f"Australia per-child amounts wrong: families={len(aus['families'])} money={aus['money']}")
+    if aus["money"]["buckets"] != {"received": 2, "pending": 1, "unmarked": 2, "other": 0}:
+        raise SystemExit(f"Australia payment buckets wrong: {aus['money']['buckets']}")
+    aus_bands = {row["amount"]: row["children"] for row in aus["money"]["by_amount"]}
+    if aus_bands != {"Rs 3,000": 5, "Rs 3,500": 2, "Rs 4,000": 1, "Rs 5,000": 2}:
+        raise SystemExit(f"Australia amount bands wrong: {aus['money']['by_amount']}")
+    food_money = ingest_responses(folder / "food-money.csv", "food-money", [], {}, set(), True, False, now, {})
+    if len(food_money["families"]) != 1 or not food_money["money"] or food_money["money"]["total"] != 5500:
+        raise SystemExit(f"food-stall money was not added per child: {food_money['money']}")
+    if "Rs 5,500" not in (food_money["money"]["line"] or ""):
+        raise SystemExit(f"food-stall money line missing the child sum: {food_money['money']['line']}")
+    heading = stall_open({"slug": "sri-lanka", "name": "Sri Lanka", "year_groups": "Playgroup"})
+    if "Download this stall" in heading or "sheets/" in heading or "<a " in heading:
+        raise SystemExit("stall heading still offers a download")
+    guard = Path("/tmp/undash-pdf-guard")
+    nested = guard / "sheets"
+    nested.mkdir(parents=True, exist_ok=True)
+    (nested / "stall.pdf").write_bytes(b"%PDF-1.4")
+    try:
+        assert_no_public_pdfs(guard)
+    except SystemExit as err:
+        if "PDF" not in str(err):
+            raise
+    else:
+        raise SystemExit("a PDF under the public folder was accepted")
+    sweep_public_pdfs(guard)
+    assert_no_public_pdfs(guard)
+    if (guard / "sheets").exists():
+        raise SystemExit("empty sheets directory was left in the public folder")
+    print("dashboard self-test ok")
 
 
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("--data-dir", required=True)
-    ap.add_argument("--out", required=True, help="counts folder, or with --contacts a directory outside the repo")
+    ap.add_argument("--data-dir")
+    ap.add_argument("--out", help="dashboard folder inside the repo")
+    ap.add_argument("--private-sheets-dir", help="per-stall contact PDFs, outside the repo and outside --out")
     ap.add_argument("--private", help="local Markdown file for the PTC (keep it outside the repo)")
+    ap.add_argument("--pledges", help="private row-level pledges.json, outside the repo and the dashboard folder")
+    ap.add_argument("--overrides", help="private stall+timestamp fixes, outside the repo")
     ap.add_argument("--clicks", help="click counts JSON instead of asking the tracker")
     ap.add_argument("--update-menus", action="store_true", help="re-read the menus from the live forms first")
     ap.add_argument("--now", help="override the current time (ISO), for tests")
-    ap.add_argument("--contacts", action="store_true",
-                    help="also write per-stall contact PDFs; --out must be outside the repo")
+    ap.add_argument("--self-test", action="store_true", help="run counting checks and exit")
     args = ap.parse_args()
+    if args.self_test:
+        _self_test()
+        return
+    if not args.data_dir or not args.out or not args.private_sheets_dir:
+        raise SystemExit("--data-dir, --out, and --private-sheets-dir are required")
 
     out = Path(args.out).resolve()
+    sheets_dir = Path(args.private_sheets_dir).resolve()
     if out == ROOT / "email-preview" or out == ROOT / "go" or out.parent == ROOT / "go":
         raise SystemExit("stall contacts are not written to the email preview or the public short links")
-    if args.private and inside_repo(Path(args.private)):
-        raise SystemExit("--private must be outside the repo")
-    if args.contacts and inside_repo(out):
-        raise SystemExit(
-            "--contacts writes parent phone numbers into stall PDFs. "
-            "Choose a folder outside the repo, then upload it with scripts/publish-dashboard.py."
-        )
-    if not inside_repo(out):
+    if args.private:
+        outside_repo(Path(args.private))
+    if args.overrides:
+        outside_repo(Path(args.overrides))
+    outside_repo(sheets_dir)
+    outside_out(sheets_dir, out)
+    pledges_path = Path(args.pledges).resolve() if args.pledges else (Path(args.data_dir).resolve() / "pledges.json")
+    outside_repo(pledges_path)
+    outside_out(pledges_path, out)
+    if ROOT not in out.parents:
         print("note: --out is outside the repo", file=sys.stderr)
     if args.update_menus:
         update_menus()
     now = datetime.fromisoformat(args.now).astimezone(COLOMBO) if args.now else datetime.now(COLOMBO)
-    data, private, pii, sheets = build(args, now)
+    data, private, pii, pledges = build(args, now)
+    if pledges.get("data_hash") != data.get("data_hash"):
+        raise SystemExit("refusing to write: pledges hash does not match data.json")
     logos = {"bsc": GEN.logo_data(GEN.BSC_LOGO), "pc": GEN.logo_data(GEN.PC_LOGO, ink=True)}
     used_names: set[str] = set()
     pdf_names: dict[str, str] = {}
-    if args.contacts:
-        for model in sheets:
-            fname = SHEET.pdf_filename(model["name"], data["updated"])
-            if fname in used_names:
-                fname = fname[:-4] + f"-{model['slug']}.pdf"
-            used_names.add(fname)
-            pdf_names[model["slug"]] = fname
-            model["filename"] = fname
-            model["as_of"] = fmt_time(data["updated"])
-            model["last_response"] = fmt_time(model.get("last_iso")) if model.get("last_iso") else "—"
+    for st in data["stalls"]:
+        fname = SHEET.pdf_filename(st["name"], data["updated"])
+        if fname in used_names:
+            fname = fname[:-4] + f"-{st['slug']}.pdf"
+        used_names.add(fname)
+        pdf_names[st["slug"]] = fname
     page_url = published_url(out)
     if page_url is None:
         print("note: link-preview tags omitted; --out is outside the repo", file=sys.stderr)
-    page = render(data, logos, pdf_names, page_url)
+    page = render(data, logos, page_url)
     jtext = json.dumps(data, ensure_ascii=False, indent=2) + "\n"
+    ptext = json.dumps(pledges, ensure_ascii=False, indent=2) + "\n"
     safe = json.dumps(json.loads(CONFIG.read_text(encoding="utf-8"))) + (ROOT / "forms.txt").read_text(encoding="utf-8") + CSS
     safe += " ".join(x["class"] for st in data["stalls"] for x in st["by_class"])
-    # Stall PDFs are intentionally not part of this check. Names and phones
-    # stay out of data.json and index.html, including the email preview and go/.
+    # Stall PDFs and pledges.json are intentionally not part of this check.
     assert_no_pii([jtext, re.sub(r'src="data:[^"]+"', "", page)], pii, safe)
-    blobs = [(model["filename"], SHEET.render_pdf(model)) for model in sheets] if args.contacts else []
 
+    if "Download this stall" in page or "sheets/" in page:
+        raise SystemExit("refusing to publish: the counts page still links a stall PDF")
+    sweep_public_pdfs(out)
     out.mkdir(parents=True, exist_ok=True)
+    pledges_path.parent.mkdir(parents=True, exist_ok=True)
     pdf_js = (ROOT / "scripts" / "dashboard-pdf.js").read_text(encoding="utf-8")
     if "@" in pdf_js or re.search(r"\d{7,}", pdf_js):
         raise SystemExit("dashboard pdf script looks like it contains contact details")
     old = (out / "data.json").read_text(encoding="utf-8") if (out / "data.json").exists() else None
     (out / "data.json").write_text(jtext, encoding="utf-8")
+    pledges_path.write_text(ptext, encoding="utf-8")
+    # Draw the PDFs from the files just written, and refuse if the hash moved.
+    blobs = pdfs_from_snapshot(json.loads((out / "data.json").read_text(encoding="utf-8")),
+                               json.loads(pledges_path.read_text(encoding="utf-8")), pdf_names)
     (out / "index.html").write_text(page, encoding="utf-8")
     (out / "report-pdf.js").write_text(pdf_js, encoding="utf-8")
-    if args.contacts:
-        publish_sheets(out / "sheets", blobs)
-        write_bundle_marker(out / BUNDLE_MARKER)
-    else:
-        clear_contact_files(out)
+    publish_sheets(sheets_dir, blobs)
     write_og_image(out / OG_FILE, data)
+    assert_no_public_pdfs(out)
     if args.private:
         Path(args.private).write_text(render_private(data, private, now), encoding="utf-8")
     s = data["summary"]

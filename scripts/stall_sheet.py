@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import re
 from datetime import datetime
+from decimal import Decimal, ROUND_HALF_UP
 
 PORTRAIT_W, PORTRAIT_H = 595.28, 841.89
 LAND_W, LAND_H = 841.89, 595.28
@@ -72,18 +73,55 @@ def parse_needed(needed: str | None) -> tuple[float | None, str | None]:
     return float(m.group(1)), unit
 
 
+# Thousands commas and a decimal point are part of one number.
+# "10,000.00" is Rs 10,000. Deleting every non-digit would make it 1,000,000.
+_RUPEE_TOKEN = re.compile(r"(\d{1,3}(?:,\d{3})+|\d+)(?:\.(\d+))?")
+_UNIT_AFTER = re.compile(
+    r"\s*(?:pcs|pc|pieces?|nos|no|kgs?|grams?|g|packs?|packets?|boxes|box)\b",
+    re.I,
+)
+
+
+def _rupees_from_token(whole: str, frac: str | None) -> int | None:
+    digits = whole.replace(",", "")
+    try:
+        num = Decimal(digits if frac is None else f"{digits}.{frac}")
+    except Exception:
+        return None
+    if num <= 0 or num > Decimal("10000000"):
+        return None
+    return int(num.quantize(Decimal("1"), rounding=ROUND_HALF_UP))
+
+
 def parse_rupees(raw: str) -> int | None:
-    s = re.sub(r"\s+", "", raw or "")
-    if not s:
+    """First rupee amount in an amount cell.
+
+    Commas group thousands and '.' is the decimal point, so '10,000.00',
+    '5,000', and '5000' are 10000, 5000, and 5000.
+    """
+    text = str(raw or "")
+    if not text.strip():
         return None
-    s = s.replace(",", "")
-    m = re.search(r"(\d+)", s)
-    if not m:
-        return None
-    val = int(m.group(1))
-    if val <= 0 or val > 10_000_000:
-        return None
-    return val
+    for match in _RUPEE_TOKEN.finditer(text):
+        val = _rupees_from_token(match.group(1), match.group(2))
+        if val is not None:
+            return val
+    return None
+
+
+def money_from_notes(text: str) -> int | None:
+    """A stated amount in free text. Piece and weight notes are not money."""
+    raw = str(text or "")
+    for match in _RUPEE_TOKEN.finditer(raw):
+        if _UNIT_AFTER.match(raw[match.end():]):
+            continue
+        whole = match.group(1).replace(",", "")
+        if not (3 <= len(whole) <= 6):
+            continue
+        val = _rupees_from_token(match.group(1), match.group(2))
+        if val is not None:
+            return val
+    return None
 
 
 def rs(n: int) -> str:
@@ -273,7 +311,7 @@ def summarize_money(contacts: list[dict]) -> dict:
                 slips["uploaded"] += 1
             else:
                 slips["written"] += 1
-    by_amount = [{"amount": rs(n), "families": amounts[n]} for n in sorted(amounts)]
+    by_amount = [{"amount": rs(n), "children": amounts[n]} for n in sorted(amounts)]
     return {
         "families": len(contacts),
         "known": known,
@@ -298,6 +336,10 @@ def prepare(model: dict) -> dict:
     contacts = list(model.get("contacts") or [])
     contacts.sort(key=lambda r: (class_key(r.get("class") or ""), (r.get("parent") or "").lower(), (r.get("child") or "").lower()))
     model["contacts"] = contacts
+    # A snapshot already has page-1 figures from data.json. Recomputing them
+    # from the contact rows would let the PDF drift from the public totals.
+    if model.get("snapshot"):
+        return model
     if model.get("kind") == "money":
         model["money"] = summarize_money(contacts)
     else:
@@ -709,18 +751,28 @@ def _food_glance(doc: Doc, model: dict) -> None:
         )
         doc.note("Needed is the quantity on the menu. Total pledged adds the numbers parents wrote (tbc means no number). % uses the same unit; >= means some pledges could not be added in. Covered means that total meets the target.")
     if connected:
-        unlisted = model.get("unlisted") or {}
-        if unlisted:
-            bits = [f"{name} ({n})" if n > 1 else name for name, n in sorted(unlisted.items())]
-            doc.note("Other foods offered (not on the menu): " + "; ".join(bits) + ".")
+        if model.get("snapshot"):
+            n = int(model.get("unlisted_ticks") or 0)
+            doc.note(
+                f"Other foods offered (not on the menu): {n} tick(s)."
+                if n else "Other foods offered (not on the menu): none so far."
+            )
         else:
-            doc.note("Other foods offered (not on the menu): none so far.")
+            unlisted = model.get("unlisted") or {}
+            if unlisted:
+                bits = [f"{name} ({n})" if n > 1 else name for name, n in sorted(unlisted.items())]
+                doc.note("Other foods offered (not on the menu): " + "; ".join(bits) + ".")
+            else:
+                doc.note("Other foods offered (not on the menu): none so far.")
         line = _money_line(model)
         if line:
             doc.note(line, color=INK)
 
 
 def _money_line(model: dict) -> str:
+    published = model.get("money_line")
+    if model.get("snapshot") and published is not None:
+        return published
     contrib = model.get("contribution") or {}
     money_n = int(contrib.get(MONEY, 0) or 0)
     both = int(contrib.get("Both", 0) or 0)
@@ -769,7 +821,7 @@ def _money_glance(doc: Doc, model: dict) -> None:
     doc.note("Money-only stall, no food pledges to list.")
     if model.get("minimum_note"):
         doc.note(model["minimum_note"])
-    doc.note("The form asks a minimum per child, not a stall total, so there is no money target and no %. Amounts are what parents entered.")
+    doc.note("The form asks a minimum per child, not a stall total, so there is no money target and no %. Each child's amount is added. A repeated submission of the same child, class, and amount is counted once.")
     if money["other"]:
         bits = [f"{name} {n}" for name, n in sorted(money["other"].items())]
         doc.note("Other status marks: " + "; ".join(bits) + ".")
@@ -778,9 +830,9 @@ def _money_glance(doc: Doc, model: dict) -> None:
         doc.note("No amounts on the sheet yet.")
     else:
         cols = [doc.content_w * 0.62, doc.content_w * 0.38]
-        rows = [[a["amount"], str(a["families"])] for a in money["by_amount"]]
-        rows.append([f"Total · {total}", str(money["families"])])
-        doc.table(["Amount", "Families"], rows, cols, right={0, 1})
+        rows = [[a["amount"], str(a.get("children", a.get("families", 0)))] for a in money["by_amount"]]
+        rows.append([f"Total · {total}", str(money.get("known", money["families"]))])
+        doc.table(["Amount", "Children"], rows, cols, right={0, 1})
     slips = money["slips"]
     if money["families"]:
         doc.note(
@@ -802,7 +854,8 @@ def _contacts(doc: Doc, model: dict) -> None:
     if kind == "money" and model.get("connected"):
         money = model.get("money") or {}
         total = rs(money["total"]) if money.get("known") else "no amounts"
-        sub = f"{len(contacts)} {'family' if len(contacts) == 1 else 'families'} · {total} pledged · money-only · as of {model.get('as_of') or '—'}"
+        fam = money.get("families", len(contacts))
+        sub = f"{fam} {'family' if fam == 1 else 'families'} · {total} pledged · money-only · as of {model.get('as_of') or '—'}"
     elif model.get("connected"):
         sub = f"{len(contacts)} {'response' if len(contacts) == 1 else 'responses'} · as of {model.get('as_of') or '—'}"
     else:
@@ -829,6 +882,17 @@ def _contacts(doc: Doc, model: dict) -> None:
 
 
 def _self_test() -> None:
+    # "10,000.00" is ten thousand. Stripping every non-digit yields a million.
+    assert parse_rupees("10,000.00") == 10000
+    assert parse_rupees("5,000") == 5000
+    assert parse_rupees("5000") == 5000
+    assert parse_rupees("Rs 10,000.00") == 10000
+    assert int(re.sub(r"\D", "", "10,000.00")) == 1_000_000
+    assert parse_rupees("10,000.00") != int(re.sub(r"\D", "", "10,000.00"))
+    assert money_from_notes("10,000.00") == 10000
+    assert money_from_notes("LKR 5,000") == 5000
+    assert money_from_notes("25 pieces") is None
+    assert money_from_notes("1 kg") is None
     menu = [
         {"label": "Milk toffee", "needed": "100"},
         {"label": "Coconut toffee", "needed": "50"},
@@ -894,7 +958,7 @@ def _self_test() -> None:
     money = summarize_money(money_contacts)
     if money["total"] != 13500 or money["buckets"]["received"] != 1 or money["buckets"]["pending"] != 1 or money["buckets"]["unmarked"] != 1:
         raise SystemExit(f"money summary wrong: {money}")
-    if money["by_amount"] != [{"amount": "Rs 3,500", "families": 1}, {"amount": "Rs 5,000", "families": 2}]:
+    if money["by_amount"] != [{"amount": "Rs 3,500", "children": 1}, {"amount": "Rs 5,000", "children": 2}]:
         raise SystemExit(f"amount bands wrong: {money['by_amount']}")
     food_pdf = render_pdf({
         "name": "Sri Lanka", "years": "Playgroup & Reception", "kind": "food", "connected": True,
