@@ -126,10 +126,24 @@ FIELDS = [
     ("contrib", lambda h: "contribute" in h),
     ("food", lambda h: h.startswith("food you can bring")),
     ("notes", lambda h: "quantity" in h or "notes" in h),
-    ("amount", lambda h: "amount" in h or "lkr" in h or h.startswith("monetary")),
+    ("amount", lambda h: is_amount_header(h)),
     ("pay_status", lambda h: h == "status" or "payment status" in h),
     ("slip", lambda h: "slip" in h or "receipt" in h or "deposit" in h),
 ]
+
+
+def is_amount_header(h: str) -> bool:
+    """Amount columns on the money stalls do not say "amount".
+
+    SEA uses "Contribution Value (Minimum Rs 5,000)". Australia uses
+    "Child's Contribution Value (Minimum Rs 3,000-5,000)". Food stalls
+    still use "Monetary contribution (optional)".
+    """
+    if "amount" in h or "lkr" in h or h.startswith("monetary"):
+        return True
+    if "contribution" in h and "value" in h:
+        return True
+    return "minimum rs" in h
 
 
 def map_headers(headers: list[str]) -> dict[str, int]:
@@ -182,6 +196,15 @@ def parse_time(raw: str, now: datetime) -> datetime | None:
     # Responses can only fall between the forms opening and now, which settles 4/10 vs 10/4.
     plausible = [c for c in cands if FORMS_OPENED <= c <= now + timedelta(days=1)]
     return (plausible or cands or [None])[0]
+
+
+def child_amount_token(child: str, klass: str, amt: int) -> tuple[str, str, int]:
+    """One contribution is a child in a class at one amount.
+
+    A second submission of that same child, class, and amount is a duplicate.
+    A different child, a different class, or a different amount is added.
+    """
+    return (norm(child).casefold(), norm(klass).casefold(), amt)
 
 
 def family_key(r: dict) -> str:
@@ -402,7 +425,8 @@ def ingest_responses(path: Path, slug: str, menu: list[str], aliases: dict, clos
     last = None
     fam_types: dict[str, set[str]] = {}
     fam_items: dict[str, dict[str, tuple]] = {}
-    fam_amount: dict[str, int | None] = {}
+    fam_parts: dict[str, list[int]] = {}
+    fam_seen: dict[str, set[tuple]] = {}
     fam_pay: dict[str, list[str]] = {}
     fam_slip: dict[str, str] = {}
     response_contrib = {k: 0 for k in CONTRIB_KEYS} if (has_contrib or money_only) else None
@@ -465,11 +489,13 @@ def ingest_responses(path: Path, slug: str, menu: list[str], aliases: dict, clos
             amt = SHEET.money_from_notes(note)
         if "amount" in ov and ov["amount"] is not None:
             amt = int(ov["amount"])
-        if amt is not None or fam not in fam_amount:
-            if amt is not None:
-                fam_amount[fam] = amt
-            else:
-                fam_amount.setdefault(fam, None)
+        fam_parts.setdefault(fam, [])
+        if amt is not None:
+            token = child_amount_token(r.get("child", ""), cl, amt)
+            seen = fam_seen.setdefault(fam, set())
+            if token not in seen:
+                seen.add(token)
+                fam_parts[fam].append(amt)
         fam_pay.setdefault(fam, []).append(r.get("pay_status", ""))
         slip = r.get("slip", "")
         if slip and not fam_slip.get(fam):
@@ -502,7 +528,7 @@ def ingest_responses(path: Path, slug: str, menu: list[str], aliases: dict, clos
             fam_contrib[COUNTS.family_type(types, MONEY)] += 1
     else:
         fam_contrib = None
-    money = family_money(fam_amount, fam_pay, fam_slip, money_only, fam_contrib)
+    money = family_money(fam_parts, fam_pay, fam_slip, money_only, fam_contrib)
     return {
         "responses": len(rows),
         "families": set(fam_types) or set(),
@@ -520,19 +546,29 @@ def ingest_responses(path: Path, slug: str, menu: list[str], aliases: dict, clos
     }
 
 
-def family_money(amounts: dict, pays: dict, slips: dict, money_only: bool, contribution: dict | None) -> dict | None:
-    """One amount, one payment mark, and one slip per family."""
-    stated = {fam: amt for fam, amt in amounts.items() if amt}
-    if not money_only and not stated and not (contribution and (contribution.get(MONEY) or contribution.get("Both"))):
+def family_money(parts: dict, pays: dict, slips: dict, money_only: bool, contribution: dict | None) -> dict | None:
+    """Add each child's amount. Payment marks and slips stay once per family.
+
+    parts maps a family to the amounts already deduped by child, class, and
+    amount. Two children in one family are both included. A repeated
+    submission of the same child, class, and amount is not.
+    """
+    stated_rows: list[int] = []
+    stated_fams: set[str] = set()
+    for fam, amounts in parts.items():
+        if amounts:
+            stated_fams.add(fam)
+            stated_rows.extend(amounts)
+    if not money_only and not stated_rows and not (contribution and (contribution.get(MONEY) or contribution.get("Both"))):
         return None
     buckets = {"received": 0, "pending": 0, "unmarked": 0, "other": 0}
     other: dict[str, int] = {}
     slip_counts = {"filled": 0, "uploaded": 0, "written": 0}
-    families = set(amounts) | set(pays) | set(slips)
+    families = set(parts) | set(pays) | set(slips)
     if money_only:
         pool = families
     else:
-        pool = set(stated)
+        pool = stated_fams
     for fam in pool:
         bucket = COUNTS.best_pay(pays.get(fam) or [""], SHEET.pay_bucket) if money_only else "unmarked"
         if money_only:
@@ -549,30 +585,30 @@ def family_money(amounts: dict, pays: dict, slips: dict, money_only: bool, contr
             else:
                 slip_counts["written"] += 1
     bands: dict[int, int] = {}
-    for amt in stated.values():
+    for amt in stated_rows:
         bands[amt] = bands.get(amt, 0) + 1
-    total = sum(stated.values())
+    total = sum(stated_rows)
     both = (contribution or {}).get("Both", 0)
     money_families = (contribution or {}).get(MONEY, 0) + both
     line = ""
     if not money_only:
-        if money_families or stated:
+        if money_families or stated_rows:
             line = f"Money: {money_families} {'family' if money_families == 1 else 'families'}"
             if both:
                 line += f" ({both} also bringing food)"
-            if stated:
+            if stated_rows:
                 line += f". Amounts stated add up to {SHEET.rs(total)}."
             else:
                 line += ". No amounts stated on the sheet, so no money % is shown."
     return {
         "families": len(pool) if money_only else money_families,
         "both": both,
-        "known": len(stated),
+        "known": len(stated_rows),
         "total": total,
         "buckets": buckets,
         "other": other,
         "slips": slip_counts,
-        "by_amount": [{"amount": SHEET.rs(n), "families": bands[n]} for n in sorted(bands)],
+        "by_amount": [{"amount": SHEET.rs(n), "children": bands[n]} for n in sorted(bands)],
         "line": line,
     }
 
@@ -1061,7 +1097,7 @@ def render(data: dict, logos: dict, page_url: str | None) -> str:
             sections.append(f"""
 {stall_open(st)}
   <dl class="stats">{mdl}</dl>
-  <p class="note">Money-only stall. Families, the rupee total, and received, pending, or not marked are counted once per family.</p>
+  <p class="note">Money-only stall. Families and payment marks are counted once per family. The rupee total adds each child's amount. A repeated submission of the same child, class, and amount is counted once.</p>
   <h3>Responses by class</h3>
   {classes}
   <h3>Short-link clicks</h3>
@@ -1296,6 +1332,14 @@ def _self_test() -> None:
             raise
     else:
         raise SystemExit("hash mismatch was accepted")
+    sea_headers = ["Timestamp", "Parent name", "Mobile number", "Child's name", "Class",
+                   "Contribution Value (Minimum Rs 5,000)", "Status", "Slip / receipt"]
+    sea_col = map_headers(sea_headers)
+    if sea_col.get("amount") != 5 or sea_col.get("child") != 3 or "contrib" in sea_col:
+        raise SystemExit(f"SEA amount heading not recognised: {sea_col}")
+    aus_only = map_headers(["Child's Contribution Value (Minimum Rs 3,000-5,000)"])
+    if aus_only != {"amount": 0}:
+        raise SystemExit(f"Australia amount heading not recognised: {aus_only}")
     now = datetime(2026, 10, 7, 9, 15, tzinfo=COLOMBO)
     folder = Path("/tmp/undash-selftest")
     folder.mkdir(parents=True, exist_ok=True)
@@ -1315,12 +1359,39 @@ def _self_test() -> None:
                          "Reception B", "Monetary contribution", "", "", "", "", ""])
     with (folder / "sea.csv").open("w", encoding="utf-8", newline="") as fh:
         writer = csv.writer(fh)
-        writer.writerow(["Timestamp", "Parent name", "Mobile number", "Child's name", "Class",
-                         "Monetary contribution (optional)", "Status", "Slip / receipt"])
+        writer.writerow(sea_headers)
         writer.writerow(["2/10/2026 8:00:00", "Parent S", "0772000001", "Child S", "Year 3A", "10,000.00", "Received", "https://example.test/slip"])
         writer.writerow(["2/10/2026 8:05:00", "Parent S again", "0772000001.0", "Child S", "Year 3A", "10,000.00", "Pending", ""])
         writer.writerow(["3/10/2026 8:00:00", "Parent T", "0772000002", "Child T", "Year 3B", "5,000", "Pending", ""])
         writer.writerow(["4/10/2026 8:00:00", "Parent U", "0772000003", "Child U", "Year 3A", "5000", "", ""])
+        writer.writerow(["4/10/2026 8:10:00", "Parent V", "0772000004", "Child V1", "Year 3A", "5,000", "", ""])
+        writer.writerow(["4/10/2026 8:12:00", "Parent V", "0772000004", "Child V2", "Year 3A", "5,000", "", ""])
+    with (folder / "australia.csv").open("w", encoding="utf-8", newline="") as fh:
+        writer = csv.writer(fh)
+        writer.writerow(["Timestamp", "Parent name", "WhatsApp number", "Email address", "Child's name", "Class",
+                         "Child's Contribution Value (Minimum Rs 3,000-5,000)", "Payment status", "Deposit slip"])
+        writer.writerow(["2/10/2026 8:00:00", "Parent A", "0773100001", "a@example.com", "Ann", "Year 2A", "3,000", "Received", "https://example.test/a"])
+        writer.writerow(["2/10/2026 8:01:00", "Parent A", "0773100001", "a@example.com", "Ben", "Year 2A", "3,000", "Received", ""])
+        writer.writerow(["2/10/2026 8:02:00", "Parent A", "0773100001.0", "a@example.com", "Ann", "Year 2A", "3,000", "Received", ""])
+        writer.writerow(["2/10/2026 8:10:00", "Parent B", "0773100002", "b@example.com", "Cat", "Year 2B", "3000", "Pending", "written"])
+        writer.writerow(["2/10/2026 8:11:00", "Parent B", "0773100002", "b@example.com", "Dan", "Year 2B", "3000", "Pending", ""])
+        writer.writerow(["2/10/2026 8:20:00", "Parent C", "0773100003", "c@example.com", "Eve", "2A", "3,500", "Received", "https://example.test/c"])
+        writer.writerow(["2/10/2026 8:21:00", "Parent C", "0773100003", "c@example.com", "Fay", "Year 2C", "3500", "", ""])
+        writer.writerow(["2/10/2026 8:30:00", "Parent D", "0773100004", "d@example.com", "Gus", "Year 2A", "5,000", "", ""])
+        writer.writerow(["2/10/2026 8:31:00", "Parent D", "0773100004", "d@example.com", "Gus", "Year 2B", "5,000", "", ""])
+        writer.writerow(["2/10/2026 8:40:00", "Parent E", "0773100005", "e@example.com", "Hal", "Year 2A", "3,000", "", ""])
+        writer.writerow(["2/10/2026 8:41:00", "Parent E", "0773100005", "e@example.com", "Hal", "Year 2A", "4,000", "", ""])
+    with (folder / "food-money.csv").open("w", encoding="utf-8", newline="") as fh:
+        writer = csv.writer(fh)
+        writer.writerow(sl_header)
+        writer.writerow(["2/10/2026 9:30:00", "Parent F", "0773200001", "f@example.com", "Child A",
+                         "Year 1A", "Monetary contribution", "", "", "2,000", "", ""])
+        writer.writerow(["2/10/2026 9:31:00", "Parent F", "0773200001", "f@example.com", "Child B",
+                         "Year 1A", "Monetary contribution", "", "", "1,500", "", ""])
+        writer.writerow(["2/10/2026 9:32:00", "Parent F", "0773200001", "f@example.com", "Child A",
+                         "Year 1A", "Monetary contribution", "", "", "2,000", "", ""])
+        writer.writerow(["2/10/2026 9:33:00", "Parent F", "0773200001", "f@example.com", "Child A",
+                         "Year 1B", "Monetary contribution", "", "", "2,000", "", ""])
     overrides = {
         "sri-lanka": {
             "2026-10-02T09:20+05:30": {"type": "Both", "amount": 6000},
@@ -1355,10 +1426,25 @@ def _self_test() -> None:
     if not fish.get("closed") or fish["count"] != 0:
         raise SystemExit(f"closed fish bun missing: {fish}")
     sea = ingest_responses(folder / "sea.csv", "sea", [], {}, set(), False, True, now, {})
-    if len(sea["families"]) != 3 or sea["money"]["total"] != 20000:
+    if len(sea["families"]) != 4 or sea["money"]["total"] != 30000 or sea["money"]["known"] != 5:
         raise SystemExit(f"SEA-style amounts wrong: families={len(sea['families'])} money={sea['money']}")
-    if sea["money"]["buckets"] != {"received": 1, "pending": 1, "unmarked": 1, "other": 0}:
+    if sea["money"]["buckets"] != {"received": 1, "pending": 1, "unmarked": 2, "other": 0}:
         raise SystemExit(f"payment buckets not once per family: {sea['money']['buckets']}")
+    if sea["money"]["by_amount"] != [{"amount": "Rs 5,000", "children": 4}, {"amount": "Rs 10,000", "children": 1}]:
+        raise SystemExit(f"SEA amount bands counted a duplicate or missed a child: {sea['money']['by_amount']}")
+    aus = ingest_responses(folder / "australia.csv", "australia", [], {}, set(), False, True, now, {})
+    if len(aus["families"]) != 5 or aus["money"]["total"] != 36000:
+        raise SystemExit(f"Australia per-child amounts wrong: families={len(aus['families'])} money={aus['money']}")
+    if aus["money"]["buckets"] != {"received": 2, "pending": 1, "unmarked": 2, "other": 0}:
+        raise SystemExit(f"Australia payment buckets wrong: {aus['money']['buckets']}")
+    aus_bands = {row["amount"]: row["children"] for row in aus["money"]["by_amount"]}
+    if aus_bands != {"Rs 3,000": 5, "Rs 3,500": 2, "Rs 4,000": 1, "Rs 5,000": 2}:
+        raise SystemExit(f"Australia amount bands wrong: {aus['money']['by_amount']}")
+    food_money = ingest_responses(folder / "food-money.csv", "food-money", [], {}, set(), True, False, now, {})
+    if len(food_money["families"]) != 1 or not food_money["money"] or food_money["money"]["total"] != 5500:
+        raise SystemExit(f"food-stall money was not added per child: {food_money['money']}")
+    if "Rs 5,500" not in (food_money["money"]["line"] or ""):
+        raise SystemExit(f"food-stall money line missing the child sum: {food_money['money']['line']}")
     heading = stall_open({"slug": "sri-lanka", "name": "Sri Lanka", "year_groups": "Playgroup"})
     if "Download this stall" in heading or "sheets/" in heading or "<a " in heading:
         raise SystemExit("stall heading still offers a download")
