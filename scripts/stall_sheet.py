@@ -311,7 +311,7 @@ def summarize_money(contacts: list[dict]) -> dict:
                 slips["uploaded"] += 1
             else:
                 slips["written"] += 1
-    by_amount = [{"amount": rs(n), "families": amounts[n]} for n in sorted(amounts)]
+    by_amount = [{"amount": rs(n), "children": amounts[n]} for n in sorted(amounts)]
     return {
         "families": len(contacts),
         "known": known,
@@ -821,7 +821,7 @@ def _money_glance(doc: Doc, model: dict) -> None:
     doc.note("Money-only stall, no food pledges to list.")
     if model.get("minimum_note"):
         doc.note(model["minimum_note"])
-    doc.note("The form asks a minimum per child, not a stall total, so there is no money target and no %. Amounts are what parents entered.")
+    doc.note("The form asks a minimum per child, not a stall total, so there is no money target and no %. Each child's amount is added. A repeated submission of the same child, class, and amount is counted once.")
     if money["other"]:
         bits = [f"{name} {n}" for name, n in sorted(money["other"].items())]
         doc.note("Other status marks: " + "; ".join(bits) + ".")
@@ -830,9 +830,9 @@ def _money_glance(doc: Doc, model: dict) -> None:
         doc.note("No amounts on the sheet yet.")
     else:
         cols = [doc.content_w * 0.62, doc.content_w * 0.38]
-        rows = [[a["amount"], str(a["families"])] for a in money["by_amount"]]
-        rows.append([f"Total · {total}", str(money["families"])])
-        doc.table(["Amount", "Families"], rows, cols, right={0, 1})
+        rows = [[a["amount"], str(a.get("children", a.get("families", 0)))] for a in money["by_amount"]]
+        rows.append([f"Total · {total}", str(money.get("known", money["families"]))])
+        doc.table(["Amount", "Children"], rows, cols, right={0, 1})
     slips = money["slips"]
     if money["families"]:
         doc.note(
@@ -958,7 +958,7 @@ def _self_test() -> None:
     money = summarize_money(money_contacts)
     if money["total"] != 13500 or money["buckets"]["received"] != 1 or money["buckets"]["pending"] != 1 or money["buckets"]["unmarked"] != 1:
         raise SystemExit(f"money summary wrong: {money}")
-    if money["by_amount"] != [{"amount": "Rs 3,500", "families": 1}, {"amount": "Rs 5,000", "families": 2}]:
+    if money["by_amount"] != [{"amount": "Rs 3,500", "children": 1}, {"amount": "Rs 5,000", "children": 2}]:
         raise SystemExit(f"amount bands wrong: {money['by_amount']}")
     food_pdf = render_pdf({
         "name": "Sri Lanka", "years": "Playgroup & Reception", "kind": "food", "connected": True,
