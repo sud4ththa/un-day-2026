@@ -689,7 +689,10 @@ def _contact_cells(row: dict, kind: str) -> list[str]:
     amount = parse_rupees(row.get("amount") or "")
     if kind == "money":
         status = " · ".join(x for x in (row.get("pay_status") or "", row.get("notes") or "") if x)
-        return [parent, child, klass, _dash(rs(amount) if amount else ""), _dash(status), _dash(row.get("slip")), phone]
+        slip = row.get("slip") or ""
+        if slip.startswith("http"):
+            slip = "Uploaded"
+        return [parent, child, klass, _dash(rs(amount) if amount else ""), _dash(status), _dash(slip), phone]
     labels = list(row.get("labels") or []) + list(row.get("unlisted") or [])
     item = ", ".join(labels)
     if not item:
