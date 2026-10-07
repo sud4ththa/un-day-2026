@@ -13,6 +13,7 @@ Outputs:
                        Each stall also has a Download this stall link.
   <out>/report-pdf.js  browser script copied from scripts/dashboard-pdf.js.
                        It reads the rendered page only (no names, phones, or emails).
+  <out>/og.jpg         1200×630 link-preview image (branding and totals only)
   <out>/sheets/*.pdf   one PDF per stall, written only into this folder.
                        Page 1 is targets or money totals, with no names.
                        Page 2 is parent, child, class, item or amount, notes, phone.
@@ -28,6 +29,11 @@ and only inside this folder.
 
 "Last updated" is the time the published figures last changed, so re-running
 with the same data leaves data.json byte-for-byte unchanged.
+
+The page head includes Open Graph and Twitter tags so a shared link shows a
+preview. The preview image is redrawn from the same response and family
+totals; unchanged totals keep og.jpg byte-for-byte the same. The image and
+the preview text stay counts and event branding only.
 
 Usage:
   python3 scripts/build-dashboard.py --data-dir DIR --out FOLDER [--private FILE]
@@ -47,6 +53,8 @@ import sys
 import urllib.request
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
+
+from PIL import Image, ImageDraw, ImageFont
 
 ROOT = Path(__file__).resolve().parent.parent
 CONFIG = ROOT / "scripts" / "dashboard-stalls.json"
@@ -589,7 +597,118 @@ def stall_open(st: dict, pdf_name: str) -> str:
   <p class="sub">{esc(st["year_groups"])}</p>"""
 
 
-def render(data: dict, logos: dict, pdf_names: dict[str, str]) -> str:
+OG_FILE = "og.jpg"
+OG_W, OG_H = 1200, 630
+SHARE_TITLE = "BSC UN Day 2026 · Stall pledges"
+SERIF_ITALIC = str(Path(GEN.SERIF).with_name("LiberationSerif-Italic.ttf"))
+
+
+def totals_line(data: dict) -> str:
+    s = data["summary"]
+    return f"{num(s['responses'])} responses · {num(s['families'])} families"
+
+
+def share_description(data: dict) -> str:
+    return f"{totals_line(data)}. Friday 16 October 2026."
+
+
+def published_url(out: Path) -> str | None:
+    """Absolute page URL when --out is a folder inside this repo."""
+    try:
+        rel = out.resolve().relative_to(ROOT.resolve())
+    except ValueError:
+        return None
+    if not rel.parts:
+        return None
+    return f"{GEN.SITE}/{rel.as_posix()}/"
+
+
+def og_meta(data: dict, page: str) -> str:
+    """Link-preview tags. Counts and event branding only; no contact details."""
+    title = SHARE_TITLE
+    desc = share_description(data)
+    image = f"{page}{OG_FILE}"
+    alt = f"{title}. {totals_line(data)}."
+    fields = [
+        ("name", "description", desc),
+        ("property", "og:title", title),
+        ("property", "og:description", desc),
+        ("property", "og:image", image),
+        ("property", "og:image:type", "image/jpeg"),
+        ("property", "og:image:width", str(OG_W)),
+        ("property", "og:image:height", str(OG_H)),
+        ("property", "og:image:alt", alt),
+        ("property", "og:url", page),
+        ("property", "og:type", "website"),
+        ("name", "twitter:card", "summary_large_image"),
+        ("name", "twitter:title", title),
+        ("name", "twitter:description", desc),
+        ("name", "twitter:image", image),
+        ("name", "twitter:image:alt", alt),
+    ]
+    return "\n".join(f'<meta {attr}="{name}" content="{esc(value)}">' for attr, name, value in fields)
+
+
+def _playfair(size: int, weight: str) -> ImageFont.FreeTypeFont:
+    font = ImageFont.truetype(str(GEN.PLAYFAIR), size)
+    font.set_variation_by_name(weight)
+    return font
+
+
+def _measure(draw: ImageDraw.ImageDraw, text: str, font: ImageFont.FreeTypeFont, tracking: float = 0):
+    x = 0.0
+    left, top, right, bottom = 10**6, 10**6, -10**6, -10**6
+    for i, ch in enumerate(text):
+        l, t, r, b = draw.textbbox((x, 0), ch, font=font)
+        left, top = min(left, l), min(top, t)
+        right, bottom = max(right, r), max(bottom, b)
+        x += draw.textlength(ch, font=font)
+        if i < len(text) - 1:
+            x += tracking
+    return left, top, right, bottom
+
+
+def _draw_line(draw: ImageDraw.ImageDraw, ink_top: float, text: str, font: ImageFont.FreeTypeFont, fill, tracking: float = 0) -> float:
+    left, top, right, bottom = _measure(draw, text, font, tracking)
+    origin_x = (OG_W - (right - left)) / 2 - left
+    origin_y = ink_top - top
+    x = origin_x
+    for i, ch in enumerate(text):
+        draw.text((x, origin_y), ch, font=font, fill=fill)
+        x += draw.textlength(ch, font=font)
+        if i < len(text) - 1:
+            x += tracking
+    return ink_top + (bottom - top)
+
+
+def write_og_image(path: Path, data: dict) -> None:
+    """Plain 1200×630 card: school logos, the event, and the two headline totals."""
+    image = Image.new("RGB", (OG_W, OG_H), "white")
+    draw = ImageDraw.Draw(image)
+    ink = (17, 17, 17)
+    draw.rectangle((0, 0, OG_W - 1, 6), fill=ink)
+    GEN.paste_logo(image, GEN.BSC_LOGO, (48, 168, 236, 468))
+    GEN.paste_logo(image, GEN.PC_LOGO, (964, 186, 1152, 450))
+
+    kicker = ImageFont.truetype(GEN.SANS, 20)
+    title = _playfair(80, "SemiBold")
+    date = ImageFont.truetype(SERIF_ITALIC, 32)
+    stats = ImageFont.truetype(GEN.SANS, 24)
+    footer = ImageFont.truetype(GEN.SANS, 18)
+
+    y = 178.0
+    y = _draw_line(draw, y, "UN DAY 2026", kicker, ink, tracking=5) + 20
+    y = _draw_line(draw, y, "Stall pledges", title, ink) + 14
+    y = _draw_line(draw, y, "Friday 16 October", date, ink) + 22
+    rule = 64
+    draw.rectangle(((OG_W - rule) / 2, y, (OG_W + rule) / 2, y + 1), fill=ink)
+    y += 20
+    _draw_line(draw, y, totals_line(data), stats, ink)
+    _draw_line(draw, 578, "The British School in Colombo · PTC", footer, (68, 68, 68))
+    image.save(path, "JPEG", quality=85, optimize=True, subsampling=2)
+
+
+def render(data: dict, logos: dict, pdf_names: dict[str, str], page_url: str | None) -> str:
     s = data["summary"]
     tracking = data["tracking"] == "on"
     rows = []
@@ -697,6 +816,7 @@ def render(data: dict, logos: dict, pdf_names: dict[str, str]) -> str:
   {clicks_html}
 </section>""")
 
+    meta = (og_meta(data, page_url) + "\n") if page_url else ""
     return f"""<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -704,7 +824,7 @@ def render(data: dict, logos: dict, pdf_names: dict[str, str]) -> str:
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex">
 <meta name="referrer" content="no-referrer">
-<title>UN Day 2026 · Stall responses</title>
+{meta}<title>{esc(SHARE_TITLE)}</title>
 <style>{CSS}</style>
 </head>
 <body>
@@ -871,7 +991,10 @@ def main() -> None:
         model["filename"] = fname
         model["as_of"] = fmt_time(data["updated"])
         model["last_response"] = fmt_time(model.get("last_iso")) if model.get("last_iso") else "—"
-    page = render(data, logos, pdf_names)
+    page_url = published_url(out)
+    if page_url is None:
+        print("note: link-preview tags omitted; --out is outside the repo", file=sys.stderr)
+    page = render(data, logos, pdf_names, page_url)
     jtext = json.dumps(data, ensure_ascii=False, indent=2) + "\n"
     safe = json.dumps(json.loads(CONFIG.read_text(encoding="utf-8"))) + (ROOT / "forms.txt").read_text(encoding="utf-8") + CSS
     safe += " ".join(x["class"] for st in data["stalls"] for x in st["by_class"])
@@ -889,6 +1012,7 @@ def main() -> None:
     (out / "index.html").write_text(page, encoding="utf-8")
     (out / "report-pdf.js").write_text(pdf_js, encoding="utf-8")
     publish_sheets(out / "sheets", blobs)
+    write_og_image(out / OG_FILE, data)
     if args.private:
         Path(args.private).write_text(render_private(data, private, now), encoding="utf-8")
     s = data["summary"]
