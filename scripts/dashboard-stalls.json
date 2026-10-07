@@ -1,5 +1,5 @@
 {
-  "_comment": "Stalls on the dashboard. Menus are copied from the live Google Forms; refresh with python3 scripts/build-dashboard.py --update-menus. No personal data here. The response Sheets are private and are not referenced in the public repo. A menu option ending in '(N)' or '(N unit)' sets the quantity the stall needs. 'aliases' maps old option strings (from before a menu change) to the current option so earlier ticks still count. 'stall_managed' stalls run their own form and Sheet: the dashboard shows their short-link clicks only.",
+  "_comment": "Stalls on the dashboard. Menus are copied from the live Google Forms; refresh with python3 scripts/build-dashboard.py --update-menus. No personal data here. The response Sheets are private and are not referenced in the public repo. A menu option ending in '(N)' or '(N unit)' sets the quantity the stall needs. 'aliases' maps old option strings (from before a menu change) to the current option so earlier ticks still count. 'stall_managed' stalls run their own form and Sheet: the counts page shows their short-link clicks only. If a response file is in the data dir, it is used for that stall's PDF and the private list, not for the public counts. 'money_only' stalls have no food menu; their PDF is a money sheet.",
   "stalls": [
     {
       "slug": "sri-lanka",
@@ -53,6 +53,7 @@
     {
       "slug": "australia",
       "stall_managed": true,
+      "money_only": true,
       "form_id": null,
       "menu": [],
       "contribution_options": null
@@ -60,6 +61,7 @@
     {
       "slug": "sea",
       "stall_managed": true,
+      "money_only": true,
       "form_id": null,
       "menu": [],
       "contribution_options": null
