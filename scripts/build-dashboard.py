@@ -7,25 +7,31 @@ Inputs (all outside the repo, never committed):
   click counts                           JSON from the click logger's /exec URL
                                          (read from tracker.txt), or --clicks FILE
 
-Outputs:
+Outputs (counts page, safe to keep publishing):
   <out>/data.json      counts only
   <out>/index.html     counts page. Download all stalls is counts only.
-                       Each stall also has a Download this stall link.
   <out>/report-pdf.js  browser script copied from scripts/dashboard-pdf.js.
                        It reads the rendered page only (no names, phones, or emails).
   <out>/og.jpg         1200×630 link-preview image (branding and totals only)
-  <out>/sheets/*.pdf   one PDF per stall, written only into this folder.
+
+--contacts (signed-in site only; <out> must be outside this repo):
+  the files above, plus
+  <out>/sheets/*.pdf   one PDF per stall.
                        Page 1 is targets or money totals, with no names.
                        Page 2 is parent, child, class, item or amount, notes, phone.
-                       The dashboard path is already unlisted. These contacts are
-                       not copied to the marketing site, the email preview, or go/.
+  <out>/private-bundle.json
+                       marker so scripts/publish-dashboard.py will accept the folder.
+  Upload that folder with scripts/publish-dashboard.py. Do not commit it.
+  The counts page has no per-stall download, and this script deletes any
+  sheets/*.pdf left in a counts-page folder.
+
   --private FILE     optional local Markdown list for the PTC (names, classes,
                      items, notes, phones). Never write it inside the repo.
 
 data.json and index.html never contain parent names, phone numbers, emails,
 children's names or free-text notes. A check refuses to write them if any of
-those values would show on the counts page. The stall PDFs are the exception,
-and only inside this folder.
+those values would show on the counts page. Stall PDFs are the exception, and
+only in a --contacts folder outside the repo.
 
 "Last updated" is the time the published figures last changed, so re-running
 with the same data leaves data.json byte-for-byte unchanged.
@@ -37,7 +43,14 @@ the preview text stay counts and event branding only.
 
 Usage:
   python3 scripts/build-dashboard.py --data-dir DIR --out FOLDER [--private FILE]
-         [--clicks FILE] [--update-menus] [--now ISO]
+         [--clicks FILE] [--update-menus] [--now ISO] [--contacts]
+
+  Counts page (no contact PDFs):
+    python3 scripts/build-dashboard.py --data-dir DIR --out FOLDER
+
+  Signed-in site (contact PDFs). FOLDER must be outside the repo:
+    python3 scripts/build-dashboard.py --data-dir DIR --out /var/tmp/undash-private --contacts
+    python3 scripts/publish-dashboard.py /var/tmp/undash-private
 """
 from __future__ import annotations
 
@@ -587,12 +600,14 @@ a.pdf { display: inline-block; text-align: center; text-decoration: none; }
 """
 
 
-def stall_open(st: dict, pdf_name: str) -> str:
-    href = "sheets/" + pdf_name
+def stall_open(st: dict, pdf_name: str | None) -> str:
+    link = ""
+    if pdf_name:
+        href = "sheets/" + pdf_name
+        link = f'\n    <a class="pdf" href="{esc(href)}" download="{esc(pdf_name)}">Download this stall</a>'
     return f"""<section id="{esc(st["slug"])}">
   <div class="stall-head">
-    <h2>{GEN.heading(st["name"])}</h2>
-    <a class="pdf" href="{esc(href)}" download="{esc(pdf_name)}">Download this stall</a>
+    <h2>{GEN.heading(st["name"])}</h2>{link}
   </div>
   <p class="sub">{esc(st["year_groups"])}</p>"""
 
@@ -777,6 +792,10 @@ def render(data: dict, logos: dict, pdf_names: dict[str, str], page_url: str | N
             classes = ("<ul class=\"chips\">" + "".join(f'<li>{esc(x["class"])}<b>{x["count"]}</b></li>' for x in st["by_class"]) + "</ul>") if st["by_class"] else '<p class="note">No responses yet.</p>'
         else:
             classes = '<p class="note">Response sheet not connected yet.</p>'
+        follow_up = (
+            " Download this stall for the follow-up sheet when a response file was included in the build."
+            if pdf_names.get(st["slug"]) else ""
+        )
         if st["status"] == "stall_managed":
             if st["clicks"]:
                 ck = st["clicks"]
@@ -789,8 +808,8 @@ def render(data: dict, logos: dict, pdf_names: dict[str, str], page_url: str | N
             else:
                 clicks_html = '<p class="off">Click tracking off</p>'
             sections.append(f"""
-{stall_open(st, pdf_names[st["slug"]])}
-  <p class="note">Stall-managed form. The stall team keeps its own responses, so only short-link clicks are shown here. Download this stall for the follow-up sheet when a response file was included in the build.</p>
+{stall_open(st, pdf_names.get(st["slug"]))}
+  <p class="note">Stall-managed form. The stall team keeps its own responses, so only short-link clicks are shown here.{follow_up}</p>
   <h3>Short-link clicks</h3>
   {clicks_html}
 </section>""")
@@ -806,7 +825,7 @@ def render(data: dict, logos: dict, pdf_names: dict[str, str], page_url: str | N
         else:
             clicks_html = '<p class="off">Click tracking off</p>'
         sections.append(f"""
-{stall_open(st, pdf_names[st["slug"]])}
+{stall_open(st, pdf_names.get(st["slug"]))}
   <dl class="stats">{dl}</dl>
   <h3>Menu · {gaps} of {len(st["menu"])} with no pledge</h3>
   <ul class="bars">{bars}</ul>{need_note}{unlisted}
@@ -817,6 +836,11 @@ def render(data: dict, logos: dict, pdf_names: dict[str, str], page_url: str | N
 </section>""")
 
     meta = (og_meta(data, page_url) + "\n") if page_url else ""
+    closing = (
+        "Counts only on this page. Each stall PDF adds the contact list for PTC follow-up."
+        if pdf_names
+        else "Counts only. No names or phone numbers on this page."
+    )
     return f"""<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -853,7 +877,7 @@ def render(data: dict, logos: dict, pdf_names: dict[str, str], page_url: str | N
     {"".join(f'<p class="note">{esc(n)}</p>' for n in summary_notes)}
   </section>
   {"".join(sections)}
-  <p class="note sans">Counts only on this page. Each stall PDF adds the contact list for PTC follow-up, and that file stays in this folder.</p>
+  <p class="note sans">{closing}</p>
 </main>
 <footer>The British School in Colombo · PTC</footer>
 <script src="report-pdf.js"></script>
@@ -871,7 +895,7 @@ def md(s: str) -> str:
 def render_private(data: dict, private: list, now: datetime) -> str:
     out = [f"# UN Day 2026 · stall responses (PRIVATE, PTC only)", "",
            f"Generated {now.strftime('%a %-d %b %Y, %-I:%M %p')} (Colombo). Not for the public site.",
-           "The same contacts are in each stall PDF inside the dashboard folder. They are not on the counts page.", ""]
+           "The same contacts are in each stall PDF from a --contacts build. They are not on the counts page.", ""]
     for entry, rows in private:
         out.append(f"## {entry['name']} ({entry['year_groups']})")
         if not rows and entry["status"] == "stall_managed":
@@ -921,6 +945,37 @@ def assert_no_pii(texts: list[str], pii: set[str], safe: str) -> None:
         raise SystemExit(f"refusing to write: {len(leaks)} personal value(s) would appear on the public page")
 
 
+BUNDLE_MARKER = "private-bundle.json"
+
+
+def inside_repo(path: Path) -> bool:
+    try:
+        path.resolve().relative_to(ROOT.resolve())
+    except ValueError:
+        return False
+    return True
+
+
+def write_bundle_marker(path: Path) -> None:
+    path.write_text(
+        json.dumps({"kind": "stall-dashboard-private", "contacts": True}, indent=2) + "\n",
+        encoding="utf-8",
+    )
+
+
+def clear_contact_files(out: Path) -> None:
+    """Counts-page builds must not leave contact PDFs behind."""
+    sheets = out / "sheets"
+    if sheets.is_dir():
+        for old in sheets.glob("*.pdf"):
+            old.unlink()
+        if not any(sheets.iterdir()):
+            sheets.rmdir()
+    marker = out / BUNDLE_MARKER
+    if marker.exists():
+        marker.unlink()
+
+
 def publish_sheets(folder: Path, files: list[tuple[str, bytes]]) -> None:
     folder.mkdir(parents=True, exist_ok=True)
     keep = set()
@@ -961,19 +1016,26 @@ def update_menus() -> None:
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--data-dir", required=True)
-    ap.add_argument("--out", required=True, help="dashboard folder inside the repo")
+    ap.add_argument("--out", required=True, help="counts folder, or with --contacts a directory outside the repo")
     ap.add_argument("--private", help="local Markdown file for the PTC (keep it outside the repo)")
     ap.add_argument("--clicks", help="click counts JSON instead of asking the tracker")
     ap.add_argument("--update-menus", action="store_true", help="re-read the menus from the live forms first")
     ap.add_argument("--now", help="override the current time (ISO), for tests")
+    ap.add_argument("--contacts", action="store_true",
+                    help="also write per-stall contact PDFs; --out must be outside the repo")
     args = ap.parse_args()
 
     out = Path(args.out).resolve()
     if out == ROOT / "email-preview" or out == ROOT / "go" or out.parent == ROOT / "go":
         raise SystemExit("stall contacts are not written to the email preview or the public short links")
-    if args.private and ROOT in Path(args.private).resolve().parents:
+    if args.private and inside_repo(Path(args.private)):
         raise SystemExit("--private must be outside the repo")
-    if ROOT not in out.parents:
+    if args.contacts and inside_repo(out):
+        raise SystemExit(
+            "--contacts writes parent phone numbers into stall PDFs. "
+            "Choose a folder outside the repo, then upload it with scripts/publish-dashboard.py."
+        )
+    if not inside_repo(out):
         print("note: --out is outside the repo", file=sys.stderr)
     if args.update_menus:
         update_menus()
@@ -982,15 +1044,16 @@ def main() -> None:
     logos = {"bsc": GEN.logo_data(GEN.BSC_LOGO), "pc": GEN.logo_data(GEN.PC_LOGO, ink=True)}
     used_names: set[str] = set()
     pdf_names: dict[str, str] = {}
-    for model in sheets:
-        fname = SHEET.pdf_filename(model["name"], data["updated"])
-        if fname in used_names:
-            fname = fname[:-4] + f"-{model['slug']}.pdf"
-        used_names.add(fname)
-        pdf_names[model["slug"]] = fname
-        model["filename"] = fname
-        model["as_of"] = fmt_time(data["updated"])
-        model["last_response"] = fmt_time(model.get("last_iso")) if model.get("last_iso") else "—"
+    if args.contacts:
+        for model in sheets:
+            fname = SHEET.pdf_filename(model["name"], data["updated"])
+            if fname in used_names:
+                fname = fname[:-4] + f"-{model['slug']}.pdf"
+            used_names.add(fname)
+            pdf_names[model["slug"]] = fname
+            model["filename"] = fname
+            model["as_of"] = fmt_time(data["updated"])
+            model["last_response"] = fmt_time(model.get("last_iso")) if model.get("last_iso") else "—"
     page_url = published_url(out)
     if page_url is None:
         print("note: link-preview tags omitted; --out is outside the repo", file=sys.stderr)
@@ -1001,7 +1064,7 @@ def main() -> None:
     # Stall PDFs are intentionally not part of this check. Names and phones
     # stay out of data.json and index.html, including the email preview and go/.
     assert_no_pii([jtext, re.sub(r'src="data:[^"]+"', "", page)], pii, safe)
-    blobs = [(model["filename"], SHEET.render_pdf(model)) for model in sheets]
+    blobs = [(model["filename"], SHEET.render_pdf(model)) for model in sheets] if args.contacts else []
 
     out.mkdir(parents=True, exist_ok=True)
     pdf_js = (ROOT / "scripts" / "dashboard-pdf.js").read_text(encoding="utf-8")
@@ -1011,7 +1074,11 @@ def main() -> None:
     (out / "data.json").write_text(jtext, encoding="utf-8")
     (out / "index.html").write_text(page, encoding="utf-8")
     (out / "report-pdf.js").write_text(pdf_js, encoding="utf-8")
-    publish_sheets(out / "sheets", blobs)
+    if args.contacts:
+        publish_sheets(out / "sheets", blobs)
+        write_bundle_marker(out / BUNDLE_MARKER)
+    else:
+        clear_contact_files(out)
     write_og_image(out / OG_FILE, data)
     if args.private:
         Path(args.private).write_text(render_private(data, private, now), encoding="utf-8")

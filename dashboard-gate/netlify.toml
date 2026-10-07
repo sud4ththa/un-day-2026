@@ -1,0 +1,33 @@
+# Netlify site settings: base directory = dashboard-gate.
+# Publish only this directory's public/ folder. Do not publish the repository root.
+
+[build]
+  publish = "public"
+  command = "npm ci --omit=dev"
+
+[build.environment]
+  NODE_VERSION = "22"
+
+[functions]
+  directory = "netlify/functions"
+  node_bundler = "esbuild"
+  external_node_modules = ["@netlify/blobs"]
+
+# Rewrites keep the visitor URL. The function reads that path.
+[[redirects]]
+  from = "/api/*"
+  to = "/.netlify/functions/gate"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/view"
+  to = "/.netlify/functions/gate"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/view/*"
+  to = "/.netlify/functions/gate"
+  status = 200
+  force = true
