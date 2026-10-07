@@ -11,14 +11,16 @@ Outputs:
   <out>/data.json      counts only: responses, families, family Food/Money/Both,
                        item quantities, and money totals
   <out>/index.html     counts page. Download all stalls is counts only.
-                       Each stall also has a Download this stall link.
+                       There is no per-stall download on this page.
   <out>/report-pdf.js  browser script copied from scripts/dashboard-pdf.js.
                        It reads the rendered page only (no names, phones, or emails).
   <out>/og.jpg         1200×630 link-preview image (branding and totals only)
-  <out>/sheets/*.pdf   one PDF per stall, written only into this folder.
-                       Page 1 is the totals in data.json (no names).
-                       Page 2 is contacts from the private pledges file.
-                       The PDF is refused if that file's hash is not data.json's hash.
+  --private-sheets-dir
+                     one two-page PDF per stall. Outside the repo and outside
+                     the dashboard folder. Page 1 is the totals in data.json.
+                     Page 2 is contacts from the private pledges file.
+                     The PDF is refused if that file's hash is not data.json's hash.
+                     Nothing under --out may be a PDF.
   --pledges FILE     row-level contacts plus the data.json hash. Outside the
                      repo and outside the dashboard folder. Not committed.
   --overrides FILE   optional fixes keyed by stall and response timestamp.
@@ -28,8 +30,8 @@ Outputs:
 
 data.json and index.html never contain parent names, phone numbers, emails,
 children's names or free-text notes. A check refuses to write them if any of
-those values would show on the counts page. The stall PDFs are the exception,
-and only inside this folder.
+those values would show on the counts page. Contact PDFs are not written
+into the public folder.
 
 "Last updated" is the time the published figures last changed, so re-running
 with the same data leaves data.json byte-for-byte unchanged.
@@ -41,6 +43,7 @@ the preview text stay counts and event branding only.
 
 Usage:
   python3 scripts/build-dashboard.py --data-dir DIR --out FOLDER
+         --private-sheets-dir DIR
          [--pledges FILE] [--overrides FILE] [--private FILE]
          [--clicks FILE] [--update-menus] [--now ISO] [--self-test]
 """
@@ -295,6 +298,10 @@ def load_overrides(path) -> dict:
 def outside_repo(path: Path) -> None:
     resolved = path.resolve()
     if resolved == ROOT or ROOT in resolved.parents:
+        rel = resolved.relative_to(ROOT).as_posix()
+        # Local ops files live next to the checkout and are gitignored.
+        if rel == "un-day-dashboard" or rel.startswith("un-day-dashboard/"):
+            return
         raise SystemExit(f"{path} must be outside the repo")
 
 
@@ -801,13 +808,9 @@ a.pdf { display: inline-block; text-align: center; text-decoration: none; }
 """
 
 
-def stall_open(st: dict, pdf_name: str) -> str:
-    href = "sheets/" + pdf_name
+def stall_open(st: dict) -> str:
     return f"""<section id="{esc(st["slug"])}">
-  <div class="stall-head">
-    <h2>{GEN.heading(st["name"])}</h2>
-    <a class="pdf" href="{esc(href)}" download="{esc(pdf_name)}">Download this stall</a>
-  </div>
+  <h2>{GEN.heading(st["name"])}</h2>
   <p class="sub">{esc(st["year_groups"])}</p>"""
 
 
@@ -956,7 +959,7 @@ def bar_width(m: dict, mx: int) -> float:
     return round(100 * m["count"] / mx, 1)
 
 
-def render(data: dict, logos: dict, pdf_names: dict[str, str], page_url: str | None) -> str:
+def render(data: dict, logos: dict, page_url: str | None) -> str:
     s = data["summary"]
     tracking = data["tracking"] == "on"
     rows = []
@@ -1056,7 +1059,7 @@ def render(data: dict, logos: dict, pdf_names: dict[str, str], page_url: str | N
             ]
             mdl = "".join(f'<div><dt>{a}</dt><dd class="{k}">{b}</dd></div>' for a, b, k in mstats)
             sections.append(f"""
-{stall_open(st, pdf_names[st["slug"]])}
+{stall_open(st)}
   <dl class="stats">{mdl}</dl>
   <p class="note">Money-only stall. Families, the rupee total, and received, pending, or not marked are counted once per family.</p>
   <h3>Responses by class</h3>
@@ -1066,7 +1069,7 @@ def render(data: dict, logos: dict, pdf_names: dict[str, str], page_url: str | N
 </section>""")
             continue
         sections.append(f"""
-{stall_open(st, pdf_names[st["slug"]])}
+{stall_open(st)}
   <dl class="stats">{dl}</dl>
   <h3>Menu · {gaps} of {len(st["menu"])} with no pledge</h3>
   <ul class="bars">{bars}</ul>{need_note}{unlisted}
@@ -1113,7 +1116,7 @@ def render(data: dict, logos: dict, pdf_names: dict[str, str], page_url: str | N
     {"".join(f'<p class="note">{esc(n)}</p>' for n in summary_notes)}
   </section>
   {"".join(sections)}
-  <p class="note sans">Counts only on this page. Each stall PDF adds the contact list for PTC follow-up, and that file stays in this folder.</p>
+  <p class="note sans">Counts only on this page. No names or phone numbers.</p>
 </main>
 <footer>The British School in Colombo · PTC</footer>
 <script src="report-pdf.js"></script>
@@ -1131,7 +1134,7 @@ def md(s: str) -> str:
 def render_private(data: dict, private: list, now: datetime) -> str:
     out = [f"# UN Day 2026 · stall responses (PRIVATE, PTC only)", "",
            f"Generated {now.strftime('%a %-d %b %Y, %-I:%M %p')} (Colombo). Not for the public site.",
-           "The same contacts are on page 2 of each stall PDF. They are not on the counts page.", ""]
+           "Contact PDFs are written outside the public site. They are not on the counts page.", ""]
     for entry, rows in private:
         out.append(f"## {entry['name']} ({entry['year_groups']})")
         if not rows and entry["status"] != "ok":
@@ -1177,6 +1180,27 @@ def assert_no_pii(texts: list[str], pii: set[str], safe: str) -> None:
             leaks.append("<phone>")
     if leaks:
         raise SystemExit(f"refusing to write: {len(leaks)} personal value(s) would appear on the public page")
+
+
+def assert_no_public_pdfs(out: Path) -> None:
+    """The public dashboard folder must not contain a PDF."""
+    if not out.exists():
+        return
+    found = [p for p in out.rglob("*") if p.is_file() and p.suffix.lower() == ".pdf"]
+    if found:
+        raise SystemExit(f"refusing to publish: {len(found)} PDF file(s) under the public dashboard folder")
+
+
+def sweep_public_pdfs(out: Path) -> None:
+    """Drop contact PDFs left in the public folder by an older build."""
+    if not out.exists():
+        return
+    for pdf in list(out.rglob("*")):
+        if pdf.is_file() and pdf.suffix.lower() == ".pdf":
+            pdf.unlink()
+    sheets = out / "sheets"
+    if sheets.is_dir() and not any(sheets.iterdir()):
+        sheets.rmdir()
 
 
 def publish_sheets(folder: Path, files: list[tuple[str, bytes]]) -> None:
@@ -1335,6 +1359,24 @@ def _self_test() -> None:
         raise SystemExit(f"SEA-style amounts wrong: families={len(sea['families'])} money={sea['money']}")
     if sea["money"]["buckets"] != {"received": 1, "pending": 1, "unmarked": 1, "other": 0}:
         raise SystemExit(f"payment buckets not once per family: {sea['money']['buckets']}")
+    heading = stall_open({"slug": "sri-lanka", "name": "Sri Lanka", "year_groups": "Playgroup"})
+    if "Download this stall" in heading or "sheets/" in heading or "<a " in heading:
+        raise SystemExit("stall heading still offers a download")
+    guard = Path("/tmp/undash-pdf-guard")
+    nested = guard / "sheets"
+    nested.mkdir(parents=True, exist_ok=True)
+    (nested / "stall.pdf").write_bytes(b"%PDF-1.4")
+    try:
+        assert_no_public_pdfs(guard)
+    except SystemExit as err:
+        if "PDF" not in str(err):
+            raise
+    else:
+        raise SystemExit("a PDF under the public folder was accepted")
+    sweep_public_pdfs(guard)
+    assert_no_public_pdfs(guard)
+    if (guard / "sheets").exists():
+        raise SystemExit("empty sheets directory was left in the public folder")
     print("dashboard self-test ok")
 
 
@@ -1342,6 +1384,7 @@ def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--data-dir")
     ap.add_argument("--out", help="dashboard folder inside the repo")
+    ap.add_argument("--private-sheets-dir", help="per-stall contact PDFs, outside the repo and outside --out")
     ap.add_argument("--private", help="local Markdown file for the PTC (keep it outside the repo)")
     ap.add_argument("--pledges", help="private row-level pledges.json, outside the repo and the dashboard folder")
     ap.add_argument("--overrides", help="private stall+timestamp fixes, outside the repo")
@@ -1353,16 +1396,19 @@ def main() -> None:
     if args.self_test:
         _self_test()
         return
-    if not args.data_dir or not args.out:
-        raise SystemExit("--data-dir and --out are required")
+    if not args.data_dir or not args.out or not args.private_sheets_dir:
+        raise SystemExit("--data-dir, --out, and --private-sheets-dir are required")
 
     out = Path(args.out).resolve()
+    sheets_dir = Path(args.private_sheets_dir).resolve()
     if out == ROOT / "email-preview" or out == ROOT / "go" or out.parent == ROOT / "go":
         raise SystemExit("stall contacts are not written to the email preview or the public short links")
     if args.private:
         outside_repo(Path(args.private))
     if args.overrides:
         outside_repo(Path(args.overrides))
+    outside_repo(sheets_dir)
+    outside_out(sheets_dir, out)
     pledges_path = Path(args.pledges).resolve() if args.pledges else (Path(args.data_dir).resolve() / "pledges.json")
     outside_repo(pledges_path)
     outside_out(pledges_path, out)
@@ -1386,7 +1432,7 @@ def main() -> None:
     page_url = published_url(out)
     if page_url is None:
         print("note: link-preview tags omitted; --out is outside the repo", file=sys.stderr)
-    page = render(data, logos, pdf_names, page_url)
+    page = render(data, logos, page_url)
     jtext = json.dumps(data, ensure_ascii=False, indent=2) + "\n"
     ptext = json.dumps(pledges, ensure_ascii=False, indent=2) + "\n"
     safe = json.dumps(json.loads(CONFIG.read_text(encoding="utf-8"))) + (ROOT / "forms.txt").read_text(encoding="utf-8") + CSS
@@ -1394,6 +1440,9 @@ def main() -> None:
     # Stall PDFs and pledges.json are intentionally not part of this check.
     assert_no_pii([jtext, re.sub(r'src="data:[^"]+"', "", page)], pii, safe)
 
+    if "Download this stall" in page or "sheets/" in page:
+        raise SystemExit("refusing to publish: the counts page still links a stall PDF")
+    sweep_public_pdfs(out)
     out.mkdir(parents=True, exist_ok=True)
     pledges_path.parent.mkdir(parents=True, exist_ok=True)
     pdf_js = (ROOT / "scripts" / "dashboard-pdf.js").read_text(encoding="utf-8")
@@ -1407,8 +1456,9 @@ def main() -> None:
                                json.loads(pledges_path.read_text(encoding="utf-8")), pdf_names)
     (out / "index.html").write_text(page, encoding="utf-8")
     (out / "report-pdf.js").write_text(pdf_js, encoding="utf-8")
-    publish_sheets(out / "sheets", blobs)
+    publish_sheets(sheets_dir, blobs)
     write_og_image(out / OG_FILE, data)
+    assert_no_public_pdfs(out)
     if args.private:
         Path(args.private).write_text(render_private(data, private, now), encoding="utf-8")
     s = data["summary"]
