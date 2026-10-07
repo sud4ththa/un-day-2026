@@ -1,5 +1,5 @@
 {
-  "_comment": "Stalls on the dashboard. Menus are copied from the live Google Forms; refresh with python3 scripts/build-dashboard.py --update-menus. No personal data here. The response Sheets are private and are not referenced in the public repo. A menu option ending in '(N)' or '(N unit)' sets the quantity the stall needs. 'aliases' maps old option strings (from before a menu change) to the current option so earlier ticks still count. 'stall_managed' stalls run their own form and Sheet: the counts page shows their short-link clicks only. If a response file is in the data dir, it is used for that stall's PDF and the private list, not for the public counts. 'money_only' stalls have no food menu; their PDF is a money sheet.",
+  "_comment": "Stalls on the dashboard. Menus are copied from the live Google Forms; refresh with python3 scripts/build-dashboard.py --update-menus. No personal data here. The response Sheets are private and are not referenced here. A menu option ending in '(N)' or '(N unit)' sets the quantity the stall needs. 'aliases' maps an old option to one still on the menu, including closed items. 'closed' options have left the live form; they stay listed so targets and pledges are still counted. 'money_only' stalls have no food menu. The page shows families, the rupee total, and how many are received, pending, or not marked.",
   "stalls": [
     {
       "slug": "sri-lanka",
@@ -24,7 +24,11 @@
         "Coconut roti (50)",
         "King coconut (100)",
         "Kesari (75)",
-        "Laddu (75)"
+        "Laddu (75)",
+        "Milk toffee (100)",
+        "Coconut toffee (50)",
+        "Thala karali (100)",
+        "Fish bun, please order from Paan Paan (75)"
       ],
       "aliases": {
         "Milk rice": "Milk rice with lunu miris (200)",
@@ -33,6 +37,12 @@
         "Mini pol roti": "Coconut roti (50)",
         "King coconut water": "King coconut (100)"
       },
+      "closed": [
+        "Milk toffee (100)",
+        "Coconut toffee (50)",
+        "Thala karali (100)",
+        "Fish bun, please order from Paan Paan (75)"
+      ],
       "contribution_options": [
         "Food",
         "Monetary contribution",
@@ -41,24 +51,33 @@
     },
     {
       "slug": "japan",
-      "stall_managed": true,
-      "form_id": null,
-      "menu": [],
-      "contribution_options": null
+      "form_id": "1FAIpQLSejLTZy1IY5mP0vJQVmJ0EGA1nyDUo52Tb9a8FHfILUKVA-VA",
+      "menu": [
+        "Veg sushi rolls",
+        "Yakisoba noodles",
+        "Teriyaki chicken",
+        "Chicken karaage",
+        "Matcha cookies",
+        "Mochi",
+        "Senbei (rice crackers)"
+      ],
+      "contribution_options": [
+        "Food",
+        "Monetary contribution",
+        "Both"
+      ]
     },
     {
       "slug": "australia",
-      "stall_managed": true,
       "money_only": true,
-      "form_id": null,
+      "form_id": "1FAIpQLSeEzVmQ18AtKSQkQksahvEFvqJf704HAKDWoP8-EzlIboJSLA",
       "menu": [],
       "contribution_options": null
     },
     {
       "slug": "sea",
-      "stall_managed": true,
       "money_only": true,
-      "form_id": null,
+      "form_id": "1FAIpQLScL5gSvF4bCIXgwcGgXYYWU-afcbHhYLnfAHHNA8jlVmbzEgQ",
       "menu": [],
       "contribution_options": null
     },
@@ -166,10 +185,37 @@
     },
     {
       "slug": "maldives",
-      "stall_managed": true,
-      "form_id": null,
-      "menu": [],
-      "contribution_options": null
+      "form_id": "1FAIpQLSdqx6KmESJB1HxpgVL_sf3jnUBjVyT7XADVt9NkOGog5gWEwA",
+      "menu": [
+        "Bajiya",
+        "Foni Gulha",
+        "Gulha",
+        "Mas Bai",
+        "Juice Petty",
+        "Dhandi Aluvi Bokiba"
+      ],
+      "contribution_options": [
+        "Food",
+        "Money",
+        "Both"
+      ]
+    },
+    {
+      "slug": "un-zone",
+      "form_id": "1FAIpQLSfeLByxwbI0-s0lV_7jbWmvD7kuaubMU7l-vNZ2gpSeDqKmMw",
+      "menu": [
+        "Mini chicken shawarma",
+        "Mini kebabs",
+        "Mini falafel wraps",
+        "Hummus",
+        "Palestinian Eclair",
+        "Mini iced-Palestinian flag cookies"
+      ],
+      "contribution_options": [
+        "Food",
+        "Monetary contribution",
+        "Both"
+      ]
     }
   ]
 }
