@@ -1,5 +1,6 @@
-/* Builds a PDF of the stall dashboard from the counts already on the page.
-   No network calls. Names, phone numbers, and emails are not read. */
+/* Builds the all-stalls PDF from the counts already on the page.
+   No network calls. Names, phone numbers, and emails are not read.
+   Per-stall sheets, which do include contacts, are written by scripts/stall_sheet.py. */
 (function () {
   "use strict";
 
@@ -610,16 +611,27 @@
   };
 
   Layout.prototype.renderSection = function (section) {
-    var hasH2 = false;
+    var nodes = [];
     for (var i = 0; i < section.children.length; i++) {
-      if (section.children[i].tagName === "H2") hasH2 = true;
+      var el = section.children[i];
+      if (el.classList && el.classList.contains("stall-head")) {
+        for (var k = 0; k < el.children.length; k++) {
+          if (el.children[k].tagName === "H2") nodes.push(el.children[k]);
+        }
+      } else {
+        nodes.push(el);
+      }
+    }
+    var hasH2 = false;
+    for (var n = 0; n < nodes.length; n++) {
+      if (nodes[n].tagName === "H2") hasH2 = true;
     }
     if (!hasH2) {
       this.gap(2);
       this.hline(MARGIN_X, MARGIN_X + CONTENT_W, this.y, INK, 1);
       this.gap(8);
     }
-    for (var j = 0; j < section.children.length; j++) this.renderBlock(section.children[j]);
+    for (var j = 0; j < nodes.length; j++) this.renderBlock(nodes[j]);
   };
 
   Layout.prototype.finish = function (school) {
