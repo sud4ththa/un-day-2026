@@ -93,6 +93,17 @@ def _rupees_from_token(whole: str, frac: str | None) -> int | None:
     return int(num.quantize(Decimal("1"), rounding=ROUND_HALF_UP))
 
 
+_K_AMOUNT = re.compile(r"(?<![\w.])(?:rs\.?|lkr)?\s*(\d{1,3}(?:\.\d)?)\s*k\b", re.I)
+
+
+def k_rupees(text: str) -> int | None:
+    """Shorthand like 'Rs5k' or '7.5K' in thousands."""
+    m = _K_AMOUNT.search(str(text or ""))
+    if not m:
+        return None
+    return _rupees_from_token(str(int(Decimal(m.group(1)) * 1000)), None)
+
+
 def parse_rupees(raw: str) -> int | None:
     """First rupee amount in an amount cell.
 
@@ -102,6 +113,9 @@ def parse_rupees(raw: str) -> int | None:
     text = str(raw or "")
     if not text.strip():
         return None
+    k = k_rupees(text)
+    if k is not None:
+        return k
     for match in _RUPEE_TOKEN.finditer(text):
         val = _rupees_from_token(match.group(1), match.group(2))
         if val is not None:
@@ -112,6 +126,9 @@ def parse_rupees(raw: str) -> int | None:
 def money_from_notes(text: str) -> int | None:
     """A stated amount in free text. Piece and weight notes are not money."""
     raw = str(text or "")
+    k = k_rupees(raw)
+    if k is not None:
+        return k
     for match in _RUPEE_TOKEN.finditer(raw):
         if _UNIT_AFTER.match(raw[match.end():]):
             continue
@@ -431,6 +448,8 @@ class Doc:
         self.y = 0.0
         self.kind = "glance"
         self.blank = True
+        self.pad = 7.0
+        self.lead = 1.3
 
     def cmd(self, s: str) -> None:
         self.ops.append(s)
@@ -534,9 +553,9 @@ class Doc:
     def draw_row(self, cells: list[str], col_w: list[float], font: str, size: float, *, header: bool = False, muted: bool = False, right: set[int] | None = None) -> None:
         right = right or set()
         wrapped = self.row_lines(cells, col_w, font, size)
-        line_h = size * 1.3
+        line_h = size * self.lead
         n = max(len(lines) for lines in wrapped)
-        h = n * line_h + 7
+        h = n * line_h + self.pad
         self.ensure(h)
         if header:
             self.hline(MARGIN_X, MARGIN_X + self.content_w, self.y, INK, 0.8)
@@ -552,7 +571,7 @@ class Doc:
                 tx = x + col_w[c] - 3 - tw if align_right else x + 3
                 if tx < x:
                     tx = x
-                self.text(line, tx, top - 4 - size * 0.75 - li * line_h, size=size, font=font, color=color)
+                self.text(line, tx, top - self.pad * 4 / 7 - size * 0.75 - li * line_h, size=size, font=font, color=color)
             x += col_w[c]
         self.y = top - h
         rule = INK if header else HAIR
@@ -569,7 +588,7 @@ class Doc:
         drawn_header = True
         for i, cells in enumerate(rows):
             wrapped = self.row_lines(cells, col_w, "F1", size)
-            h = max(len(lines) for lines in wrapped) * size * 1.3 + 7
+            h = max(len(lines) for lines in wrapped) * size * self.lead + self.pad
             if self.y - h < BOTTOM and not (drawn_header and i == 0 and self.y > self.h - 120):
                 self.start(self.w, self.h, self.kind, continuation=True)
                 draw_head()
@@ -669,7 +688,8 @@ def _contact_cells(row: dict, kind: str) -> list[str]:
     notes = _dash(row.get("notes"))
     amount = parse_rupees(row.get("amount") or "")
     if kind == "money":
-        return [parent, child, klass, _dash(rs(amount) if amount else ""), _dash(row.get("pay_status")), _dash(row.get("slip")), phone]
+        status = " · ".join(x for x in (row.get("pay_status") or "", row.get("notes") or "") if x)
+        return [parent, child, klass, _dash(rs(amount) if amount else ""), _dash(status), _dash(row.get("slip")), phone]
     labels = list(row.get("labels") or []) + list(row.get("unlisted") or [])
     item = ", ".join(labels)
     if not item:
@@ -878,10 +898,24 @@ def _contacts(doc: Doc, model: dict) -> None:
         headers = ["Parent", "Child", "Class", "Item(s) / amount", "Notes", "Phone"]
         width = doc.content_w
         cols = [110, 110, 78, 160, width - 110 - 110 - 78 - 160 - 96, 96]
-    doc.table(headers, [_contact_cells(r, kind) for r in contacts], cols, size=8)
+    rows = [_contact_cells(r, kind) for r in contacts]
+    # Keep the contacts on one landscape page: shrink type and row padding step by step.
+    size = 8
+    head = [h.upper() for h in headers]
+    for size, pad, lead in [(8, 7, 1.3), (7.5, 5, 1.2), (7, 4, 1.15), (6.5, 3.5, 1.12), (6, 3, 1.1)]:
+        doc.pad, doc.lead = pad, lead
+        need = max(len(x) for x in doc.row_lines(head, cols, "F2", 7.5)) * 7.5 * lead + pad
+        need += sum(max(len(x) for x in doc.row_lines(r, cols, "F1", size)) * size * lead + pad for r in rows)
+        if doc.y - need >= BOTTOM:
+            break
+    doc.table(headers, rows, cols, size=size)
+    doc.pad, doc.lead = 7.0, 1.3
 
 
 def _self_test() -> None:
+    assert money_from_notes("Transferred Rs5k to Natasha") == 5000
+    assert parse_rupees("7.5K") == 7500 and parse_rupees("Rs 5,000") == 5000
+    assert money_from_notes("1kg") is None and money_from_notes("500g pack") is None
     # "10,000.00" is ten thousand. Stripping every non-digit yields a million.
     assert parse_rupees("10,000.00") == 10000
     assert parse_rupees("5,000") == 5000
