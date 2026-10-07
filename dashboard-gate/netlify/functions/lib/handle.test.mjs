@@ -1,6 +1,6 @@
 import assert from "node:assert/strict"
 import test from "node:test"
-import { COOKIE_NAME, readCookie } from "./auth.mjs"
+import { COOKIE_NAME, readCookie, signSession } from "./auth.mjs"
 import { handle } from "./handle.mjs"
 
 const PHONES = {
@@ -164,7 +164,9 @@ test("an approved code sets a twelve-hour cookie and unlocks the files", async (
   const page = await handle(request("/view/", { cookie }), gate)
   assert.equal(page.status, 200)
   const html = await page.text()
-  assert.match(html, /FIGURES-42/)
+  assert.match(html, /Stall responses/)
+  assert.match(html, /Refresh now/)
+  assert.equal(html.includes("FIGURES-42"), false)
   assert.match(html, /<base href="\/view\/">/)
   assert.match(page.headers.get("cache-control"), /no-store/)
 
@@ -181,6 +183,27 @@ test("an approved code sets a twelve-hour cookie and unlocks the files", async (
 
   const session = await handle(request("/api/session", { cookie }), gate)
   assert.deepEqual(await session.json(), { ok: true, name: "Sudaththa" })
+})
+
+test("refresh now requires the signed-in session", async () => {
+  let calls = 0
+  const gate = deps({
+    refresh: async () => {
+      calls += 1
+      return { ok: true }
+    },
+  })
+  const locked = await handle(request("/api/refresh", { method: "POST" }), gate)
+  assert.equal(locked.status, 401)
+  assert.equal(calls, 0)
+  assertNoPhones(await locked.text())
+
+  const exp = Math.floor(gate.now() / 1000) + 3600
+  const cookie = `${COOKIE_NAME}=${signSession("zainab", exp, ENV.SESSION_SECRET)}`
+  const ok = await handle(request("/api/refresh", { method: "POST", cookie }), gate)
+  assert.equal(ok.status, 200)
+  assert.deepEqual(await ok.json(), { ok: true })
+  assert.equal(calls, 1)
 })
 
 test("sign-in is refused when Twilio is not configured", async () => {

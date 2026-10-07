@@ -1,5 +1,6 @@
 import { getStore } from "@netlify/blobs"
 import { handle } from "./lib/handle.mjs"
+import { refreshDashboard } from "./lib/refresh.mjs"
 
 // Keep in step with scripts/publish-dashboard.py (store name, site: prefix, region).
 export const STORE_NAME = "stall-dashboard"
@@ -13,6 +14,7 @@ export default async (req, context) => {
     fetch: globalThis.fetch,
     ip: context?.ip || "",
     now: () => Date.now(),
+    refresh: (opts) => refreshDashboard({ ...opts, fetch: opts.fetch || globalThis.fetch }),
   })
 }
 

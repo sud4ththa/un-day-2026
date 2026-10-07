@@ -1,16 +1,20 @@
-# Stall dashboard sign-in
+# Stall dashboard
 
-The counts page and the per-stall contact PDFs are served only after an SMS code.
-Three people can sign in: Sudaththa, Subraja, and Zainab. Each code goes to that
-person's mobile through Twilio Verify. A successful code lasts 12 hours.
+This Netlify site is the stall dashboard. Counts, `data.json`, and the per-stall
+PDFs (page 1 totals, page 2 names and phones) are written by a scheduled
+function into a private blob store. They are served only after an SMS code.
 
-The login page in `public/` is the only file this Netlify site publishes.
-`data.json`, the counts HTML, and `sheets/*.pdf` are not in the site publish
-directory and are not committed. A function reads them from a Netlify Blobs
-store after it has checked the session cookie.
+Three people can sign in: Sudaththa, Subraja, and Zainab. Each code goes to
+that person's mobile through Twilio Verify. A successful code lasts 12 hours.
+
+The login page in `public/` is the only file this site publishes. Nothing with
+names is a static file. A function checks the session cookie, then reads the
+blobs.
 
 Phone numbers stay in Netlify environment variables. The browser receives a
 masked number (`+94` and the last two digits).
+
+Sheet ids stay in `STALL_SHEETS`. Do not commit them. This repository is public.
 
 ## 1. Twilio
 
@@ -19,72 +23,57 @@ masked number (`+94` and the last two digits).
 3. Enable Sri Lanka (`+94`) for SMS geo permissions if the account restricts destinations.
 4. Copy the Verify **Service SID** (`VA…`).
 
-## 2. Netlify site
+## 2. Google Sheets
 
-Create a new site from this repository. Do not reuse the food-portal site.
+1. In Google Cloud, create or choose a project.
+2. Enable the **Google Sheets API** for that project.
+3. Create a service account (IAM → Service accounts).
+4. Add a JSON key for that account.
+5. Copy the service account email (`client_email` in the key). It looks like `something@project.iam.gserviceaccount.com`.
+6. Share each stall **response** spreadsheet with that email as **Viewer**. These are the 11 sheets behind the forms, not the public form links:
+
+   Sri Lanka, Japan, Australia/NZ/Philippines/Indonesia, Singapore/Malaysia/Vietnam/Thailand, India, USA/Canada, Europe, Middle East, China, Maldives, UN Zone / Palestine.
+
+The function reads with the key in `GOOGLE_SA_KEY_JSON`. If one sheet cannot be read, that stall keeps its last good counts and PDF. The log line is only the stall key (`sri-lanka`, `japan`, …). Names, phones, and emails are not logged.
+
+## 3. Netlify site
+
+Create a new site from this repository. Do not reuse another site, and do not publish the repository root.
 
 | Setting | Value |
 | --- | --- |
 | Base directory | `dashboard-gate` |
-| Build command | `npm ci --omit=dev` (already in `netlify.toml`) |
+| Build command | `node scripts/vendor-config.mjs && npm ci --omit=dev` |
 | Publish directory | `public` |
 | Functions directory | `netlify/functions` |
 | Node version | 22 |
 
-The publish directory must stay `dashboard-gate/public`. Publishing the
-repository root would put the counts page on this host without the gate.
-
-Set every variable below to the **Production** scope only, so deploy previews
-cannot send texts:
+Set every variable below to the **Production** scope only, so deploy previews cannot send texts or read the sheets. Scheduled functions run on production deploys only.
 
 | Variable | Value |
 | --- | --- |
-| `TWILIO_ACCOUNT_SID` | Account SID |
-| `TWILIO_AUTH_TOKEN` | Auth token |
+| `TWILIO_ACCOUNT_SID` | Twilio Account SID |
+| `TWILIO_AUTH_TOKEN` | Twilio Auth Token |
 | `TWILIO_VERIFY_SERVICE_SID` | Verify service SID (`VA…`) |
 | `PHONE_SUDATHTHA` | E.164, Sri Lanka, for Sudaththa |
 | `PHONE_SUBRAJA` | E.164, Sri Lanka, for Subraja |
 | `PHONE_ZAINAB` | E.164, Sri Lanka, for Zainab |
 | `SESSION_SECRET` | `openssl rand -base64 32` (at least 32 characters) |
+| `GOOGLE_SA_KEY_JSON` | The entire service-account JSON key, one line is fine |
+| `STALL_SHEETS` | JSON map of stall key to spreadsheet id and tab gid. Example shape, with placeholders only: `{"sri-lanka":{"id":"SHEET_ID","gid":0},"japan":{"id":"SHEET_ID","gid":0},"australia":{"id":"SHEET_ID","gid":0},"sea":{"id":"SHEET_ID","gid":0},"india":{"id":"SHEET_ID","gid":0},"americas":{"id":"SHEET_ID","gid":0},"europe":{"id":"SHEET_ID","gid":0},"middle-east":{"id":"SHEET_ID","gid":0},"china":{"id":"SHEET_ID","gid":0},"maldives":{"id":"SHEET_ID","gid":0},"un-zone":{"id":"SHEET_ID","gid":0}}` |
 
-Copy the site's **Project ID** from Project configuration → General → Project
-information. That value is `NETLIFY_SITE_ID` on the build machine.
+`gid` is the numeric tab id from the sheet URL (`#gid=`). Use `0` for the first tab.
 
-Create a personal access token (User settings → Applications) that can update
-this site. That value is `NETLIFY_AUTH_TOKEN` on the build machine. It is not
-a Netlify environment variable.
+After the first production deploy, the function `refresh-scheduled` runs at
+07 and 37 minutes past each hour from 01:00 through 16:00 UTC. That is about
+every 30 minutes from 07:07 to 22:07 Asia/Colombo. A run that would fall at
+06:37 Colombo is skipped. The minutes are off the hour on purpose.
 
-## 3. Hourly upload from the build machine
+Anyone signed in can press **Refresh now**. That is `POST /api/refresh` with
+the session cookie. A second refresh inside a minute is refused.
 
-Response files stay on the machine, outside the repo. The contact bundle also
-stays outside the repo. `--contacts` refuses a folder inside the repo.
-
-```bash
-export NETLIFY_AUTH_TOKEN="the personal access token"
-export NETLIFY_SITE_ID="the project id"
-
-python3 scripts/build-dashboard.py \
-  --data-dir /path/to/response-files \
-  --out /var/tmp/undash-private \
-  --contacts
-
-python3 scripts/publish-dashboard.py /var/tmp/undash-private
-```
-
-`publish-dashboard.py` writes the bundle into the site-wide blob store
-`stall-dashboard` in region `us-east-2`, using:
-
-`PUT https://api.netlify.com/api/v1/blobs/$NETLIFY_SITE_ID/site:stall-dashboard/<key>?region=us-east-2`
-
-with `Authorization: Bearer $NETLIFY_AUTH_TOKEN` and
-`Accept: application/json;type=signed-url`, then `PUT` of the file bytes to
-the returned URL. It then deletes stored keys that this build no longer has
-(yesterday's PDFs). The gate function opens the same store with
-`getStore({ name: "stall-dashboard", region: "us-east-2" })`.
-
-The counts-only refresh that is still committed can keep running **without**
-`--contacts`. That command does not write contact PDFs, and it removes any
-`sheets/*.pdf` left in its output folder.
+Counts and PDFs land in the site blob store `stall-dashboard` (`us-east-2`).
+There is no hourly job on a build machine.
 
 ## What the gate allows
 
@@ -92,3 +81,4 @@ The counts-only refresh that is still committed can keep running **without**
 - 3 texts per person and 8 per IP address, each per 15 minutes.
 - 10 code checks per person per 15 minutes. Twilio's own limits still apply.
 - `GET /view/…` only with a valid cookie. Anything else is redirected to the sign-in page and the file is not in the response.
+- `POST /api/refresh` only with a valid cookie.

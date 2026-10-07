@@ -3,7 +3,7 @@
 
 [build]
   publish = "public"
-  command = "npm ci --omit=dev"
+  command = "node scripts/vendor-config.mjs && npm ci --omit=dev"
 
 [build.environment]
   NODE_VERSION = "22"
@@ -31,3 +31,8 @@
   to = "/.netlify/functions/gate"
   status = 200
   force = true
+
+# 07:07–22:07 Asia/Colombo, every 30 minutes, off the hour. The function
+# skips the 06:37 Colombo run that this UTC window also includes.
+[functions."refresh-scheduled"]
+  schedule = "7,37 1-16 * * *"

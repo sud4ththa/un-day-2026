@@ -6,7 +6,6 @@ import {
   VERIFY_LIMIT,
   WINDOW_MS,
   allowStamp,
-  decorateDashboard,
   ipHash,
   maskPhone,
   normalizePhone,
@@ -18,6 +17,7 @@ import {
   signSession,
   viewKey,
 } from "./auth.mjs"
+import { dashboardShell } from "./shell.mjs"
 
 const TWILIO_VARS = ["TWILIO_ACCOUNT_SID", "TWILIO_AUTH_TOKEN", "TWILIO_VERIFY_SERVICE_SID"]
 
@@ -214,6 +214,29 @@ async function verifyCode(req, deps) {
   })
 }
 
+async function refreshNow(req, deps) {
+  const session = currentSession(req, deps.env, deps.now())
+  if (!session) return json(401, { ok: false, error: "Sign in again." })
+  if (!deps.refresh) return json(500, { ok: false, error: "Refresh is not set up yet." })
+  let result
+  try {
+    result = await deps.refresh({
+      manual: true,
+      env: deps.env,
+      store: deps.dashboard,
+      fetch: deps.fetch,
+      now: new Date(deps.now()),
+      log: (slug) => console.error(slug),
+    })
+  } catch (err) {
+    console.error("refresh failed", err && err.name)
+    return json(500, { ok: false, error: "The refresh could not finish. Try again in a minute." })
+  }
+  if (result?.retry) return json(429, { ok: false, error: "A refresh just ran. Wait a minute." })
+  if (!result?.ok) return json(500, { ok: false, error: "The refresh could not finish. Try again in a minute." })
+  return json(200, { ok: true })
+}
+
 function sessionInfo(req, deps) {
   const session = currentSession(req, deps.env, deps.now())
   if (!session) return json(401, { ok: false })
@@ -240,6 +263,9 @@ async function serveAsset(req, deps, key) {
       headers: { location: "/", "cache-control": "no-store" },
     })
   }
+  if (key === "index.html") {
+    return new Response(dashboardShell(), { status: 200, headers: privateHeaders(key) })
+  }
   let data
   try {
     const type = key.endsWith(".pdf") || key.endsWith(".jpg") ? "arrayBuffer" : "text"
@@ -252,18 +278,12 @@ async function serveAsset(req, deps, key) {
     })
   }
   if (data == null) {
-    const missing = key === "index.html"
-      ? "The stall dashboard has not been uploaded yet."
-      : "That file is not on the dashboard."
-    return new Response(missing, {
-      status: key === "index.html" ? 503 : 404,
+    return new Response("That file is not on the dashboard.", {
+      status: 404,
       headers: { "content-type": "text/plain; charset=utf-8", "cache-control": "no-store" },
     })
   }
   const headers = privateHeaders(key)
-  if (key === "index.html") {
-    return new Response(decorateDashboard(data), { status: 200, headers })
-  }
   const bytes = typeof data === "string" ? data : data
   return new Response(bytes, { status: 200, headers })
 }
@@ -276,6 +296,7 @@ export async function handle(req, deps) {
     if (path === "/api/verify" && method === "POST") return await verifyCode(req, deps)
     if (path === "/api/session" && method === "GET") return sessionInfo(req, deps)
     if (path === "/api/logout" && (method === "GET" || method === "POST")) return logout(req)
+    if (path === "/api/refresh" && method === "POST") return await refreshNow(req, deps)
     if (method === "GET" || method === "HEAD") {
       const key = viewKey(path)
       if (key) {
