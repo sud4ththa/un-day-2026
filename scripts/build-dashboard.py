@@ -364,7 +364,7 @@ def pdfs_from_snapshot(data: dict, pledges: dict, pdf_names: dict[str, str]) -> 
             "kind": "money" if st.get("money_only") else "food",
             "connected": st.get("status") == "ok",
             "managed": False,
-            "as_of": fmt_time(data.get("updated")),
+            "as_of": fmt_time(st.get("data_as_of") or data.get("updated")),
             "responses": st.get("responses"),
             "families": st.get("families"),
             "last_response": fmt_time(st.get("last_response")) if st.get("last_response") else "—",
@@ -1059,6 +1059,8 @@ def render(data: dict, logos: dict, page_url: str | None) -> str:
         unlisted = ""
         if st["unlisted_ticks"]:
             unlisted = f'<p class="note">{st["unlisted_ticks"]} other tick(s) not on the current menu.</p>'
+        if st.get("data_as_of"):
+            unlisted += f'<p class="note">Figures from a copy of this stall\'s sheet taken {esc(fmt_time(st["data_as_of"]))}.</p>'
         if st.get("money_line"):
             unlisted += f'<p class="note">{esc(st["money_line"])}</p>'
         if st.get("extras"):
@@ -1102,10 +1104,12 @@ def render(data: dict, logos: dict, page_url: str | None) -> str:
                 ("Not marked", num(buckets.get("unmarked", 0)) if ok else "—", ""),
             ]
             mdl = "".join(f'<div><dt>{a}</dt><dd class="{k}">{b}</dd></div>' for a, b, k in mstats)
+            asof_note = (f'<p class="note">Figures from a copy of this stall\'s sheet taken {esc(fmt_time(st["data_as_of"]))}.</p>'
+                         if st.get("data_as_of") else "")
             sections.append(f"""
 {stall_open(st)}
   <dl class="stats">{mdl}</dl>
-  <p class="note">Money-only stall. Families and payment marks are counted once per family. The rupee total adds each child's amount. A repeated submission of the same child, class, and amount is counted once.</p>
+  <p class="note">Money-only stall. Families and payment marks are counted once per family. The rupee total adds each child's amount. A repeated submission of the same child, class, and amount is counted once.</p>{asof_note}
   <h3>Responses by class</h3>
   {classes}
   <h3>Short-link clicks</h3>
@@ -1485,6 +1489,8 @@ def main() -> None:
     ap.add_argument("--pledges", help="private row-level pledges.json, outside the repo and the dashboard folder")
     ap.add_argument("--overrides", help="private stall+timestamp fixes, outside the repo")
     ap.add_argument("--clicks", help="click counts JSON instead of asking the tracker")
+    ap.add_argument("--stall-as-of", action="append", default=[], metavar="SLUG=ISO",
+                    help="a stall whose sheet is a manual copy, e.g. sea=2026-10-07T19:18+05:30")
     ap.add_argument("--update-menus", action="store_true", help="re-read the menus from the live forms first")
     ap.add_argument("--now", help="override the current time (ISO), for tests")
     ap.add_argument("--self-test", action="store_true", help="run counting checks and exit")
@@ -1514,6 +1520,12 @@ def main() -> None:
         update_menus()
     now = datetime.fromisoformat(args.now).astimezone(COLOMBO) if args.now else datetime.now(COLOMBO)
     data, private, pii, pledges = build(args, now)
+    for spec in args.stall_as_of:
+        slug, _, iso = spec.partition("=")
+        st = next((x for x in data["stalls"] if x["slug"] == slug.strip()), None)
+        if st is None or not iso:
+            raise SystemExit(f"--stall-as-of: unknown stall or missing time in {spec!r}")
+        st["data_as_of"] = datetime.fromisoformat(iso.strip()).astimezone(COLOMBO).isoformat(timespec="minutes")
     if pledges.get("data_hash") != data.get("data_hash"):
         raise SystemExit("refusing to write: pledges hash does not match data.json")
     logos = {"bsc": GEN.logo_data(GEN.BSC_LOGO), "pc": GEN.logo_data(GEN.PC_LOGO, ink=True)}
