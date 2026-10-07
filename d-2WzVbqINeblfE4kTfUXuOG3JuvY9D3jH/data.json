@@ -1,6 +1,6 @@
 {
-  "updated": "2026-10-07T09:15+05:30",
-  "data_hash": "a5419ed70c28dbb1",
+  "updated": "2026-10-07T10:19+05:30",
+  "data_hash": "dffcfedef90539ce",
   "event": {
     "name": "UN Day 2026",
     "date": "2026-10-16",
@@ -9,28 +9,28 @@
   "tracking": "on",
   "summary": {
     "stalls": 10,
-    "connected": 5,
+    "connected": 6,
     "stall_managed": 4,
-    "responses": 84,
-    "families": 75,
+    "responses": 109,
+    "families": 97,
     "contribution": {
-      "Food": 31,
-      "Monetary contribution": 35,
+      "Food": 45,
+      "Monetary contribution": 46,
       "Both": 3,
       "Not given": 0
     },
-    "menu_items": 75,
-    "menu_items_unpledged": 50,
-    "last_response": "2026-10-07T08:43+05:30",
+    "menu_items": 71,
+    "menu_items_unpledged": 41,
+    "last_response": "2026-10-07T10:08+05:30",
     "clicks": {
-      "total": 540,
-      "unique": 395,
+      "total": 550,
+      "unique": 399,
       "all_links": {
-        "total": 597,
-        "unique": 379
+        "total": 610,
+        "unique": 382
       }
     },
-    "conversion": 0.406
+    "conversion": 0.522
   },
   "stalls": [
     {
@@ -38,8 +38,8 @@
       "name": "Sri Lanka",
       "year_groups": "Playgroup & Reception",
       "status": "ok",
-      "responses": 29,
-      "families": 28,
+      "responses": 30,
+      "families": 29,
       "by_class": [
         {
           "class": "Playgroup A",
@@ -47,7 +47,7 @@
         },
         {
           "class": "Playgroup B",
-          "count": 2
+          "count": 3
         },
         {
           "class": "Playgroup C",
@@ -71,7 +71,7 @@
         }
       ],
       "contribution": {
-        "Food": 21,
+        "Food": 22,
         "Monetary contribution": 7,
         "Both": 1,
         "Not given": 0
@@ -121,7 +121,7 @@
         },
         {
           "item": "Aluwa (75)",
-          "count": 1,
+          "count": 2,
           "label": "Aluwa",
           "needed": "75"
         },
@@ -144,21 +144,9 @@
           "needed": "200"
         },
         {
-          "item": "Milk toffee (100)",
-          "count": 8,
-          "label": "Milk toffee",
-          "needed": "100"
-        },
-        {
           "item": "Ala toffee (50)",
           "count": 0,
           "label": "Ala toffee",
-          "needed": "50"
-        },
-        {
-          "item": "Coconut toffee (50)",
-          "count": 4,
-          "label": "Coconut toffee",
           "needed": "50"
         },
         {
@@ -174,12 +162,6 @@
           "needed": "5 kg"
         },
         {
-          "item": "Thala karali (100)",
-          "count": 5,
-          "label": "Thala karali",
-          "needed": "100"
-        },
-        {
           "item": "Bibikkan (150)",
           "count": 0,
           "label": "Bibikkan",
@@ -190,12 +172,6 @@
           "count": 0,
           "label": "Vienna roll",
           "needed": "50"
-        },
-        {
-          "item": "Fish bun, please order from Paan Paan (75)",
-          "count": 2,
-          "label": "Fish bun, please order from Paan Paan",
-          "needed": "75"
         },
         {
           "item": "Coconut roti (50)",
@@ -222,20 +198,20 @@
           "needed": "75"
         }
       ],
-      "unlisted_ticks": 0,
-      "last_response": "2026-10-07T06:22+05:30",
+      "unlisted_ticks": 21,
+      "last_response": "2026-10-07T10:08+05:30",
       "clicks": {
-        "total": 44,
-        "unique": 31,
+        "total": 47,
+        "unique": 32,
         "by_src": {
-          "g2": 31,
+          "g2": 34,
           "(none)": 13
         },
         "by_device": {
-          "mobile": 44
+          "mobile": 47
         }
       },
-      "conversion": 0.935
+      "conversion": 0.938
     },
     {
       "slug": "japan",
@@ -250,14 +226,14 @@
       "unlisted_ticks": 0,
       "last_response": null,
       "clicks": {
-        "total": 84,
+        "total": 85,
         "unique": 63,
         "by_src": {
-          "g2": 49,
+          "g2": 50,
           "(none)": 35
         },
         "by_device": {
-          "mobile": 78,
+          "mobile": 79,
           "desktop": 6
         }
       },
@@ -276,15 +252,15 @@
       "unlisted_ticks": 0,
       "last_response": null,
       "clicks": {
-        "total": 87,
+        "total": 90,
         "unique": 61,
         "by_src": {
-          "g2": 69,
+          "g2": 72,
           "(none)": 18
         },
         "by_device": {
-          "mobile": 77,
-          "desktop": 10
+          "mobile": 79,
+          "desktop": 11
         }
       },
       "conversion": null
@@ -302,14 +278,14 @@
       "unlisted_ticks": 0,
       "last_response": null,
       "clicks": {
-        "total": 79,
-        "unique": 48,
+        "total": 81,
+        "unique": 50,
         "by_src": {
-          "g2": 58,
-          "(none)": 21
+          "g2": 59,
+          "(none)": 22
         },
         "by_device": {
-          "mobile": 70,
+          "mobile": 72,
           "desktop": 9
         }
       },
@@ -609,20 +585,49 @@
       "slug": "middle-east",
       "name": "Middle East",
       "year_groups": "Years 5 & 8",
-      "status": "not_connected",
-      "responses": 0,
-      "families": 0,
-      "by_class": [],
+      "status": "ok",
+      "responses": 24,
+      "families": 24,
+      "by_class": [
+        {
+          "class": "Year 5A",
+          "count": 3
+        },
+        {
+          "class": "Year 5B",
+          "count": 4
+        },
+        {
+          "class": "Year 5C",
+          "count": 3
+        },
+        {
+          "class": "Year 5D",
+          "count": 2
+        },
+        {
+          "class": "Year 8A",
+          "count": 3
+        },
+        {
+          "class": "Year 8C",
+          "count": 5
+        },
+        {
+          "class": "Year 8D",
+          "count": 4
+        }
+      ],
       "contribution": {
-        "Food": 0,
-        "Monetary contribution": 0,
+        "Food": 13,
+        "Monetary contribution": 11,
         "Both": 0,
         "Not given": 0
       },
       "menu": [
         {
           "item": "Pita bread",
-          "count": 0
+          "count": 1
         },
         {
           "item": "Hummus",
@@ -630,7 +635,7 @@
         },
         {
           "item": "Tabbouleh",
-          "count": 0
+          "count": 1
         },
         {
           "item": "Fatayer",
@@ -642,7 +647,7 @@
         },
         {
           "item": "Mini kebabs",
-          "count": 0
+          "count": 2
         },
         {
           "item": "Mini shawarma",
@@ -650,15 +655,15 @@
         },
         {
           "item": "Baklava",
-          "count": 0
+          "count": 1
         },
         {
           "item": "Date cake",
-          "count": 0
+          "count": 4
         },
         {
           "item": "Basbousa",
-          "count": 0
+          "count": 2
         },
         {
           "item": "Kunafa",
@@ -666,15 +671,15 @@
         },
         {
           "item": "Dates (non-sticky, easy to handle)",
-          "count": 0
+          "count": 1
         },
         {
           "item": "Almonds",
-          "count": 0
+          "count": 1
         },
         {
           "item": "Pistachios",
-          "count": 0
+          "count": 1
         },
         {
           "item": "Cashews",
@@ -686,20 +691,20 @@
         }
       ],
       "unlisted_ticks": 0,
-      "last_response": null,
+      "last_response": "2026-10-07T06:27+05:30",
       "clicks": {
-        "total": 39,
-        "unique": 31,
+        "total": 40,
+        "unique": 32,
         "by_src": {
-          "g2": 21,
+          "g2": 22,
           "(none)": 18
         },
         "by_device": {
-          "mobile": 35,
+          "mobile": 36,
           "desktop": 4
         }
       },
-      "conversion": 0.0
+      "conversion": 0.75
     },
     {
       "slug": "china",
