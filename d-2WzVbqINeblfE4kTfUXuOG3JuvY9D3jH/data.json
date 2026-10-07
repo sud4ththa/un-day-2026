@@ -1,6 +1,6 @@
 {
-  "updated": "2026-10-07T13:16+05:30",
-  "data_hash": "54a5a1ef89c098df",
+  "updated": "2026-10-07T14:15+05:30",
+  "data_hash": "c7ac4c0d375b87e5",
   "event": {
     "name": "UN Day 2026",
     "date": "2026-10-16",
@@ -11,26 +11,26 @@
     "stalls": 11,
     "connected": 11,
     "stall_managed": 0,
-    "responses": 186,
-    "families": 160,
+    "responses": 187,
+    "families": 161,
     "contribution": {
       "Food": 49,
-      "Monetary contribution": 106,
+      "Monetary contribution": 107,
       "Both": 7,
       "Not given": 0
     },
     "menu_items": 94,
     "menu_items_unpledged": 54,
-    "last_response": "2026-10-07T12:52+05:30",
+    "last_response": "2026-10-07T13:57+05:30",
     "clicks": {
-      "total": 646,
-      "unique": 471,
+      "total": 661,
+      "unique": 481,
       "all_links": {
-        "total": 646,
-        "unique": 405
+        "total": 661,
+        "unique": 413
       }
     },
-    "conversion": 0.395
+    "conversion": 0.389
   },
   "stalls": [
     {
@@ -40,8 +40,8 @@
       "minimum_note": "",
       "status": "ok",
       "money_only": false,
-      "responses": 32,
-      "families": 30,
+      "responses": 33,
+      "families": 31,
       "by_class": [
         {
           "class": "Playgroup A",
@@ -69,12 +69,12 @@
         },
         {
           "class": "Reception D",
-          "count": 7
+          "count": 8
         }
       ],
       "contribution": {
         "Food": 22,
-        "Monetary contribution": 7,
+        "Monetary contribution": 8,
         "Both": 1,
         "Not given": 0
       },
@@ -304,20 +304,20 @@
       "unlisted_ticks": 0,
       "extras": [],
       "money": null,
-      "money_line": "Money: 8 families (1 also bringing food). No amounts stated on the sheet, so no money % is shown.",
-      "last_response": "2026-10-07T12:45+05:30",
+      "money_line": "Money: 9 families (1 also bringing food). No amounts stated on the sheet, so no money % is shown.",
+      "last_response": "2026-10-07T13:57+05:30",
       "clicks": {
-        "total": 49,
-        "unique": 34,
+        "total": 51,
+        "unique": 36,
         "by_src": {
-          "g2": 36,
+          "g2": 38,
           "(none)": 13
         },
         "by_device": {
-          "mobile": 49
+          "mobile": 51
         }
       },
-      "conversion": 0.941
+      "conversion": 0.917
     },
     {
       "slug": "japan",
@@ -421,18 +421,18 @@
       "money_line": "Money: 12 families (1 also bringing food). No amounts stated on the sheet, so no money % is shown.",
       "last_response": "2026-10-07T08:36+05:30",
       "clicks": {
-        "total": 94,
-        "unique": 70,
+        "total": 96,
+        "unique": 71,
         "by_src": {
-          "g2": 57,
+          "g2": 59,
           "(none)": 37
         },
         "by_device": {
-          "mobile": 87,
+          "mobile": 89,
           "desktop": 7
         }
       },
-      "conversion": 0.2
+      "conversion": 0.197
     },
     {
       "slug": "australia",
@@ -605,18 +605,18 @@
       "money_line": "",
       "last_response": "2026-10-07T06:25+05:30",
       "clicks": {
-        "total": 90,
-        "unique": 58,
+        "total": 96,
+        "unique": 62,
         "by_src": {
-          "g2": 68,
-          "(none)": 22
+          "g2": 73,
+          "(none)": 23
         },
         "by_device": {
-          "mobile": 80,
+          "mobile": 86,
           "desktop": 10
         }
       },
-      "conversion": 0.328
+      "conversion": 0.306
     },
     {
       "slug": "india",
@@ -898,18 +898,18 @@
       "money_line": "Money: 11 families (2 also bringing food). Amounts stated add up to Rs 20,000.",
       "last_response": "2026-10-07T11:59+05:30",
       "clicks": {
-        "total": 32,
-        "unique": 21,
+        "total": 36,
+        "unique": 23,
         "by_src": {
-          "g2": 20,
+          "g2": 24,
           "(none)": 12
         },
         "by_device": {
-          "mobile": 27,
+          "mobile": 31,
           "desktop": 5
         }
       },
-      "conversion": 0.857
+      "conversion": 0.783
     },
     {
       "slug": "europe",
@@ -1524,18 +1524,18 @@
       "money_line": "Money: 6 families (1 also bringing food). No amounts stated on the sheet, so no money % is shown.",
       "last_response": "2026-10-06T21:03+05:30",
       "clicks": {
-        "total": 61,
-        "unique": 46,
+        "total": 62,
+        "unique": 47,
         "by_src": {
-          "g2": 52,
+          "g2": 53,
           "(none)": 9
         },
         "by_device": {
-          "mobile": 57,
+          "mobile": 58,
           "desktop": 4
         }
       },
-      "conversion": 0.152
+      "conversion": 0.149
     }
   ]
 }
