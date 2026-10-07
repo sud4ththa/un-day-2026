@@ -1,6 +1,6 @@
 {
-  "updated": "2026-10-07T16:51+05:30",
-  "data_hash": "e7c99ec0d4d3fb7f",
+  "updated": "2026-10-07T17:12+05:30",
+  "data_hash": "28fab23dff35ca86",
   "event": {
     "name": "UN Day 2026",
     "date": "2026-10-16",
@@ -23,14 +23,14 @@
     "menu_items_unpledged": 54,
     "last_response": "2026-10-07T16:44+05:30",
     "clicks": {
-      "total": 679,
-      "unique": 487,
+      "total": 680,
+      "unique": 488,
       "all_links": {
-        "total": 679,
-        "unique": 418
+        "total": 680,
+        "unique": 419
       }
     },
-    "conversion": 0.39
+    "conversion": 0.389
   },
   "stalls": [
     {
@@ -421,18 +421,18 @@
       "money_line": "Money: 14 families (1 also bringing food). No amounts stated on the sheet, so no money % is shown.",
       "last_response": "2026-10-07T15:59+05:30",
       "clicks": {
-        "total": 104,
-        "unique": 74,
+        "total": 105,
+        "unique": 75,
         "by_src": {
-          "g2": 65,
+          "g2": 66,
           "(none)": 39
         },
         "by_device": {
-          "mobile": 97,
+          "mobile": 98,
           "desktop": 7
         }
       },
-      "conversion": 0.216
+      "conversion": 0.213
     },
     {
       "slug": "australia",
