@@ -8,8 +8,10 @@ Inputs (all outside the repo, never committed):
                                          (read from tracker.txt), or --clicks FILE
 
 Outputs:
-  <out>/data.json    counts only
-  <out>/index.html   static page (no JavaScript, no chart libraries)
+  <out>/data.json      counts only
+  <out>/index.html     counts page, with a button that downloads a PDF
+  <out>/report-pdf.js  browser script copied from scripts/dashboard-pdf.js.
+                       It reads the rendered page only (no names, phones, or emails).
   --private FILE     optional local Markdown list for the PTC (names, classes,
                      items, notes). Never write it inside the repo.
 
@@ -423,7 +425,7 @@ html { -webkit-text-size-adjust: 100%; }
 body { margin: 0; background: #fff; color: var(--ink);
   font-family: "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua", Georgia, serif;
   -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; line-height: 1.45; }
-.sans, .kicker, table, .stats, .bars, .meta, footer, .note, .chips { font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+.sans, .kicker, table, .stats, .bars, .meta, footer, .note, .chips, .actions, .pdf-status { font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
 main { max-width: 46rem; margin: 0 auto; padding: 2.75rem 1.25rem 2rem; }
 .logos { display: flex; align-items: center; justify-content: center; gap: 1.25rem; margin: 0 0 2rem; }
 .logos img { display: block; height: 44px; width: auto; }
@@ -467,6 +469,17 @@ td a { color: inherit; text-decoration: none; border-bottom: 1px solid var(--hai
 .note { font-size: .8rem; color: var(--mute); margin: .6rem 0 0; }
 .off { font-size: .86rem; margin: 0; padding: .6rem 0; border-top: 1px solid var(--hair); border-bottom: 1px solid var(--hair); color: #333; }
 footer { font-size: .7rem; letter-spacing: .04em; color: var(--mute); text-align: center; padding: 0 1.5rem 2rem; }
+.actions { display: flex; justify-content: center; margin: 1.35rem 0 0; }
+.pdf { appearance: none; -webkit-appearance: none; font: 600 .72rem/1.2 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  letter-spacing: .14em; text-transform: uppercase; color: #fff; background: var(--ink); border: 1px solid var(--ink);
+  border-radius: 999px; padding: .7rem 1.25rem; min-height: 44px; cursor: pointer; }
+.pdf:hover { background: #000; }
+.pdf:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }
+.pdf:disabled { opacity: .55; cursor: progress; }
+.pdf-status { text-align: center; font-size: .78rem; color: var(--mute); margin: .55rem 0 0; }
+.pdf-status:empty { display: none; }
+@media (max-width: 40rem) { .actions { display: block; } .pdf { width: 100%; } }
+@media print { .actions, .pdf-status { display: none !important; } a { border: 0; color: inherit; } }
 @media (min-width: 40rem) {
   main { padding-top: 3.5rem; }
   .stats { grid-template-columns: repeat(3, minmax(0, 1fr)); }
@@ -611,6 +624,10 @@ def render(data: dict, logos: dict) -> str:
     <h1>Stall responses</h1>
     <p class="detail">{EVENT}</p>
     <p class="meta">Last updated {fmt_time(data["updated"])} (Colombo)<br>Leads summarise {LEADS_DUE}</p>
+    <div class="actions">
+      <button type="button" class="pdf" id="download-pdf">Download PDF</button>
+    </div>
+    <p class="pdf-status" id="pdf-status" role="status"></p>
   </header>
   <section aria-label="All stalls">
     <table>
@@ -623,6 +640,7 @@ def render(data: dict, logos: dict) -> str:
   <p class="note sans">Counts only. No names or contact details are shown on this page.</p>
 </main>
 <footer>The British School in Colombo · PTC</footer>
+<script src="report-pdf.js"></script>
 </body>
 </html>
 """
@@ -727,9 +745,13 @@ def main() -> None:
     assert_no_pii([jtext, re.sub(r'src="data:[^"]+"', "", page)], pii, safe)
 
     out.mkdir(parents=True, exist_ok=True)
+    pdf_js = (ROOT / "scripts" / "dashboard-pdf.js").read_text(encoding="utf-8")
+    if "@" in pdf_js or re.search(r"\d{7,}", pdf_js):
+        raise SystemExit("dashboard pdf script looks like it contains contact details")
     old = (out / "data.json").read_text(encoding="utf-8") if (out / "data.json").exists() else None
     (out / "data.json").write_text(jtext, encoding="utf-8")
     (out / "index.html").write_text(page, encoding="utf-8")
+    (out / "report-pdf.js").write_text(pdf_js, encoding="utf-8")
     if args.private:
         Path(args.private).write_text(render_private(data, private, now), encoding="utf-8")
     s = data["summary"]
