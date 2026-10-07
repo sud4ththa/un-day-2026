@@ -122,10 +122,12 @@ FIELDS = [
     ("phone", lambda h: any(k in h for k in ("mobile", "whatsapp", "phone", "contact number"))),
     ("email", lambda h: h.startswith("email")),
     ("child", lambda h: "child" in h and "name" in h),
+    ("class_other", lambda h: "class" in h and "other" in h),
     ("class", lambda h: "class" in h),
     ("contrib", lambda h: "contribute" in h),
     ("food", lambda h: h.startswith("food you can bring")),
-    ("notes", lambda h: "quantity" in h or "notes" in h),
+    ("notes", lambda h: "quantity" in h or "notes" in h or h == "note"),
+    ("extra", lambda h: h.startswith("anything else")),
     ("amount", lambda h: is_amount_header(h)),
     ("pay_status", lambda h: h == "status" or "payment status" in h),
     ("slip", lambda h: "slip" in h or "receipt" in h or "deposit" in h),
@@ -434,13 +436,17 @@ def ingest_responses(path: Path, slug: str, menu: list[str], aliases: dict, clos
     for n, row in enumerate(rows, 1):
         r = {k: norm(row[i]) if i < len(row) else "" for k, i in col.items()}
         r["_row"] = f"{slug}:{n}"
-        for k in ("parent", "phone", "email", "child", "notes"):
+        for k in ("parent", "phone", "email", "child", "notes", "extra", "class_other"):
             if len(r.get(k, "")) >= 3 and not (k == "notes" and COUNTS.parse_qty(r[k]) is not None):
                 found_pii.add(r[k])
         fam = family_key(r)
         t = parse_time(r.get("timestamp", ""), now)
         ov = row_override(overrides, slug, r.get("timestamp", ""), t)
         cl = norm_class(r.get("class", ""))
+        if cl in ("Other", "Not given") and r.get("class_other"):
+            typed = norm_class(r["class_other"])
+            # Only a recognisable class goes on the counts page; anything else stays "Other".
+            cl = typed if re.fullmatch(r"(Year \d{1,2}[A-Z]?|Playgroup( [A-Z])?|Nursery( [A-Z])?|Reception( [A-Z])?)", typed) else "Other"
         classes[cl] = classes.get(cl, 0) + 1
         note = r.get("notes", "")
         kn = COUNTS.note_key(note)
@@ -487,6 +493,8 @@ def ingest_responses(path: Path, slug: str, menu: list[str], aliases: dict, clos
         amt = SHEET.parse_rupees(r.get("amount", "")) if r.get("amount") else None
         if amt is None and (money_only or not ticked):
             amt = SHEET.money_from_notes(note)
+        if amt is None and (money_only or not ticked) and r.get("extra"):
+            amt = SHEET.money_from_notes(r["extra"])
         if "amount" in ov and ov["amount"] is not None:
             amt = int(ov["amount"])
         fam_parts.setdefault(fam, [])
@@ -512,7 +520,7 @@ def ingest_responses(path: Path, slug: str, menu: list[str], aliases: dict, clos
             "items": items,
             "labels": [label_of[m] for m in menu if m in ticked],
             "unlisted": row_unlisted,
-            "notes": note,
+            "notes": note + (f" · Anything else: {r['extra']}" if r.get("extra") else ""),
             "amount": r.get("amount", ""),
             "pay_status": r.get("pay_status", ""),
             "slip": slip,
@@ -1292,6 +1300,8 @@ def update_menus() -> None:
 
 
 def _self_test() -> None:
+    cols = map_headers(["Timestamp", "Child's class", "If you chose \"Other\", please type your child's class", "Note", "Anything else?"])
+    assert cols.get("class") == 1 and cols.get("class_other") == 2 and cols.get("notes") == 3 and cols.get("extra") == 4, cols
     assert COUNTS.phone_digits("0771234567.0") == "0771234567"
     assert COUNTS.phone_digits("0771234567.0") != re.sub(r"\D", "", "0771234567.0")
     same = family_key({"phone": "0771234567.0", "email": "", "parent": "A", "child": ""})
