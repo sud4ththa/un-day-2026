@@ -1,6 +1,6 @@
 {
-  "updated": "2026-10-07T14:15+05:30",
-  "data_hash": "c7ac4c0d375b87e5",
+  "updated": "2026-10-07T15:12+05:30",
+  "data_hash": "3949e1a9809d482e",
   "event": {
     "name": "UN Day 2026",
     "date": "2026-10-16",
@@ -23,14 +23,14 @@
     "menu_items_unpledged": 54,
     "last_response": "2026-10-07T13:57+05:30",
     "clicks": {
-      "total": 661,
-      "unique": 481,
+      "total": 664,
+      "unique": 483,
       "all_links": {
-        "total": 661,
-        "unique": 413
+        "total": 664,
+        "unique": 415
       }
     },
-    "conversion": 0.389
+    "conversion": 0.387
   },
   "stalls": [
     {
@@ -605,14 +605,14 @@
       "money_line": "",
       "last_response": "2026-10-07T06:25+05:30",
       "clicks": {
-        "total": 96,
+        "total": 97,
         "unique": 62,
         "by_src": {
-          "g2": 73,
+          "g2": 74,
           "(none)": 23
         },
         "by_device": {
-          "mobile": 86,
+          "mobile": 87,
           "desktop": 10
         }
       },
@@ -779,18 +779,18 @@
       "money_line": "Money: 10 families (2 also bringing food). Amounts stated add up to Rs 16,000.",
       "last_response": "2026-10-06T13:54+05:30",
       "clicks": {
-        "total": 29,
-        "unique": 26,
+        "total": 30,
+        "unique": 27,
         "by_src": {
-          "g2": 22,
+          "g2": 23,
           "(none)": 7
         },
         "by_device": {
-          "mobile": 26,
+          "mobile": 27,
           "desktop": 3
         }
       },
-      "conversion": 0.538
+      "conversion": 0.519
     },
     {
       "slug": "americas",
@@ -1524,18 +1524,18 @@
       "money_line": "Money: 6 families (1 also bringing food). No amounts stated on the sheet, so no money % is shown.",
       "last_response": "2026-10-06T21:03+05:30",
       "clicks": {
-        "total": 62,
-        "unique": 47,
+        "total": 63,
+        "unique": 48,
         "by_src": {
-          "g2": 53,
+          "g2": 54,
           "(none)": 9
         },
         "by_device": {
-          "mobile": 58,
+          "mobile": 59,
           "desktop": 4
         }
       },
-      "conversion": 0.149
+      "conversion": 0.146
     }
   ]
 }
