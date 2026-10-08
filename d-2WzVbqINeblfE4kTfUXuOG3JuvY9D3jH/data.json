@@ -1,6 +1,6 @@
 {
-  "updated": "2026-10-08T13:17+05:30",
-  "data_hash": "869bb84180aec46f",
+  "updated": "2026-10-08T14:17+05:30",
+  "data_hash": "e798e0a4bc37f582",
   "event": {
     "name": "UN Day 2026",
     "date": "2026-10-16",
@@ -11,26 +11,26 @@
     "stalls": 11,
     "connected": 11,
     "stall_managed": 0,
-    "responses": 238,
-    "families": 199,
+    "responses": 240,
+    "families": 201,
     "contribution": {
       "Food": 57,
-      "Monetary contribution": 143,
+      "Monetary contribution": 144,
       "Both": 8,
       "Not given": 0
     },
     "menu_items": 94,
     "menu_items_unpledged": 51,
-    "last_response": "2026-10-08T12:42+05:30",
+    "last_response": "2026-10-08T14:13+05:30",
     "clicks": {
-      "total": 841,
-      "unique": 595,
+      "total": 861,
+      "unique": 608,
       "all_links": {
-        "total": 842,
-        "unique": 511
+        "total": 862,
+        "unique": 521
       }
     },
-    "conversion": 0.4
+    "conversion": 0.395
   },
   "stalls": [
     {
@@ -307,18 +307,18 @@
       "money_line": "Money: 10 families (1 also bringing food). No amounts stated on the sheet, so no money % is shown.",
       "last_response": "2026-10-08T11:29+05:30",
       "clicks": {
-        "total": 65,
-        "unique": 45,
+        "total": 66,
+        "unique": 46,
         "by_src": {
           "g2": 49,
-          "(none)": 16
+          "(none)": 17
         },
         "by_device": {
-          "mobile": 61,
+          "mobile": 62,
           "desktop": 4
         }
       },
-      "conversion": 0.778
+      "conversion": 0.761
     },
     {
       "slug": "japan",
@@ -327,8 +327,8 @@
       "minimum_note": "",
       "status": "ok",
       "money_only": false,
-      "responses": 23,
-      "families": 22,
+      "responses": 24,
+      "families": 23,
       "by_class": [
         {
           "class": "Nursery A",
@@ -348,7 +348,7 @@
         },
         {
           "class": "Year 1B",
-          "count": 5
+          "count": 6
         },
         {
           "class": "Year 1C",
@@ -365,7 +365,7 @@
       ],
       "contribution": {
         "Food": 3,
-        "Monetary contribution": 17,
+        "Monetary contribution": 18,
         "Both": 2,
         "Not given": 0
       },
@@ -431,21 +431,21 @@
       "unlisted_ticks": 0,
       "extras": [],
       "money": null,
-      "money_line": "Money: 19 families (2 also bringing food). No amounts stated on the sheet, so no money % is shown.",
-      "last_response": "2026-10-08T11:19+05:30",
+      "money_line": "Money: 20 families (2 also bringing food). No amounts stated on the sheet, so no money % is shown.",
+      "last_response": "2026-10-08T13:43+05:30",
       "clicks": {
-        "total": 128,
-        "unique": 90,
+        "total": 131,
+        "unique": 92,
         "by_src": {
-          "g2": 82,
+          "g2": 85,
           "(none)": 46
         },
         "by_device": {
-          "mobile": 118,
+          "mobile": 121,
           "desktop": 10
         }
       },
-      "conversion": 0.256
+      "conversion": 0.261
     },
     {
       "slug": "australia",
@@ -622,14 +622,14 @@
       "money_line": "",
       "last_response": "2026-10-08T11:18+05:30",
       "clicks": {
-        "total": 138,
+        "total": 139,
         "unique": 82,
         "by_src": {
-          "g2": 114,
+          "g2": 115,
           "(none)": 24
         },
         "by_device": {
-          "mobile": 126,
+          "mobile": 127,
           "desktop": 12
         }
       },
@@ -797,18 +797,18 @@
       "money_line": "Money: 10 families (2 also bringing food). Amounts stated add up to Rs 16,000.",
       "last_response": "2026-10-06T13:54+05:30",
       "clicks": {
-        "total": 36,
-        "unique": 31,
+        "total": 38,
+        "unique": 32,
         "by_src": {
-          "g2": 28,
+          "g2": 30,
           "(none)": 8
         },
         "by_device": {
-          "mobile": 31,
+          "mobile": 33,
           "desktop": 5
         }
       },
-      "conversion": 0.452
+      "conversion": 0.438
     },
     {
       "slug": "americas",
@@ -920,18 +920,18 @@
       "money_line": "Money: 12 families (2 also bringing food). Amounts stated add up to Rs 20,000.",
       "last_response": "2026-10-08T12:42+05:30",
       "clicks": {
-        "total": 51,
-        "unique": 33,
+        "total": 54,
+        "unique": 35,
         "by_src": {
-          "g2": 36,
-          "(none)": 15
+          "g2": 38,
+          "(none)": 16
         },
         "by_device": {
-          "mobile": 45,
+          "mobile": 48,
           "desktop": 6
         }
       },
-      "conversion": 0.697
+      "conversion": 0.657
     },
     {
       "slug": "europe",
@@ -940,12 +940,12 @@
       "minimum_note": "",
       "status": "ok",
       "money_only": false,
-      "responses": 22,
-      "families": 21,
+      "responses": 23,
+      "families": 22,
       "by_class": [
         {
           "class": "Year 6A",
-          "count": 5
+          "count": 6
         },
         {
           "class": "Year 6B",
@@ -1036,8 +1036,8 @@
         },
         {
           "item": "Pastries or other savoury items",
-          "count": 1,
-          "pledged": "40 pcs",
+          "count": 2,
+          "pledged": "65 pcs",
           "pct": "—",
           "status": "Partial",
           "label": "Pastries or other savoury items"
@@ -1048,20 +1048,20 @@
       "extras": [],
       "money": null,
       "money_line": "",
-      "last_response": "2026-10-08T12:32+05:30",
+      "last_response": "2026-10-08T14:13+05:30",
       "clicks": {
-        "total": 42,
-        "unique": 28,
+        "total": 43,
+        "unique": 29,
         "by_src": {
-          "g2": 22,
+          "g2": 23,
           "(none)": 20
         },
         "by_device": {
-          "mobile": 36,
+          "mobile": 37,
           "desktop": 6
         }
       },
-      "conversion": 0.786
+      "conversion": 0.793
     },
     {
       "slug": "middle-east",
@@ -1249,18 +1249,18 @@
       "money_line": "Money: 14 families. Amounts stated add up to Rs 5,000.",
       "last_response": "2026-10-08T12:15+05:30",
       "clicks": {
-        "total": 49,
-        "unique": 40,
+        "total": 50,
+        "unique": 41,
         "by_src": {
-          "g2": 29,
+          "g2": 30,
           "(none)": 20
         },
         "by_device": {
-          "mobile": 44,
+          "mobile": 45,
           "desktop": 5
         }
       },
-      "conversion": 0.675
+      "conversion": 0.659
     },
     {
       "slug": "china",
@@ -1352,18 +1352,18 @@
       "money_line": "Money: 10 families. Amounts stated add up to Rs 21,000.",
       "last_response": "2026-10-07T21:14+05:30",
       "clicks": {
-        "total": 116,
-        "unique": 84,
+        "total": 118,
+        "unique": 85,
         "by_src": {
-          "(none)": 113,
+          "(none)": 115,
           "group": 3
         },
         "by_device": {
-          "mobile": 107,
+          "mobile": 109,
           "desktop": 9
         }
       },
-      "conversion": 0.167
+      "conversion": 0.165
     },
     {
       "slug": "maldives",
@@ -1447,18 +1447,18 @@
       "money_line": "Money: 2 families. No amounts stated on the sheet, so no money % is shown.",
       "last_response": "2026-10-06T10:13+05:30",
       "clicks": {
-        "total": 19,
-        "unique": 19,
+        "total": 25,
+        "unique": 23,
         "by_src": {
-          "g2": 11,
+          "g2": 17,
           "(none)": 8
         },
         "by_device": {
-          "mobile": 15,
+          "mobile": 21,
           "desktop": 4
         }
       },
-      "conversion": 0.105
+      "conversion": 0.087
     },
     {
       "slug": "un-zone",
