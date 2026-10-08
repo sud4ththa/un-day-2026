@@ -1,6 +1,6 @@
 {
-  "updated": "2026-10-08T17:15+05:30",
-  "data_hash": "6c616f042dbc047a",
+  "updated": "2026-10-08T18:23+05:30",
+  "data_hash": "7be2efed6c40fb2e",
   "event": {
     "name": "UN Day 2026",
     "date": "2026-10-16",
@@ -23,10 +23,10 @@
     "menu_items_unpledged": 51,
     "last_response": "2026-10-08T15:13+05:30",
     "clicks": {
-      "total": 882,
+      "total": 883,
       "unique": 622,
       "all_links": {
-        "total": 883,
+        "total": 884,
         "unique": 533
       }
     },
@@ -1554,14 +1554,14 @@
       "money_line": "Money: 9 families (1 also bringing food). No amounts stated on the sheet, so no money % is shown.",
       "last_response": "2026-10-08T11:53+05:30",
       "clicks": {
-        "total": 80,
+        "total": 81,
         "unique": 63,
         "by_src": {
           "g2": 68,
-          "(none)": 12
+          "(none)": 13
         },
         "by_device": {
-          "mobile": 73,
+          "mobile": 74,
           "desktop": 6,
           "tablet": 1
         }
