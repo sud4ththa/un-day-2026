@@ -1,6 +1,6 @@
 {
-  "updated": "2026-10-08T09:10+05:30",
-  "data_hash": "6c875ddf65f5d9fc",
+  "updated": "2026-10-08T10:15+05:30",
+  "data_hash": "d62536c3f5629d3c",
   "event": {
     "name": "UN Day 2026",
     "date": "2026-10-16",
@@ -11,7 +11,7 @@
     "stalls": 11,
     "connected": 11,
     "stall_managed": 0,
-    "responses": 212,
+    "responses": 213,
     "families": 179,
     "contribution": {
       "Food": 52,
@@ -21,16 +21,16 @@
     },
     "menu_items": 94,
     "menu_items_unpledged": 52,
-    "last_response": "2026-10-08T08:44+05:30",
+    "last_response": "2026-10-08T09:24+05:30",
     "clicks": {
-      "total": 773,
+      "total": 775,
       "unique": 548,
       "all_links": {
-        "total": 773,
+        "total": 775,
         "unique": 469
       }
     },
-    "conversion": 0.387
+    "conversion": 0.389
   },
   "stalls": [
     {
@@ -610,14 +610,14 @@
       "money_line": "",
       "last_response": "2026-10-07T15:15+05:30",
       "clicks": {
-        "total": 131,
+        "total": 132,
         "unique": 79,
         "by_src": {
-          "g2": 107,
+          "g2": 108,
           "(none)": 24
         },
         "by_device": {
-          "mobile": 119,
+          "mobile": 120,
           "desktop": 12
         }
       },
@@ -924,12 +924,12 @@
       "minimum_note": "",
       "status": "ok",
       "money_only": false,
-      "responses": 19,
-      "families": 19,
+      "responses": 20,
+      "families": 20,
       "by_class": [
         {
           "class": "Year 6A",
-          "count": 4
+          "count": 5
         },
         {
           "class": "Year 6B",
@@ -964,7 +964,7 @@
         },
         {
           "item": "Fruits (grapes/strawberries)",
-          "count": 7,
+          "count": 8,
           "pledged": "–",
           "pct": "—",
           "status": "Partial",
@@ -1032,20 +1032,20 @@
       "extras": [],
       "money": null,
       "money_line": "",
-      "last_response": "2026-10-07T21:11+05:30",
+      "last_response": "2026-10-08T09:24+05:30",
       "clicks": {
-        "total": 37,
+        "total": 38,
         "unique": 25,
         "by_src": {
-          "g2": 21,
+          "g2": 22,
           "(none)": 16
         },
         "by_device": {
-          "mobile": 32,
+          "mobile": 33,
           "desktop": 5
         }
       },
-      "conversion": 0.76
+      "conversion": 0.8
     },
     {
       "slug": "middle-east",
