@@ -1,6 +1,6 @@
 {
-  "updated": "2026-10-08T15:19+05:30",
-  "data_hash": "3d7e1b5f8ab122b4",
+  "updated": "2026-10-08T16:09+05:30",
+  "data_hash": "280ca8debc534790",
   "event": {
     "name": "UN Day 2026",
     "date": "2026-10-16",
@@ -23,14 +23,14 @@
     "menu_items_unpledged": 51,
     "last_response": "2026-10-08T15:13+05:30",
     "clicks": {
-      "total": 872,
-      "unique": 614,
+      "total": 878,
+      "unique": 619,
       "all_links": {
-        "total": 873,
-        "unique": 527
+        "total": 879,
+        "unique": 531
       }
     },
-    "conversion": 0.394
+    "conversion": 0.391
   },
   "stalls": [
     {
@@ -528,18 +528,18 @@
       "money_line": "",
       "last_response": "2026-10-08T10:42+05:30",
       "clicks": {
-        "total": 119,
-        "unique": 81,
+        "total": 120,
+        "unique": 82,
         "by_src": {
           "g2": 99,
-          "(none)": 20
+          "(none)": 21
         },
         "by_device": {
-          "mobile": 105,
+          "mobile": 106,
           "desktop": 14
         }
       },
-      "conversion": 0.407
+      "conversion": 0.402
     },
     {
       "slug": "sea",
@@ -622,14 +622,14 @@
       "money_line": "",
       "last_response": "2026-10-08T11:18+05:30",
       "clicks": {
-        "total": 143,
+        "total": 144,
         "unique": 84,
         "by_src": {
-          "g2": 119,
+          "g2": 120,
           "(none)": 24
         },
         "by_device": {
-          "mobile": 131,
+          "mobile": 132,
           "desktop": 12
         }
       },
@@ -1050,18 +1050,18 @@
       "money_line": "",
       "last_response": "2026-10-08T14:13+05:30",
       "clicks": {
-        "total": 43,
-        "unique": 29,
+        "total": 44,
+        "unique": 30,
         "by_src": {
-          "g2": 23,
+          "g2": 24,
           "(none)": 20
         },
         "by_device": {
-          "mobile": 37,
+          "mobile": 38,
           "desktop": 6
         }
       },
-      "conversion": 0.793
+      "conversion": 0.767
     },
     {
       "slug": "middle-east",
@@ -1249,18 +1249,18 @@
       "money_line": "Money: 14 families. Amounts stated add up to Rs 5,000.",
       "last_response": "2026-10-08T12:15+05:30",
       "clicks": {
-        "total": 50,
-        "unique": 41,
+        "total": 51,
+        "unique": 42,
         "by_src": {
-          "g2": 30,
+          "g2": 31,
           "(none)": 20
         },
         "by_device": {
-          "mobile": 45,
+          "mobile": 46,
           "desktop": 5
         }
       },
-      "conversion": 0.659
+      "conversion": 0.643
     },
     {
       "slug": "china",
@@ -1447,18 +1447,18 @@
       "money_line": "Money: 2 families. No amounts stated on the sheet, so no money % is shown.",
       "last_response": "2026-10-06T10:13+05:30",
       "clicks": {
-        "total": 25,
-        "unique": 23,
+        "total": 26,
+        "unique": 24,
         "by_src": {
-          "g2": 17,
+          "g2": 18,
           "(none)": 8
         },
         "by_device": {
-          "mobile": 21,
+          "mobile": 22,
           "desktop": 4
         }
       },
-      "conversion": 0.087
+      "conversion": 0.083
     },
     {
       "slug": "un-zone",
@@ -1554,19 +1554,19 @@
       "money_line": "Money: 9 families (1 also bringing food). No amounts stated on the sheet, so no money % is shown.",
       "last_response": "2026-10-08T11:53+05:30",
       "clicks": {
-        "total": 78,
-        "unique": 62,
+        "total": 79,
+        "unique": 63,
         "by_src": {
-          "g2": 67,
+          "g2": 68,
           "(none)": 11
         },
         "by_device": {
-          "mobile": 71,
+          "mobile": 72,
           "desktop": 6,
           "tablet": 1
         }
       },
-      "conversion": 0.161
+      "conversion": 0.159
     }
   ]
 }
