@@ -1,0 +1,16 @@
+{
+  "name": "stall-dashboard-gate",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "test": "node scripts/vendor-config.mjs && node --test netlify/functions/lib/*.test.mjs"
+  },
+  "dependencies": {
+    "@netlify/blobs": "11.1.1",
+    "pdf-lib": "1.17.1"
+  }
+}

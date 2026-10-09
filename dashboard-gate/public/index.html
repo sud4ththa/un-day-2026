@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<meta name="referrer" content="no-referrer">
+<title>Stall responses · Sign in</title>
+<link rel="stylesheet" href="/gate.css">
+</head>
+<body>
+<main>
+  <p class="kicker">UN Day 2026</p>
+  <h1>Who are you?</h1>
+  <p class="detail" id="prompt">Choose your name. A code will come by text message.</p>
+  <div class="choices" id="choices">
+    <button type="button" data-who="sudaththa">Sudaththa</button>
+    <button type="button" data-who="subraja">Subraja</button>
+    <button type="button" data-who="zainab">Zainab</button>
+  </div>
+  <form id="code-form" hidden>
+    <label for="code">Code</label>
+    <input id="code" name="code" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9 ]*" maxlength="12" required>
+    <button type="submit">Continue</button>
+    <button type="button" class="text" id="back">Choose a different name</button>
+  </form>
+  <p class="status" id="status" role="status"></p>
+  <p class="fine">The code is single-use. After it works, this sign-in lasts 12 hours on this browser.</p>
+</main>
+<footer>The British School in Colombo · PTC</footer>
+<script src="/gate.js"></script>
+</body>
+</html>
