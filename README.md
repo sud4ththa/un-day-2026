@@ -74,7 +74,7 @@ Do not edit files under `go/` or `contributions/` by hand. The script rewrites t
 
 `https://sud4ththa.github.io/un-day-2026/contributions/` is the public page for stall contribution forms. It is generated from `forms.txt` (same order) by `python3 scripts/gen-go.py`, which writes `contributions/index.html` and the 1200×630 share image `contributions/og.png`.
 
-Each tile shows the stall name and year groups, and links to `/un-day-2026/go/<slug>/`, not straight to the form, so the short link still records the tap and then opens the form. The picture is that form's header image, saved under `contributions/headers/` (WebP and JPG, at 1x and 2x) when the script can read the public form page. If the form cannot be fetched or has no header, the tile keeps that stall's flags. Eco Warriors is not listed. Any other stall with a blank form address is greyed out, says "Form coming soon", and is not a link.
+Each tile shows the stall name and year groups, and links to `/un-day-2026/go/<slug>/`, not straight to the form, so the short link still records the tap and then opens the form. The picture is that form's header image, saved under `contributions/headers/` (WebP and JPG, at 1x and 2x). When the script can read the public form page it writes those files. If it cannot, and a complete set is already saved there, it keeps those files. Otherwise the tile uses that stall's flags. Eco Warriors is not listed. Any other stall with a blank form address is greyed out, says "Form coming soon", and is not a link.
 
 The page says "the PTC". Commit `contributions/` together with `forms.txt` after you regenerate. Drawing the share image needs Pillow and CairoSVG (`pip install pillow cairosvg`).
 

@@ -1239,23 +1239,36 @@ def fetch_form_header(stall: Stall) -> Image.Image | None:
     try:
         html = _http_bytes(stall.url, 30).decode("utf-8", "replace")
     except urllib.error.HTTPError as err:
-        print(f"contributions: {stall.slug}: form page HTTP {err.code}; keeping flags", file=sys.stderr)
+        print(f"contributions: {stall.slug}: form page HTTP {err.code}", file=sys.stderr)
         return None
     except Exception as err:
-        print(f"contributions: {stall.slug}: form page not available ({type(err).__name__}); keeping flags", file=sys.stderr)
+        print(f"contributions: {stall.slug}: form page not available ({type(err).__name__})", file=sys.stderr)
         return None
     image_url = _header_image_url(html)
     if not image_url:
-        print(f"contributions: {stall.slug}: no header image; keeping flags", file=sys.stderr)
+        print(f"contributions: {stall.slug}: no header image", file=sys.stderr)
         return None
     try:
         return Image.open(io.BytesIO(_http_bytes(image_url, 40)))
     except urllib.error.HTTPError as err:
-        print(f"contributions: {stall.slug}: header HTTP {err.code}; keeping flags", file=sys.stderr)
+        print(f"contributions: {stall.slug}: header HTTP {err.code}", file=sys.stderr)
         return None
     except Exception as err:
-        print(f"contributions: {stall.slug}: header not available ({type(err).__name__}); keeping flags", file=sys.stderr)
+        print(f"contributions: {stall.slug}: header not available ({type(err).__name__})", file=sys.stderr)
         return None
+
+
+def _saved_header_files(slug: str) -> dict[str, bytes] | None:
+    """A complete on-disk header set, reused when the form page cannot be read."""
+    folder = CONTRIBUTIONS / "headers"
+    files: dict[str, bytes] = {}
+    for label, _width in HEADER_WIDTHS:
+        for ext in ("jpg", "webp"):
+            path = folder / f"{slug}-{label}.{ext}"
+            if not path.is_file():
+                return None
+            files[path.name] = path.read_bytes()
+    return files
 
 
 def _cover_rgb(image: Image.Image, size: tuple[int, int]) -> Image.Image:
@@ -1436,12 +1449,21 @@ def write_contributions_og(path: Path, stalls: list[Stall], headers: dict[str, I
 def write_contributions(stalls: list[Stall]) -> None:
     shown = [stall for stall in stalls if stall.slug not in CONTRIB_SKIP]
     headers: dict[str, Image.Image] = {}
+    saved: dict[str, dict[str, bytes]] = {}
     for stall in shown:
         image = fetch_form_header(stall)
         if image is not None:
             headers[stall.slug] = image
-    page = render_contributions(shown, set(headers))
-    _check_contributions(page, shown, set(headers))
+            continue
+        existing = _saved_header_files(stall.slug)
+        if existing is None:
+            print(f"contributions: {stall.slug}: keeping flags", file=sys.stderr)
+            continue
+        saved[stall.slug] = existing
+        print(f"contributions: {stall.slug}: using saved header files", file=sys.stderr)
+    header_slugs = set(headers) | set(saved)
+    page = render_contributions(shown, header_slugs)
+    _check_contributions(page, shown, header_slugs)
     if CONTRIBUTIONS.exists():
         shutil.rmtree(CONTRIBUTIONS)
     header_dir = CONTRIBUTIONS / "headers"
@@ -1453,15 +1475,19 @@ def write_contributions(stalls: list[Stall]) -> None:
                 size = (header_dir / f"{slug}-{label}.{ext}").stat().st_size
                 if size > HEADER_MAX_BYTES:
                     raise SystemExit(f"{slug}-{label}.{ext} is {size} bytes, over {HEADER_MAX_BYTES}")
+    for files in saved.values():
+        for name, data in files.items():
+            (header_dir / name).write_bytes(data)
     (CONTRIBUTIONS / "index.html").write_text(page, encoding="utf-8")
     image_path = CONTRIBUTIONS / CONTRIB_OG_NAME
+    # Only freshly fetched banners feed the share image, so a saved set does not change it.
     write_contributions_og(image_path, shown, headers)
     with Image.open(image_path) as image:
         if image.size != (1200, 630):
             raise SystemExit(f"contributions share image must be 1200x630, got {image.size}")
-    flagged = [stall.slug for stall in shown if stall.slug not in headers]
+    flagged = [stall.slug for stall in shown if stall.slug not in header_slugs]
     print(
-        f"contributions: {len(headers)} header images, {len(flagged)} flag cards"
+        f"contributions: {len(header_slugs)} header images, {len(flagged)} flag cards"
         + (f" ({', '.join(flagged)})" if flagged else "")
         + ", eco omitted"
     )
