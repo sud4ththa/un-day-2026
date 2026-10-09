@@ -159,20 +159,27 @@ def map_headers(headers: list[str]) -> dict[str, int]:
     return found
 
 
+def _row_nonempty(row: list) -> bool:
+    return any(str(c).strip() for c in row)
+
+
 def read_rows(path: Path) -> tuple[list[str], list[list[str]]]:
     text = path.read_text(encoding="utf-8-sig")
     if path.suffix == ".json":
         data = json.loads(text)
         if isinstance(data, dict) and "headers" in data:
-            return [str(h) for h in data["headers"]], [[str(c) for c in r] for r in data.get("rows", [])]
+            headers = [str(h) for h in data["headers"]]
+            rows = [[str(c) for c in r] for r in data.get("rows", [])]
+            return headers, [r for r in rows if _row_nonempty(r)]
         if isinstance(data, list):
             headers = list(data[0].keys()) if data else []
-            return headers, [[str(r.get(h, "")) for h in headers] for r in data]
+            rows = [[str(r.get(h, "")) for h in headers] for r in data]
+            return headers, [r for r in rows if _row_nonempty(r)]
         raise SystemExit(f"{path}: unsupported JSON shape")
     rows = list(csv.reader(io.StringIO(text)))
     if not rows:
         return [], []
-    return rows[0], [r for r in rows[1:] if any(c.strip() for c in r)]
+    return rows[0], [r for r in rows[1:] if _row_nonempty(r)]
 
 
 def parse_time(raw: str, now: datetime) -> datetime | None:
@@ -407,7 +414,11 @@ def coerce_type(raw: str) -> str:
 def ingest_responses(path: Path, slug: str, menu: list[str], aliases: dict, closed: set[str],
                      has_contrib: bool, money_only: bool, now: datetime, overrides: dict):
     """Read one response file. Public totals are families and quantities.
-    Contact fields stay out of data.json; the caller writes them to pledges.json."""
+    Contact fields stay out of data.json; the caller writes them to pledges.json.
+
+    A row with no child, parent, phone, or email is not a response. That drops
+    a hand-typed totals row. A hand-added cash row that names the child is kept.
+    """
     headers, rows = read_rows(path)
     col = map_headers(headers)
     classes: dict[str, int] = {}
@@ -433,9 +444,13 @@ def ingest_responses(path: Path, slug: str, menu: list[str], aliases: dict, clos
     fam_slip: dict[str, str] = {}
     response_contrib = {k: 0 for k in CONTRIB_KEYS} if (has_contrib or money_only) else None
     extras: dict[str, set[str]] = {}
+    response_count = 0
     for n, row in enumerate(rows, 1):
         r = {k: norm(row[i]) if i < len(row) else "" for k, i in col.items()}
         r["_row"] = f"{slug}:{n}"
+        if not SHEET.person_named(r):
+            continue
+        response_count += 1
         for k in ("parent", "phone", "email", "child", "notes", "extra", "class_other"):
             val = r.get(k, "")
             if len(val) < 3:
@@ -523,6 +538,7 @@ def ingest_responses(path: Path, slug: str, menu: list[str], aliases: dict, clos
             "parent": r.get("parent", ""),
             "child": r.get("child", ""),
             "phone": r.get("phone", ""),
+            "email": r.get("email", ""),
             "class": cl,
             "type": ct,
             "items": items,
@@ -546,7 +562,7 @@ def ingest_responses(path: Path, slug: str, menu: list[str], aliases: dict, clos
         fam_contrib = None
     money = family_money(fam_parts, fam_pay, fam_slip, money_only, fam_contrib)
     return {
-        "responses": len(rows),
+        "responses": response_count,
         "families": set(fam_types) or set(),
         "by_class": [{"class": c, "count": classes[c]} for c in sorted(classes, key=class_sort)],
         "menu": menu_rows,
@@ -1311,6 +1327,115 @@ def update_menus() -> None:
     CONFIG.write_text(json.dumps(cfg, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
 
+def _test_identityless_rows(now: datetime) -> None:
+    """Totals and blank rows are not pledges. A hand-added child row still is."""
+    folder = Path("/tmp/undash-totals-row")
+    folder.mkdir(parents=True, exist_ok=True)
+    header = ["Timestamp", "Parent name", "WhatsApp number", "Email address", "Child's name", "Class",
+              "Child's Contribution Value (Minimum Rs 3,000-5,000)", "Payment status", "Deposit slip"]
+    normal = ["2/10/2026 8:00:00", "Parent A", "0773100001", "a@example.com", "Ann", "Year 2A",
+              "5,000", "Received", "https://example.test/a"]
+    phone_only = ["", "", "0773100099", "", "", "Year 2D", "3500", "", ""]
+    email_only = ["", "", "", "c@example.com", "", "Year 2A", "4000", "", ""]
+    buf = io.StringIO()
+    writer = csv.writer(buf)
+    writer.writerow(header)
+    writer.writerow(normal)
+    text = buf.getvalue() + "\n,,,,,,,,\n,,,,,,198500,,,,\n,,,,,,,Received,https://example.test/ghost\n,,,,Child H,2C,3000,,\n"
+    extra = io.StringIO()
+    writer = csv.writer(extra)
+    writer.writerow(phone_only)
+    writer.writerow(email_only)
+    text += extra.getvalue()
+    if ",,,,,,198500,,,," not in text or ",,,,Child H,2C,3000,," not in text:
+        raise SystemExit("fixture did not keep the totals row or the hand-added child row")
+    csv_path = folder / "australia.csv"
+    csv_path.write_text(text, encoding="utf-8")
+    _headers, raw_rows = read_rows(csv_path)
+    if len(raw_rows) != 6 or not any(cell == "198500" for row in raw_rows for cell in row):
+        raise SystemExit(f"blank rows were kept, or the totals row was dropped early: {raw_rows}")
+    got = ingest_responses(csv_path, "australia", [], {}, set(), False, True, now, {})
+    expected = 5000 + 3000 + 3500 + 4000
+    stated = [SHEET.parse_rupees(c.get("amount") or "") for c in got["contacts"]]
+    if got["responses"] != 4 or len(got["families"]) != 4 or len(got["contacts"]) != 4:
+        raise SystemExit(f"totals or blank row counted as a response: {got['responses']} families={len(got['families'])}")
+    if None in stated or sum(stated) != expected or got["money"]["total"] != expected or got["money"]["known"] != 4:
+        raise SystemExit(f"Australia total was not the sum of the real rows: {got['money']} contacts={stated}")
+    if any(row["amount"] == "Rs 198,500" for row in got["money"]["by_amount"]):
+        raise SystemExit(f"totals amount was bucketed: {got['money']['by_amount']}")
+    if got["money"]["by_amount"] != [
+        {"amount": "Rs 3,000", "children": 1},
+        {"amount": "Rs 3,500", "children": 1},
+        {"amount": "Rs 4,000", "children": 1},
+        {"amount": "Rs 5,000", "children": 1},
+    ]:
+        raise SystemExit(f"amount bands included a totals row or missed a child: {got['money']['by_amount']}")
+    if got["money"]["buckets"] != {"received": 1, "pending": 0, "unmarked": 3, "other": 0}:
+        raise SystemExit(f"payment mark on the totals row was counted: {got['money']['buckets']}")
+    if got["money"]["slips"] != {"filled": 1, "uploaded": 1, "written": 0}:
+        raise SystemExit(f"slip on the totals row was counted: {got['money']['slips']}")
+    if not any(c.get("child") == "Child H" and c.get("class") == "Year 2C" for c in got["contacts"]):
+        raise SystemExit(f"hand-added child was dropped: {got['contacts']}")
+    if any("ghost" in (c.get("slip") or "") or (c.get("amount") or "") == "198500" for c in got["contacts"]):
+        raise SystemExit("totals row stayed in the contact list")
+    classes = {row["class"]: row["count"] for row in got["by_class"]}
+    if "Not given" in classes or classes != {"Year 2A": 2, "Year 2C": 1, "Year 2D": 1}:
+        raise SystemExit(f"class counts included an empty row: {classes}")
+
+    listed = [dict(zip(header, normal)), {key: "" for key in header},
+              dict(zip(header, ["", "", "", "", "", "", "198500", "", ""])),
+              dict(zip(header, ["", "", "", "", "Child H", "2C", "3000", "", ""]))]
+    list_path = folder / "listed.json"
+    list_path.write_text(json.dumps(listed), encoding="utf-8")
+    list_headers, list_rows = read_rows(list_path)
+    if list_headers != header or len(list_rows) != 3:
+        raise SystemExit(f"blank JSON row was kept: {len(list_rows)} {list_headers}")
+    listed_got = ingest_responses(list_path, "australia", [], {}, set(), False, True, now, {})
+    if listed_got["responses"] != 2 or listed_got["money"]["total"] != 8000:
+        raise SystemExit(f"JSON totals row was counted: {listed_got['money']}")
+    if not any(c.get("child") == "Child H" for c in listed_got["contacts"]):
+        raise SystemExit("JSON hand-added child was dropped")
+
+    sea_header = ["Timestamp", "Parent name", "Mobile number", "Child's name", "Class",
+                  "Contribution Value (Minimum Rs 5,000)", "Status", "Slip / receipt"]
+    sea_text = ",".join(sea_header) + "\n"
+    sea_text += "2/10/2026 8:00:00,Parent S,0772000001,Child S,Year 3A,\"5,000\",,\n"
+    sea_text += "\n,,,Child H,2C,3000,,\n,,,,,198500,,\n,,,,,,,,\n"
+    if ",,,Child H,2C,3000,," not in sea_text:
+        raise SystemExit("literal hand-added row was not written")
+    sea_path = folder / "literal.csv"
+    sea_path.write_text(sea_text, encoding="utf-8")
+    sea = ingest_responses(sea_path, "sea", [], {}, set(), False, True, now, {})
+    sea_stated = [SHEET.parse_rupees(c.get("amount") or "") for c in sea["contacts"]]
+    if sea["responses"] != 2 or None in sea_stated or sum(sea_stated) != 8000 or sea["money"]["total"] != 8000:
+        raise SystemExit(f"literal child row was not counted, or the totals row was: {sea['money']} {sea_stated}")
+    if not any(c.get("child") == "Child H" and c.get("class") == "Year 2C" for c in sea["contacts"]):
+        raise SystemExit("literal hand-added child row was not kept")
+
+    (folder / "clicks.json").write_text(
+        json.dumps({"total": {"clicks": 0, "unique": 0}, "stalls": {}}), encoding="utf-8")
+    out_dir = folder / "out"
+    out_dir.mkdir(parents=True, exist_ok=True)
+    built, _private, _pii, pledges = build(argparse.Namespace(
+        data_dir=str(folder), out=str(out_dir), clicks=str(folder / "clicks.json"), overrides=None,
+    ), now)
+    stall = next(st for st in built["stalls"] if st["slug"] == "australia")
+    if stall["responses"] != 4 or stall["families"] != 4 or stall["money"]["total"] != expected:
+        raise SystemExit(f"fixture build counted the totals row: {stall['responses']} {stall['money']}")
+    pledge_rows = next(st for st in pledges["stalls"] if st["slug"] == "australia")["contacts"]
+    if len(pledge_rows) != 4 or any((c.get("amount") or "") == "198500" for c in pledge_rows):
+        raise SystemExit("fixture build kept the totals row on the contact list")
+    pdf_names = {st["slug"]: f"{st['slug']}.pdf" for st in built["stalls"]}
+    blobs = pdfs_from_snapshot(built, pledges, pdf_names)
+    pdf = next(blob for name, blob in blobs if name == "australia.pdf")
+    if b"198,500" in pdf or b"198500" in pdf or b"ghost" in pdf:
+        raise SystemExit("totals row was written into the stall PDF")
+    if b"a@example.com" in pdf or b"c@example.com" in pdf:
+        raise SystemExit("an email address was written into the stall PDF")
+    if b"Child H" not in pdf or b"Rs 15,500" not in pdf:
+        raise SystemExit("hand-added child or the real total is missing from the stall PDF")
+
+
 def _self_test() -> None:
     cols = map_headers(["Timestamp", "Child's class", "If you chose \"Other\", please type your child's class", "Note", "Anything else?"])
     assert cols.get("class") == 1 and cols.get("class_other") == 2 and cols.get("notes") == 3 and cols.get("extra") == 4, cols
@@ -1448,20 +1573,21 @@ def _self_test() -> None:
     if not fish.get("closed") or fish["count"] != 0:
         raise SystemExit(f"closed fish bun missing: {fish}")
     sea = ingest_responses(folder / "sea.csv", "sea", [], {}, set(), False, True, now, {})
-    if len(sea["families"]) != 4 or sea["money"]["total"] != 30000 or sea["money"]["known"] != 5:
+    if sea["responses"] != 6 or len(sea["families"]) != 4 or sea["money"]["total"] != 30000 or sea["money"]["known"] != 5:
         raise SystemExit(f"SEA-style amounts wrong: families={len(sea['families'])} money={sea['money']}")
     if sea["money"]["buckets"] != {"received": 1, "pending": 1, "unmarked": 2, "other": 0}:
         raise SystemExit(f"payment buckets not once per family: {sea['money']['buckets']}")
     if sea["money"]["by_amount"] != [{"amount": "Rs 5,000", "children": 4}, {"amount": "Rs 10,000", "children": 1}]:
         raise SystemExit(f"SEA amount bands counted a duplicate or missed a child: {sea['money']['by_amount']}")
     aus = ingest_responses(folder / "australia.csv", "australia", [], {}, set(), False, True, now, {})
-    if len(aus["families"]) != 5 or aus["money"]["total"] != 36000:
-        raise SystemExit(f"Australia per-child amounts wrong: families={len(aus['families'])} money={aus['money']}")
+    if aus["responses"] != 11 or len(aus["contacts"]) != 11 or len(aus["families"]) != 5 or aus["money"]["total"] != 36000:
+        raise SystemExit(f"Australia per-child amounts wrong: responses={aus['responses']} families={len(aus['families'])} money={aus['money']}")
     if aus["money"]["buckets"] != {"received": 2, "pending": 1, "unmarked": 2, "other": 0}:
         raise SystemExit(f"Australia payment buckets wrong: {aus['money']['buckets']}")
     aus_bands = {row["amount"]: row["children"] for row in aus["money"]["by_amount"]}
     if aus_bands != {"Rs 3,000": 5, "Rs 3,500": 2, "Rs 4,000": 1, "Rs 5,000": 2}:
         raise SystemExit(f"Australia amount bands wrong: {aus['money']['by_amount']}")
+    _test_identityless_rows(now)
     food_money = ingest_responses(folder / "food-money.csv", "food-money", [], {}, set(), True, False, now, {})
     if len(food_money["families"]) != 1 or not food_money["money"] or food_money["money"]["total"] != 5500:
         raise SystemExit(f"food-stall money was not added per child: {food_money['money']}")

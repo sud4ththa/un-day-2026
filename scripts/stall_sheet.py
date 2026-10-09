@@ -254,7 +254,20 @@ def convert(qty: float, unit: str | None, needed_unit: str | None) -> float | No
     return None
 
 
+def person_named(row: dict) -> bool:
+    """A response names a child, a parent, or a phone or email.
+
+    A hand-typed totals row is only an amount, and a blank row names nobody.
+    A cash row added by hand still counts when it names the child.
+    """
+    for key in ("child", "parent", "phone", "email"):
+        if re.sub(r"\s+", " ", str(row.get(key) or "")).strip():
+            return True
+    return False
+
+
 def summarize_targets(menu: list[dict], contacts: list[dict]) -> list[dict]:
+    contacts = [row for row in contacts if person_named(row)]
     pledges: dict[str, list[tuple[float | None, str | None]]] = {item["label"]: [] for item in menu}
     for row in contacts:
         labels = list(row.get("labels") or [])
@@ -327,6 +340,7 @@ def pay_bucket(status: str) -> str:
 
 
 def summarize_money(contacts: list[dict]) -> dict:
+    contacts = [row for row in contacts if person_named(row)]
     amounts: dict[int, int] = {}
     buckets = {"received": 0, "pending": 0, "unmarked": 0, "other": 0}
     other: dict[str, int] = {}
@@ -373,7 +387,7 @@ def class_key(label: str):
 
 
 def prepare(model: dict) -> dict:
-    contacts = list(model.get("contacts") or [])
+    contacts = [row for row in (model.get("contacts") or []) if person_named(row)]
     contacts.sort(key=lambda r: (class_key(r.get("class") or ""), (r.get("parent") or "").lower(), (r.get("child") or "").lower()))
     model["contacts"] = contacts
     # A snapshot already has page-1 figures from data.json. Recomputing them
@@ -1033,6 +1047,14 @@ def _self_test() -> None:
         raise SystemExit(f"kokis summary wrong: {kokis}")
     if targets["Asmi"]["status"] != "Open" or targets["Asmi"]["pct"] != "0%":
         raise SystemExit(f"open item wrong: {targets['Asmi']}")
+    nameless = {
+        "parent": "", "child": "", "phone": "", "email": "", "notes": "20",
+        "labels": ["Milk toffee"], "unlisted": [], "type": "Food", "amount": "",
+        "pay_status": "", "slip": "",
+    }
+    milk_again = {row["label"]: row for row in summarize_targets(menu, contacts + [nameless])}["Milk toffee"]
+    if milk_again != milk:
+        raise SystemExit(f"a row with no child, parent, or phone changed the food totals: {milk_again}")
     both = assign_quantities(["Milk toffee", "Coconut toffee"], "25 pieces")
     if [q for _, q, _ in both] != [25, 25]:
         raise SystemExit(f"shared quantity wrong: {both}")
@@ -1046,6 +1068,36 @@ def _self_test() -> None:
         raise SystemExit(f"money summary wrong: {money}")
     if money["by_amount"] != [{"amount": "Rs 3,500", "children": 1}, {"amount": "Rs 5,000", "children": 2}]:
         raise SystemExit(f"amount bands wrong: {money['by_amount']}")
+    totals_row = {
+        "parent": "", "child": "", "class": "", "phone": "", "email": "",
+        "amount": "198500", "pay_status": "Received", "slip": "https://example.test/ghost",
+        "notes": "", "labels": [], "type": MONEY,
+    }
+    child_only = {
+        "parent": "", "child": "Child H", "class": "Year 2C", "phone": "", "email": "",
+        "amount": "3000", "pay_status": "", "slip": "", "notes": "", "labels": [], "type": MONEY,
+    }
+    skipped = summarize_money(money_contacts + [{}, {"parent": " ", "child": " ", "phone": " ", "email": " "}, totals_row])
+    if skipped != money:
+        raise SystemExit(f"totals or blank row was counted: {skipped}")
+    kept = summarize_money(money_contacts + [child_only])
+    if kept["total"] != money["total"] + 3000 or kept["families"] != money["families"] + 1:
+        raise SystemExit(f"hand-added child was not counted: {kept}")
+    if {"amount": "Rs 3,000", "children": 1} not in kept["by_amount"]:
+        raise SystemExit(f"hand-added amount missing: {kept['by_amount']}")
+    snap = {
+        "kind": "money", "snapshot": True, "money": money,
+        "contacts": list(money_contacts) + [{}, totals_row, child_only],
+    }
+    prepared = prepare(snap)
+    if prepared["money"] is not money:
+        raise SystemExit("snapshot totals were recomputed from the contact rows")
+    if any((c.get("amount") or "") == "198500" for c in prepared["contacts"]):
+        raise SystemExit("totals row stayed on the contact list")
+    if not any(c.get("child") == "Child H" for c in prepared["contacts"]):
+        raise SystemExit("hand-added child was dropped from the contact list")
+    if len(prepared["contacts"]) != len(money_contacts) + 1:
+        raise SystemExit(f"blank row stayed on the contact list: {len(prepared['contacts'])}")
     food_pdf = render_pdf({
         "name": "Sri Lanka", "years": "Playgroup & Reception", "kind": "food", "connected": True,
         "managed": False, "as_of": "Wed 7 Oct, 9:15 am", "responses": len(contacts), "families": len(contacts),
