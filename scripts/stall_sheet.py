@@ -76,6 +76,11 @@ def parse_needed(needed: str | None) -> tuple[float | None, str | None]:
 # Thousands commas and a decimal point are part of one number.
 # "10,000.00" is Rs 10,000. Deleting every non-digit would make it 1,000,000.
 _RUPEE_TOKEN = re.compile(r"(\d{1,3}(?:,\d{3})+|\d+)(?:\.(\d+))?")
+# A whole cell that is only an amount: optional Rs/LKR, the number, optional /- .
+_PLAIN_PREFIX = re.compile(r"^(?:rs\.?|lkr)\s*", re.I)
+_PLAIN_SUFFIX = re.compile(r"\s*/-\s*$")
+_PLAIN_K = re.compile(r"\d{1,3}(?:\.\d)?\s*k", re.I)
+_PLAIN_NUM = re.compile(r"\d{1,3}(?:,\d{3})+(?:\.\d+)?|\d+(?:\.\d+)?")
 _UNIT_AFTER = re.compile(
     r"\s*(?:pcs|pc|pieces?|nos|no|kgs?|grams?|g|packs?|packets?|boxes|box)\b",
     re.I,
@@ -120,6 +125,24 @@ def parse_rupees(raw: str) -> int | None:
         val = _rupees_from_token(match.group(1), match.group(2))
         if val is not None:
             return val
+    return None
+
+
+def plain_rupees(raw: str) -> int | None:
+    """Rupees when the whole value is one amount, else None.
+
+    '15,000', 'Rs. 5,000/-', 'LKR 15,000', and '10k' are amounts.
+    Free text that only contains one ('Amana 15,000'), a phone, or an
+    email is not. The number itself is read by parse_rupees / k_rupees.
+    """
+    text = str(raw or "").strip()
+    if not text:
+        return None
+    core = _PLAIN_SUFFIX.sub("", _PLAIN_PREFIX.sub("", text, count=1)).strip()
+    if not core:
+        return None
+    if _PLAIN_K.fullmatch(core) or _PLAIN_NUM.fullmatch(core):
+        return parse_rupees(text)
     return None
 
 
@@ -930,6 +953,32 @@ def _self_test() -> None:
     assert money_from_notes("LKR 5,000") == 5000
     assert money_from_notes("25 pieces") is None
     assert money_from_notes("1 kg") is None
+    for raw, want in (
+        ("15,000", 15000),
+        ("5,000", 5000),
+        ("Rs 5,000", 5000),
+        ("Rs. 5,000/-", 5000),
+        ("LKR 15,000", 15000),
+        ("15000", 15000),
+        ("15,000.00", 15000),
+        ("10k", 10000),
+        ("10K", 10000),
+        ("Rs5k", 5000),
+        ("7.5K", 7500),
+    ):
+        if plain_rupees(raw) != want:
+            raise SystemExit(f"plain amount {raw!r} was {plain_rupees(raw)!r}, wanted {want}")
+    for raw in (
+        "Amana 15,000",
+        "0771234567",
+        "+94 77 123 4567",
+        "a@example.com",
+        "25 pieces",
+        "Transferred Rs5k to Natasha",
+        "about 15,000",
+    ):
+        if plain_rupees(raw) is not None:
+            raise SystemExit(f"plain amount accepted personal text {raw!r}")
     menu = [
         {"label": "Milk toffee", "needed": "100"},
         {"label": "Coconut toffee", "needed": "50"},

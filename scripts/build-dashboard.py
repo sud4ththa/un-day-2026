@@ -437,8 +437,16 @@ def ingest_responses(path: Path, slug: str, menu: list[str], aliases: dict, clos
         r = {k: norm(row[i]) if i < len(row) else "" for k, i in col.items()}
         r["_row"] = f"{slug}:{n}"
         for k in ("parent", "phone", "email", "child", "notes", "extra", "class_other"):
-            if len(r.get(k, "")) >= 3 and not (k == "notes" and COUNTS.parse_qty(r[k]) is not None):
-                found_pii.add(r[k])
+            val = r.get(k, "")
+            if len(val) < 3:
+                continue
+            # A quantity, or a value that is only a rupee amount, is not a name,
+            # phone, or email. "15,000" is an amount; "Amana 15,000" is not.
+            if k == "notes" and COUNTS.parse_qty(val) is not None:
+                continue
+            if k in ("notes", "extra") and SHEET.plain_rupees(val) is not None:
+                continue
+            found_pii.add(val)
         fam = family_key(r)
         t = parse_time(r.get("timestamp", ""), now)
         ov = row_override(overrides, slug, r.get("timestamp", ""), t)
@@ -1477,6 +1485,94 @@ def _self_test() -> None:
     assert_no_public_pdfs(guard)
     if (guard / "sheets").exists():
         raise SystemExit("empty sheets directory was left in the public folder")
+    amount_dir = Path("/tmp/undash-amount-note")
+    amount_dir.mkdir(parents=True, exist_ok=True)
+    for old in amount_dir.glob("*.csv"):
+        old.unlink()
+    note_header = ["Timestamp", "Parent name", "Mobile number", "Email", "Child's name", "Class",
+                   "How would you like to contribute?", "Food you can bring", "Quantity / notes",
+                   "Anything else?", "Monetary contribution (optional)", "Status", "Slip / receipt"]
+    amount_values = (
+        "15,000", "5,000", "Rs 5,000", "Rs. 5,000/-", "LKR 15,000", "15000", "15,000.00", "10k",
+    )
+    with (amount_dir / "notes.csv").open("w", encoding="utf-8", newline="") as fh:
+        writer = csv.writer(fh)
+        writer.writerow(note_header)
+        for raw in amount_values:
+            writer.writerow(["2/10/2026 9:00:00", "Parent One", "0771234567", "b@example.com", "Child One",
+                             "Year 1A", "Monetary contribution", "", raw, "", "", "", ""])
+            writer.writerow(["2/10/2026 9:01:00", "Parent One", "0771234567", "b@example.com", "Child One",
+                             "Year 1A", "Monetary contribution", "", "", raw, "", "", ""])
+        writer.writerow(["2/10/2026 9:02:00", "Parent One", "0771234567", "b@example.com", "Child One",
+                         "Year 1A", "Monetary contribution", "", "20 pieces", "", "", "", ""])
+        writer.writerow(["2/10/2026 9:03:00", "Parent One", "0771234567", "b@example.com", "Child One",
+                         "Year 1A", "Monetary contribution", "", "Amana 15,000", "", "", "", ""])
+        writer.writerow(["2/10/2026 9:04:00", "Parent One", "", "", "Child One",
+                         "Year 1A", "Monetary contribution", "", "+94 77 123 4567", "", "", "", ""])
+        writer.writerow(["2/10/2026 9:05:00", "Parent One", "", "", "Child One",
+                         "Year 1A", "Monetary contribution", "", "a@example.com", "", "", "", ""])
+        writer.writerow(["2/10/2026 9:06:00", "Parent One", "", "", "Child One",
+                         "Year 1A", "Monetary contribution", "", "", "0779999999", "", "", ""])
+        writer.writerow(["2/10/2026 9:07:00", "Parent One", "", "", "Child One",
+                         "Year 1A", "Monetary contribution", "", "", "25 pieces", "", "", ""])
+        writer.writerow(["2/10/2026 9:08:00", "Parent One", "", "", "Child One",
+                         "Year 1A", "Monetary contribution", "", "", "hello 15,000", "", "", ""])
+    checked = ingest_responses(amount_dir / "notes.csv", "japan", [], {}, set(), True, False, now, {})
+    for raw in amount_values:
+        if raw in checked["pii"]:
+            raise SystemExit(f"amount treated as personal data: {raw}")
+    if "20 pieces" in checked["pii"]:
+        raise SystemExit("a quantity note was treated as personal data")
+    for raw in ("Amana 15,000", "+94 77 123 4567", "a@example.com", "0779999999",
+                "25 pieces", "hello 15,000", "Parent One", "0771234567", "b@example.com", "Child One"):
+        if raw not in checked["pii"]:
+            raise SystemExit(f"personal value was not flagged: {raw}")
+    with (amount_dir / "japan.csv").open("w", encoding="utf-8", newline="") as fh:
+        writer = csv.writer(fh)
+        writer.writerow(sl_header)
+        writer.writerow(["2/10/2026 9:00:00", "Parent One", "0771234567", "a@example.com", "Child One",
+                         "Year 1A", "Monetary contribution", "", "15,000", "", "", ""])
+    (amount_dir / "clicks.json").write_text(
+        json.dumps({"total": {"clicks": 0, "unique": 0}, "stalls": {}}), encoding="utf-8")
+    out_dir = amount_dir / "out"
+    out_dir.mkdir(parents=True, exist_ok=True)
+    built, _private, built_pii, _pledges = build(argparse.Namespace(
+        data_dir=str(amount_dir), out=str(out_dir), clicks=str(amount_dir / "clicks.json"), overrides=None,
+    ), now)
+    japan = next(st for st in built["stalls"] if st["slug"] == "japan")
+    if "15,000" not in (japan.get("money_line") or "") or "15,000" in built_pii:
+        raise SystemExit(f"fixture amount did not publish cleanly: {japan.get('money_line')!r}")
+    for raw in ("Parent One", "0771234567", "a@example.com", "Child One"):
+        if raw not in built_pii:
+            raise SystemExit(f"fixture contact was not flagged: {raw}")
+    logos = {"bsc": GEN.logo_data(GEN.BSC_LOGO), "pc": GEN.logo_data(GEN.PC_LOGO, ink=True)}
+    page = render(built, logos, None)
+    jtext = json.dumps(built, ensure_ascii=False, indent=2) + "\n"
+    safe = json.dumps(json.loads(CONFIG.read_text(encoding="utf-8"))) + (ROOT / "forms.txt").read_text(encoding="utf-8") + CSS
+    safe += " ".join(x["class"] for st in built["stalls"] for x in st["by_class"])
+    assert_no_pii([jtext, re.sub(r'src="data:[^"]+"', "", page)], built_pii, safe)
+    if "15,000" not in jtext:
+        raise SystemExit("fixture amount was not on the public page")
+    try:
+        assert_no_pii([jtext], {"15,000"}, safe)
+    except SystemExit as err:
+        if "personal value" not in str(err):
+            raise
+    else:
+        raise SystemExit("an amount still listed as personal data was published")
+    for blob, val in (
+        ("Amana 15,000", "Amana 15,000"),
+        ("0771234567", "0771234567"),
+        ("+94 77 123 4567", "+94 77 123 4567"),
+        ("a@example.com", "a@example.com"),
+    ):
+        try:
+            assert_no_pii([blob], {val}, "")
+        except SystemExit as err:
+            if "personal value" not in str(err):
+                raise
+        else:
+            raise SystemExit(f"personal value was published: {val}")
     print("dashboard self-test ok")
 
 
