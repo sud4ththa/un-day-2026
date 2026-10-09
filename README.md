@@ -50,7 +50,7 @@ slug | Stall name | form-url | year groups | note
 
 Leave the form URL blank until the form is ready. Lines starting with `#` are comments. The form address is only the third column.
 
-To publish or change a form URL, edit that third column, then run `python3 scripts/gen-go.py` and commit `forms.txt` together with the regenerated `go/` folder. The script copies each form address into its short-link page at build time, so the page opens the form without loading anything else. Editing `forms.txt` alone does not change where a link goes.
+To publish or change a form URL, edit that third column, then run `python3 scripts/gen-go.py` and commit `forms.txt` together with the regenerated `go/` folder and the `contributions/` page. The script copies each form address into its short-link page at build time, so the page opens the form without loading anything else. Editing `forms.txt` alone does not change where a link goes.
 
 Year groups and the optional note are the preview shown when a `/go/<slug>/` link is pasted into WhatsApp. Leave the year groups blank for a generic preview. A note replaces the sentence "Tap to pledge food or a contribution for the … stall." After editing a name, year group, or note, run `python3 scripts/gen-go.py`.
 
@@ -68,7 +68,15 @@ To add or remove a stall, add or delete its line in `forms.txt`, then regenerate
 python3 scripts/gen-go.py
 ```
 
-Do not edit files under `go/` by hand. The script rewrites them from `forms.txt` and `tracker.txt`, including the form and tracker addresses. The logos are inlined as small greyscale PNGs, and the preview images (`og.jpg`) are drawn deterministically, so unchanged stalls keep identical images.
+Do not edit files under `go/` or `contributions/` by hand. The script rewrites them from `forms.txt` and `tracker.txt`, including the form and tracker addresses. The logos are inlined as small greyscale PNGs, and the preview images (`og.jpg`) are drawn deterministically, so unchanged stalls keep identical images.
+
+## Parent contributions page
+
+`https://sud4ththa.github.io/un-day-2026/contributions/` is the public page for stall contribution forms. It is generated from `forms.txt` (same order) by `python3 scripts/gen-go.py`, which writes `contributions/index.html` and the 1200×630 share image `contributions/og.png`.
+
+Each tile shows that stall's flags, using the same name-to-flag mapping as the WhatsApp groups page, then the stall name and year groups. The tile links to `/un-day-2026/go/<slug>/`, not straight to the form, so the short link still records the tap and then opens the form. A blank form address is greyed out, says "Form coming soon", and is not a link.
+
+The page says "the PTC". Commit `contributions/` together with `forms.txt` after you regenerate. Drawing the share image needs Pillow and CairoSVG (`pip install pillow cairosvg`).
 
 The pages are self-contained. `/go/?s=<slug>` uses a stall list baked into `go/index.html`. To preview them, serve the parent of this repo while the repo folder is named `un-day-2026`, then open `http://localhost:8000/un-day-2026/go/sri-lanka/`.
 

@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
-"""Regenerate the go/ short-link pages from forms.txt and tracker.txt.
+"""Regenerate the go/ short-link pages and the parent contributions page.
+
+Reads forms.txt and tracker.txt.
 
 Each /go/<slug>/ page is fully static. The form address (third column of
 forms.txt) and the click-tracker address (tracker.txt) are baked into the
@@ -11,13 +13,20 @@ screen and replaces itself with the form after REDIRECT_MS. A holding
 page records the tap and stays put. Nothing waits for the tracker.
 
 Because the addresses are baked in, you MUST run this script and commit
-the regenerated go/ folder after any of these changes:
+the regenerated go/ folder and contributions/ page after any of these
+changes:
 
   * a form address is added, changed, or cleared in forms.txt
   * a stall is added or removed, or its name, year groups, or note change
   * the tracker address in tracker.txt is set, changed, or cleared
 
     python3 scripts/gen-go.py
+
+That run also rewrites contributions/index.html and contributions/og.png.
+The page lists every stall in forms.txt order. A stall with a form
+address links to /un-day-2026/go/<slug>/ (the short link, so the tap is
+still logged). A blank address is a greyed "Form coming soon" tile and
+is not a link. Flags use the same name-to-flag mapping as app.js.
 
 The Open Graph preview images are drawn deterministically, so a stall
 whose name and year groups did not change keeps a byte-identical image.
@@ -56,6 +65,7 @@ BASE = "/un-day-2026"
 SLUG_RE = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)*$")
 SERIF = "/usr/share/fonts/truetype/liberation/LiberationSerif-Regular.ttf"
 SANS = "/usr/share/fonts/truetype/liberation/LiberationSans-Regular.ttf"
+SANS_BOLD = "/usr/share/fonts/truetype/liberation/LiberationSans-Bold.ttf"
 BSC_LOGO = ROOT / "assets" / "bsc-logo.png"
 PC_LOGO = ROOT / "assets" / "pc-logo.png"
 BANNERS = ROOT / "assets" / "banners"
@@ -64,6 +74,15 @@ BANNER_OG = "og-v2.jpg"
 CUSTOM_OG_DIR = ROOT / "assets" / "custom-og"
 CUSTOM_OG = "og-v3.jpg"
 PLAIN_OG = "og.jpg"
+FLAGS = ROOT / "flags"
+CONTRIBUTIONS = ROOT / "contributions"
+CONTRIB_OG_NAME = "og.png"
+CONTRIB_TITLE = "UN Day 2026 · Parent Contributions"
+CONTRIB_DESCRIPTION = "Tap your child's stall to pledge food or a contribution."
+CONTRIB_INTRO = "Tap your child’s stall to open its contribution form."
+CONTRIB_FOOTER = "The PTC · The British School in Colombo"
+UN_BLUE = (0, 158, 219)
+PC_PURPLE = (53, 30, 91)
 PREVIEW_URL = re.compile(
     r"https://sud4ththa\.github\.io/un-day-2026/go/[a-z0-9-]+/(?:og(?:-v[23])?\.jpg)?"
 )
@@ -407,6 +426,11 @@ def js(value: object) -> str:
 
 def esc(value: str) -> str:
     return html.escape(value, quote=True)
+
+
+def esc_double(value: str) -> str:
+    """Escape for a double-quoted attribute, keeping apostrophes as characters."""
+    return html.escape(value, quote=False).replace('"', "&quot;")
 
 
 def heading(name: str) -> str:
@@ -827,6 +851,365 @@ def write_banner_og_image(path: Path, stall: Stall, banner_file: Path) -> None:
     canvas.save(path, "JPEG", quality=86, optimize=True, subsampling=2)
 
 
+# Same stall → flag files as STALL_FLAGS in app.js (code in flags/, readable name).
+# A third item is the full alt text. The two extra keys are the forms.txt
+# spellings of stalls the WhatsApp page names differently.
+_STALL_FLAG_ROWS: dict[str, list[tuple[str, ...]]] = {
+    "Sri Lanka": [("lk", "Sri Lanka")],
+    "India": [("in", "India")],
+    "USA/Canada": [("us", "United States"), ("ca", "Canada")],
+    "Europe": [("eu", "European Union")],
+    "Japan": [("jp", "Japan")],
+    "Singapore/Malaysia/Thailand": [("sg", "Singapore"), ("my", "Malaysia"), ("th", "Thailand")],
+    "Middle East": [("ae", "United Arab Emirates"), ("sa", "Saudi Arabia"), ("jo", "Jordan"), ("om", "Oman")],
+    "China": [("cn", "China")],
+    "Eco Warriors": [("eco", "Eco Warriors", "Green leaf")],
+    "Australia/NZ/Philippines/Indonesia": [
+        ("au", "Australia"),
+        ("nz", "New Zealand"),
+        ("ph", "Philippines"),
+        ("id", "Indonesia"),
+    ],
+    "Palestine and UN Zone": [("ps", "Palestine"), ("un", "United Nations")],
+    "Maldives": [("mv", "Maldives")],
+}
+_STALL_FLAG_ROWS["Singapore/Malaysia/Vietnam/Thailand"] = _STALL_FLAG_ROWS["Singapore/Malaysia/Thailand"]
+_STALL_FLAG_ROWS["UN Zone / Palestine"] = _STALL_FLAG_ROWS["Palestine and UN Zone"]
+
+
+def _norm_stall_name(value: str) -> str:
+    return re.sub(r"[^a-z0-9]", "", value.lower().replace("&", "and"))
+
+
+FLAG_LOOKUP = {_norm_stall_name(name): rows for name, rows in _STALL_FLAG_ROWS.items()}
+
+
+def _has_banned_word(text: str) -> bool:
+    """Reject wording the public page must not use. Pieces stay split so the
+    source does not spell those words."""
+    folded = text.casefold()
+    blocked = (
+        "dona" + "te",
+        "dona" + "tion",
+        "organis" + "ers",
+        "organis" + "ing team",
+    )
+    if any(word in folded for word in blocked):
+        return True
+    return re.search(r"\b" + "pt" + "a" + r"\b", folded) is not None
+
+
+def stall_flags(stall: Stall) -> list[tuple[str, str]]:
+    """Flag file code and alt text, using the same loose name match as app.js."""
+    rows = FLAG_LOOKUP.get(_norm_stall_name(stall.name))
+    if not rows:
+        print(f"contributions: no flag mapping for {stall.name!r}; using globe", file=sys.stderr)
+        rows = [("globe", "Globe")]
+    flags: list[tuple[str, str]] = []
+    for row in rows:
+        alt = row[2] if len(row) > 2 else f"{row[1]} flag"
+        flags.append((row[0], alt))
+    return flags
+
+
+def render_tile(stall: Stall) -> str:
+    flags = stall_flags(stall)
+    images = "\n".join(
+        "            "
+        f'<img src="../flags/{esc(code)}.svg" alt="{esc(alt)}" width="640" height="480" decoding="async">'
+        for code, alt in flags
+    )
+    name = esc(stall.name).replace("/", "/\u200b")
+    parts = [
+        f'          <div class="flags n{len(flags)}">',
+        images,
+        "          </div>",
+        f'          <div class="name">{name}</div>',
+    ]
+    if stall.is_open:
+        if stall.years:
+            parts.append(f'          <div class="label">{esc(stall.years)}</div>')
+        aria = stall.name if not stall.years else f"{stall.name}, {stall.years}"
+        href = f"{BASE}/go/{stall.slug}/"
+        body = "\n".join(parts)
+        return (
+            "      <li>\n"
+            f'        <a class="tile" href="{esc(href)}" aria-label="{esc(aria)}">\n'
+            f"{body}\n"
+            "        </a>\n"
+            "      </li>"
+        )
+    if stall.years:
+        parts.append(f'          <div class="years">{esc(stall.years)}</div>')
+    parts.append('          <div class="label">Form coming soon</div>')
+    body = "\n".join(parts)
+    return (
+        "      <li>\n"
+        f'        <div class="tile off" aria-disabled="true" aria-label="{esc(stall.name)}, form coming soon">\n'
+        f"{body}\n"
+        "        </div>\n"
+        "      </li>"
+    )
+
+
+def render_contributions(stalls: list[Stall]) -> str:
+    image = f"{SITE}/contributions/{CONTRIB_OG_NAME}"
+    page_url = f"{SITE}/contributions/"
+    tiles = "\n".join(render_tile(stall) for stall in stalls)
+    return f"""<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta property="og:title" content="{esc(CONTRIB_TITLE)}">
+  <meta property="og:description" content="{esc_double(CONTRIB_DESCRIPTION)}">
+  <meta property="og:image" content="{esc(image)}">
+  <meta property="og:image:secure_url" content="{esc(image)}">
+  <meta property="og:image:type" content="image/png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="{esc(CONTRIB_TITLE)}">
+  <meta property="og:url" content="{esc(page_url)}">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="The PTC">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="{esc(CONTRIB_TITLE)}">
+  <meta name="twitter:description" content="{esc_double(CONTRIB_DESCRIPTION)}">
+  <meta name="twitter:image" content="{esc(image)}">
+  <link rel="image_src" href="{esc(image)}">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>{esc(CONTRIB_TITLE)}</title>
+  <meta name="description" content="{esc_double(CONTRIB_DESCRIPTION)}">
+  <meta name="theme-color" content="#009edb">
+  <link rel="icon" href="../flags/un.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="../style.css">
+  <style>
+    .site-header .hint {{
+      max-width: min(22.5rem, calc(100% - 4px));
+      line-height: 1.35;
+    }}
+    .years {{
+      margin-top: 6px;
+      text-align: center;
+      font-size: .82rem;
+      font-weight: 600;
+      line-height: 1.3;
+      color: var(--ink);
+    }}
+    a.tile, .tile.off {{ padding: 16px 14px 16px; }}
+    a.tile {{ touch-action: manipulation; }}
+    .tile.off .years {{ color: var(--muted); }}
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <div class="brand">
+      <img class="logo logo-bsc" src="../assets/bsc-logo.png" alt="The British School in Colombo" width="180" height="240">
+      <h1>UN Day 2026 <span class="dot">·</span> <span class="nowrap">Parent Contributions</span></h1>
+      <img class="logo logo-pc" src="../assets/pc-logo.png" alt="BSC Parent Collective" width="247" height="240">
+    </div>
+    <p class="sub">The PTC · Fri 16 Oct</p>
+    <p class="hint">{esc(CONTRIB_INTRO)}</p>
+  </header>
+
+  <main>
+    <ul class="grid" aria-label="Stalls">
+{tiles}
+    </ul>
+  </main>
+
+  <footer class="site-footer">
+    <span>{esc(CONTRIB_FOOTER)}</span>
+  </footer>
+</body>
+</html>
+"""
+
+
+def _check_contributions(page: str, stalls: list[Stall]) -> None:
+    if _has_banned_word(page):
+        raise SystemExit("contributions page contains wording that is not allowed")
+    if esc(CONTRIB_TITLE) not in page or esc_double(CONTRIB_DESCRIPTION) not in page:
+        raise SystemExit("contributions page is missing its title or description")
+    if esc(CONTRIB_INTRO) not in page or esc(CONTRIB_FOOTER) not in page:
+        raise SystemExit("contributions page is missing the intro or footer")
+    if "docs.google.com" in page or "forms.gle" in page:
+        raise SystemExit("contributions page must link to the short link, not the form")
+    if page.count("<li>") != len(stalls):
+        raise SystemExit("tile count does not match forms.txt")
+    cursor = 0
+    soon = 0
+    for stall in stalls:
+        for code, _alt in stall_flags(stall):
+            if not (FLAGS / f"{code}.svg").is_file():
+                raise SystemExit(f"missing flags/{code}.svg for {stall.slug}")
+        href = f'href="{BASE}/go/{stall.slug}/"'
+        if stall.is_open:
+            pos = page.find(href, cursor)
+            if pos < 0:
+                raise SystemExit(f"contributions page is missing {href}")
+            cursor = pos + len(href)
+            if stall.url and stall.url in page:
+                raise SystemExit(f"contributions page includes the form address for {stall.slug}")
+        else:
+            soon += 1
+            if href in page:
+                raise SystemExit(f"{stall.slug} has no form address and must not be a link")
+    if page.count("Form coming soon") != soon:
+        raise SystemExit("coming-soon tile count does not match forms.txt")
+
+
+def _raster_svg(path: Path, width: int, height: int) -> Image.Image:
+    try:
+        import cairosvg
+    except ImportError as err:
+        raise SystemExit(
+            "cairosvg is required to draw contributions/og.png. Install it with: pip install cairosvg"
+        ) from err
+    png = cairosvg.svg2png(url=str(path), output_width=width, output_height=height)
+    return Image.open(io.BytesIO(png)).convert("RGBA")
+
+
+def _fit_rgba(path: Path, height: int) -> Image.Image:
+    logo = Image.open(path).convert("RGBA")
+    width = max(1, round(logo.width * height / logo.height))
+    return logo.resize((width, height), Image.Resampling.LANCZOS)
+
+
+def _pc_badge(diameter: int) -> Image.Image:
+    badge = Image.new("RGBA", (diameter, diameter), (0, 0, 0, 0))
+    ImageDraw.Draw(badge).ellipse((0, 0, diameter - 1, diameter - 1), fill=(*PC_PURPLE, 255))
+    logo = _fit_rgba(PC_LOGO, diameter - 16)
+    badge.alpha_composite(logo, ((diameter - logo.width) // 2, (diameter - logo.height) // 2))
+    return badge
+
+
+def _flag_card(code: str, card_w: int, card_h: int) -> Image.Image:
+    pad = 8
+    flag_w = card_w - pad * 2
+    flag_h = card_h - pad * 2
+    flag = _raster_svg(FLAGS / f"{code}.svg", flag_w * 2, flag_h * 2)
+    flag = flag.resize((flag_w, flag_h), Image.Resampling.LANCZOS)
+    mask = Image.new("L", flag.size, 0)
+    ImageDraw.Draw(mask).rounded_rectangle((0, 0, flag_w - 1, flag_h - 1), radius=5, fill=255)
+    flag.putalpha(mask)
+    ring = Image.new("RGBA", flag.size, (0, 0, 0, 0))
+    ImageDraw.Draw(ring).rounded_rectangle(
+        (0, 0, flag_w - 1, flag_h - 1), radius=5, outline=(0, 0, 0, 48), width=1
+    )
+    card = Image.new("RGBA", (card_w, card_h), (0, 0, 0, 0))
+    ImageDraw.Draw(card).rounded_rectangle((0, 0, card_w - 1, card_h - 1), radius=12, fill=(255, 255, 255, 255))
+    card.alpha_composite(flag, (pad, pad))
+    card.alpha_composite(ring, (pad, pad))
+    return card
+
+
+def _card_shadow(card_w: int, card_h: int) -> tuple[Image.Image, tuple[int, int]]:
+    blur = 5
+    extra = blur * 2
+    shadow = Image.new("RGBA", (card_w + extra * 2, card_h + extra * 2), (0, 0, 0, 0))
+    ImageDraw.Draw(shadow).rounded_rectangle(
+        (extra, extra + 3, extra + card_w - 1, extra + card_h + 2),
+        radius=14,
+        fill=(0, 30, 60, 90),
+    )
+    return shadow.filter(ImageFilter.GaussianBlur(blur)), (-extra, -extra + 1)
+
+
+def write_contributions_og(path: Path, stalls: list[Stall]) -> None:
+    """1200x630 flag collage on UN blue, titled for parent contributions."""
+    width, height = 1200, 630
+    measure = ImageDraw.Draw(Image.new("RGB", (1, 1)))
+    title_font = ImageFont.truetype(SANS_BOLD, 60)
+    line_font = ImageFont.truetype(SANS_BOLD, 40)
+    detail_font = ImageFont.truetype(SANS, 26)
+    title = "UN Day 2026"
+    line = "Parent Contributions"
+    detail = "The PTC · Fri 16 Oct"
+    for text in (title, line, detail, CONTRIB_TITLE, CONTRIB_DESCRIPTION):
+        if _has_banned_word(text):
+            raise SystemExit("contributions share image contains wording that is not allowed")
+
+    def bounds(text: str, font: ImageFont.FreeTypeFont) -> tuple[int, int, int, int]:
+        return measure.textbbox((0, 0), text, font=font)
+
+    bsc = _fit_rgba(BSC_LOGO, 108)
+    badge = _pc_badge(100)
+    logo_gap = 28
+    title_box = bounds(title, title_font)
+    line_box = bounds(line, line_font)
+    while (line_box[2] - line_box[0]) > 520 and line_font.size > 30:
+        line_font = ImageFont.truetype(SANS_BOLD, line_font.size - 2)
+        line_box = bounds(line, line_font)
+    detail_box = bounds(detail, detail_font)
+    title_w, title_h = title_box[2] - title_box[0], title_box[3] - title_box[1]
+    line_w, line_h = line_box[2] - line_box[0], line_box[3] - line_box[1]
+    detail_w, detail_h = detail_box[2] - detail_box[0], detail_box[3] - detail_box[1]
+    text_w = max(title_w, line_w)
+    text_h = title_h + 10 + line_h
+    row_h = max(bsc.height, badge.height, text_h)
+    header_h = row_h + 16 + detail_h
+
+    cols = 6 if len(stalls) > 6 else max(1, len(stalls))
+    row_count = (len(stalls) + cols - 1) // cols
+    gap_x, gap_y = 12, 14
+    card_w = 94
+    flag_w = card_w - 16
+    card_h = round(flag_w * 3 / 4) + 16
+    grid_h = row_count * card_h + (row_count - 1) * gap_y
+    block_h = header_h + 32 + grid_h
+    top = max(24, (height - block_h) // 2)
+
+    overlay = Image.new("RGBA", (width, height), (0, 0, 0, 0))
+    draw = ImageDraw.Draw(overlay)
+    row_w = bsc.width + logo_gap + text_w + logo_gap + badge.width
+    x0 = (width - row_w) // 2
+    overlay.alpha_composite(bsc, (x0, top + (row_h - bsc.height) // 2))
+    text_x = x0 + bsc.width + logo_gap
+    title_y = top + (row_h - text_h) // 2
+    draw.text(
+        (text_x + (text_w - title_w) / 2 - title_box[0], title_y - title_box[1]),
+        title, font=title_font, fill=(255, 255, 255, 255),
+    )
+    draw.text(
+        (text_x + (text_w - line_w) / 2 - line_box[0], title_y + title_h + 10 - line_box[1]),
+        line, font=line_font, fill=(255, 255, 255, 255),
+    )
+    overlay.alpha_composite(badge, (text_x + text_w + logo_gap, top + (row_h - badge.height) // 2))
+    detail_y = top + row_h + 16
+    draw.text(
+        ((width - detail_w) / 2 - detail_box[0], detail_y - detail_box[1]),
+        detail, font=detail_font, fill=(255, 255, 255, 235),
+    )
+
+    grid_top = detail_y + detail_h + 32
+    for index, stall in enumerate(stalls):
+        row, col = divmod(index, cols)
+        in_row = min(cols, len(stalls) - row * cols)
+        row_pixels = in_row * card_w + (in_row - 1) * gap_x
+        x = (width - row_pixels) // 2 + col * (card_w + gap_x)
+        y = grid_top + row * (card_h + gap_y)
+        card = _flag_card(stall_flags(stall)[0][0], card_w, card_h)
+        shadow, offset = _card_shadow(card_w, card_h)
+        overlay.alpha_composite(shadow, (x + offset[0], y + offset[1]))
+        overlay.alpha_composite(card, (x, y))
+
+    image = Image.alpha_composite(Image.new("RGBA", (width, height), (*UN_BLUE, 255)), overlay)
+    image.convert("RGB").save(path, "PNG", optimize=True)
+
+
+def write_contributions(stalls: list[Stall]) -> None:
+    page = render_contributions(stalls)
+    _check_contributions(page, stalls)
+    if CONTRIBUTIONS.exists():
+        shutil.rmtree(CONTRIBUTIONS)
+    CONTRIBUTIONS.mkdir()
+    (CONTRIBUTIONS / "index.html").write_text(page, encoding="utf-8")
+    image_path = CONTRIBUTIONS / CONTRIB_OG_NAME
+    write_contributions_og(image_path, stalls)
+    with Image.open(image_path) as image:
+        if image.size != (1200, 630):
+            raise SystemExit(f"contributions share image must be 1200x630, got {image.size}")
+
 
 def main() -> None:
     stalls = parse_stalls(FORMS.read_text(encoding="utf-8"))
@@ -853,10 +1236,11 @@ def main() -> None:
             write_og_image(folder / PLAIN_OG, stall)
     GO.mkdir(exist_ok=True)
     (GO / "index.html").write_text(render_index(stalls, endpoint, logos), encoding="utf-8")
+    write_contributions(stalls)
     live = sum(1 for stall in stalls if stall.is_open)
     print(
         f"wrote {len(stalls)} short links ({live} with a form, {len(stalls) - live} opening soon), "
-        f"previews, and go/index.html; tracking {'on' if endpoint else 'off'}"
+        f"previews, go/index.html and contributions/; tracking {'on' if endpoint else 'off'}"
     )
 
 

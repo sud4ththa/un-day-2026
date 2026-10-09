@@ -9,9 +9,17 @@
 # To point a stall at its form, paste the https address in the third
 # column, then ALWAYS run:
 #   python3 scripts/gen-go.py
-# and commit forms.txt together with the regenerated go/ folder. Editing
-# this file alone does not change where a short link goes. The address
-# is only the third column (it must not contain a "|").
+# and commit forms.txt together with the regenerated go/ folder and the
+# contributions/ page. Editing this file alone does not change where a
+# short link goes, and it does not update the parent contributions page.
+# The address is only the third column (it must not contain a "|").
+#
+# The parent contributions page (contributions/index.html, published at
+# /un-day-2026/contributions/) is built from this file, in this order.
+# A stall with a form address is a tile linking to /un-day-2026/go/<slug>/.
+# A blank address is a greyed "Form coming soon" tile and is not a link.
+# The same script rewrites that page and its share image,
+# contributions/og.png.
 #
 # Year groups and the optional note are the WhatsApp link preview.
 # Leave year groups blank for a generic preview. The note, if present,
