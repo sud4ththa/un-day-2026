@@ -22,11 +22,14 @@ changes:
 
     python3 scripts/gen-go.py
 
-That run also rewrites contributions/index.html and contributions/og.png.
-The page lists every stall in forms.txt order. A stall with a form
-address links to /un-day-2026/go/<slug>/ (the short link, so the tap is
-still logged). A blank address is a greyed "Form coming soon" tile and
-is not a link. Flags use the same name-to-flag mapping as app.js.
+That run also rewrites contributions/index.html, contributions/og.png
+and the header images under contributions/headers/. The page lists stalls
+in forms.txt order, except Eco Warriors, which is left off. A stall with
+a form address links to /un-day-2026/go/<slug>/ (the short link, so the
+tap is still logged). The picture is that form's header when the public
+page can be read; otherwise the tile keeps the stall's flags. A blank
+address, other than Eco Warriors, is a greyed "Form coming soon" tile
+and is not a link. Flags use the same name-to-flag mapping as app.js.
 
 The Open Graph preview images are drawn deterministically, so a stall
 whose name and year groups did not change keeps a byte-identical image.
@@ -52,6 +55,8 @@ import re
 from dataclasses import dataclass
 import shutil
 import sys
+import urllib.error
+import urllib.request
 from pathlib import Path
 
 from PIL import Image, ImageDraw, ImageFilter, ImageFont, ImageOps
@@ -81,6 +86,18 @@ CONTRIB_TITLE = "UN Day 2026 · Parent Contributions"
 CONTRIB_DESCRIPTION = "Tap your child's stall to pledge food or a contribution."
 CONTRIB_INTRO = "Tap your child’s stall to open its contribution form."
 CONTRIB_FOOTER = "The PTC · The British School in Colombo"
+# Eco Warriors has no form yet, so the contributions page leaves it off.
+CONTRIB_SKIP = frozenset({"eco"})
+# Public form headers are 1600x400. Cards keep that ratio so the centred title stays visible.
+HEADER_RATIO = 4 / 1
+HEADER_WIDTHS = (("1x", 640), ("2x", 1280))
+HEADER_MAX_BYTES = 120_000
+# Enough eager tiles for the first row at the widest layout (4 columns).
+HEADER_EAGER = 4
+FORM_UA = (
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
+    "(KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36"
+)
 UN_BLUE = (0, 158, 219)
 PC_PURPLE = (53, 30, 91)
 PREVIEW_URL = re.compile(
@@ -912,18 +929,40 @@ def stall_flags(stall: Stall) -> list[tuple[str, str]]:
     return flags
 
 
-def render_tile(stall: Stall) -> str:
+def _media(stall: Stall, *, header: bool, index: int) -> str:
+    eager = index < HEADER_EAGER
+    loading = "eager" if eager else "lazy"
+    priority = ' fetchpriority="high"' if index == 0 else ""
+    if header:
+        alt = esc(f"{stall.name} stall")
+        base = f"headers/{stall.slug}"
+        return (
+            '          <div class="banner">\n'
+            "            <picture>\n"
+            f'              <source type="image/webp" srcset="{base}-1x.webp 1x, {base}-2x.webp 2x">\n'
+            f'              <img src="{base}-1x.jpg" srcset="{base}-1x.jpg 1x, {base}-2x.jpg 2x"'
+            f' alt="{alt}" width="1280" height="320" decoding="async" loading="{loading}"{priority}>\n'
+            "            </picture>\n"
+            "          </div>"
+        )
     flags = stall_flags(stall)
     images = "\n".join(
         "            "
-        f'<img src="../flags/{esc(code)}.svg" alt="{esc(alt)}" width="640" height="480" decoding="async">'
+        f'<img src="../flags/{esc(code)}.svg" alt="{esc(alt)}" width="640" height="480"'
+        f' decoding="async" loading="{loading}">'
         for code, alt in flags
     )
+    return (
+        f'          <div class="flags n{len(flags)}">\n'
+        f"{images}\n"
+        "          </div>"
+    )
+
+
+def render_tile(stall: Stall, *, header: bool, index: int) -> str:
     name = esc(stall.name).replace("/", "/\u200b")
     parts = [
-        f'          <div class="flags n{len(flags)}">',
-        images,
-        "          </div>",
+        _media(stall, header=header, index=index),
         f'          <div class="name">{name}</div>',
     ]
     if stall.is_open:
@@ -952,10 +991,13 @@ def render_tile(stall: Stall) -> str:
     )
 
 
-def render_contributions(stalls: list[Stall]) -> str:
+def render_contributions(stalls: list[Stall], header_slugs: set[str]) -> str:
     image = f"{SITE}/contributions/{CONTRIB_OG_NAME}"
     page_url = f"{SITE}/contributions/"
-    tiles = "\n".join(render_tile(stall) for stall in stalls)
+    tiles = "\n".join(
+        render_tile(stall, header=stall.slug in header_slugs, index=index)
+        for index, stall in enumerate(stalls)
+    )
     return f"""<!doctype html>
 <html lang="en">
 <head>
@@ -983,10 +1025,48 @@ def render_contributions(stalls: list[Stall]) -> str:
   <link rel="icon" href="../flags/un.svg" type="image/svg+xml">
   <link rel="stylesheet" href="../style.css">
   <style>
+    main {{ max-width: 1120px; }}
     .site-header .hint {{
       max-width: min(22.5rem, calc(100% - 4px));
       line-height: 1.35;
     }}
+    .grid {{ grid-template-columns: 1fr; gap: 14px; }}
+    @media (min-width: 640px) {{
+      .grid {{ grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }}
+    }}
+    @media (min-width: 960px) {{
+      .grid {{ grid-template-columns: repeat(3, minmax(0, 1fr)); }}
+    }}
+    @media (min-width: 1440px) {{
+      .grid {{ grid-template-columns: repeat(4, minmax(0, 1fr)); }}
+      main {{ max-width: 1280px; }}
+    }}
+    .banner, .tile .flags {{
+      aspect-ratio: 4 / 1;
+      overflow: hidden;
+      border-radius: 10px;
+      background: #e7eef3;
+    }}
+    .banner img {{
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center center;
+    }}
+    .tile .flags {{
+      background: #f4f7fa;
+      gap: 3%;
+    }}
+    .tile .flags img {{
+      width: auto;
+      height: 68%;
+      max-width: 28%;
+    }}
+    .tile .flags.n1 img {{ height: 84%; max-width: 42%; }}
+    .tile .flags.n2 img {{ height: 74%; max-width: 32%; }}
+    .tile .flags.n3 img,
+    .tile .flags.n4 img {{ height: 40%; max-width: 22%; }}
     .years {{
       margin-top: 6px;
       text-align: center;
@@ -995,7 +1075,7 @@ def render_contributions(stalls: list[Stall]) -> str:
       line-height: 1.3;
       color: var(--ink);
     }}
-    a.tile, .tile.off {{ padding: 16px 14px 16px; }}
+    a.tile, .tile.off {{ padding: 12px 12px 14px; }}
     a.tile {{ touch-action: manipulation; }}
     .tile.off .years {{ color: var(--muted); }}
   </style>
@@ -1025,15 +1105,17 @@ def render_contributions(stalls: list[Stall]) -> str:
 """
 
 
-def _check_contributions(page: str, stalls: list[Stall]) -> None:
+def _check_contributions(page: str, stalls: list[Stall], header_slugs: set[str]) -> None:
     if _has_banned_word(page):
         raise SystemExit("contributions page contains wording that is not allowed")
     if esc(CONTRIB_TITLE) not in page or esc_double(CONTRIB_DESCRIPTION) not in page:
         raise SystemExit("contributions page is missing its title or description")
     if esc(CONTRIB_INTRO) not in page or esc(CONTRIB_FOOTER) not in page:
         raise SystemExit("contributions page is missing the intro or footer")
-    if "docs.google.com" in page or "forms.gle" in page:
-        raise SystemExit("contributions page must link to the short link, not the form")
+    if any(token in page for token in ("docs.google.com", "forms.gle", "googleusercontent", "forms-images")):
+        raise SystemExit("contributions page must not hotlink a form or its header")
+    if "Eco Warriors" in page or "/go/eco/" in page:
+        raise SystemExit("Eco Warriors must not appear on the contributions page")
     if page.count("<li>") != len(stalls):
         raise SystemExit("tile count does not match forms.txt")
     cursor = 0
@@ -1043,6 +1125,17 @@ def _check_contributions(page: str, stalls: list[Stall]) -> None:
             if not (FLAGS / f"{code}.svg").is_file():
                 raise SystemExit(f"missing flags/{code}.svg for {stall.slug}")
         href = f'href="{BASE}/go/{stall.slug}/"'
+        if stall.slug in header_slugs:
+            for name in (
+                f"headers/{stall.slug}-1x.jpg",
+                f"headers/{stall.slug}-2x.jpg",
+                f"headers/{stall.slug}-1x.webp",
+                f"headers/{stall.slug}-2x.webp",
+            ):
+                if name not in page:
+                    raise SystemExit(f"contributions page is missing {name}")
+        elif f"headers/{stall.slug}-" in page:
+            raise SystemExit(f"{stall.slug} should keep its flags")
         if stall.is_open:
             pos = page.find(href, cursor)
             if pos < 0:
@@ -1115,7 +1208,98 @@ def _card_shadow(card_w: int, card_h: int) -> tuple[Image.Image, tuple[int, int]
     return shadow.filter(ImageFilter.GaussianBlur(blur)), (-extra, -extra + 1)
 
 
-def write_contributions_og(path: Path, stalls: list[Stall]) -> None:
+def _header_image_url(html: str) -> str:
+    """The form's own header banner, not the social-preview crop."""
+    banners = re.findall(
+        r"background-image:\s*url\((https://(?:docs\.google\.com/forms-images-rt|lh\d+\.googleusercontent\.com)/[^)\s]+)\)",
+        html,
+    )
+    if not banners:
+        banners = re.findall(
+            r'property="og:image" content="(https://lh\d+\.googleusercontent\.com/[^"]+)"',
+            html,
+        )
+    if not banners:
+        return ""
+    url = banners[0]
+    if re.search(r"=w\d+", url):
+        return re.sub(r"=w\d+.*$", "=w1600", url)
+    return url + "=w1600"
+
+
+def _http_bytes(url: str, timeout: int) -> bytes:
+    request = urllib.request.Request(url, headers={"User-Agent": FORM_UA})
+    with urllib.request.urlopen(request, timeout=timeout) as response:
+        return response.read()
+
+
+def fetch_form_header(stall: Stall) -> Image.Image | None:
+    if not stall.is_open:
+        return None
+    try:
+        html = _http_bytes(stall.url, 30).decode("utf-8", "replace")
+    except urllib.error.HTTPError as err:
+        print(f"contributions: {stall.slug}: form page HTTP {err.code}; keeping flags", file=sys.stderr)
+        return None
+    except Exception as err:
+        print(f"contributions: {stall.slug}: form page not available ({type(err).__name__}); keeping flags", file=sys.stderr)
+        return None
+    image_url = _header_image_url(html)
+    if not image_url:
+        print(f"contributions: {stall.slug}: no header image; keeping flags", file=sys.stderr)
+        return None
+    try:
+        return Image.open(io.BytesIO(_http_bytes(image_url, 40)))
+    except urllib.error.HTTPError as err:
+        print(f"contributions: {stall.slug}: header HTTP {err.code}; keeping flags", file=sys.stderr)
+        return None
+    except Exception as err:
+        print(f"contributions: {stall.slug}: header not available ({type(err).__name__}); keeping flags", file=sys.stderr)
+        return None
+
+
+def _cover_rgb(image: Image.Image, size: tuple[int, int]) -> Image.Image:
+    image = image.convert("RGB")
+    width, height = size
+    scale = max(width / image.width, height / image.height)
+    resized = image.resize((max(1, round(image.width * scale)), max(1, round(image.height * scale))), Image.Resampling.LANCZOS)
+    left = max(0, (resized.width - width) // 2)
+    top = max(0, (resized.height - height) // 2)
+    return resized.crop((left, top, left + width, top + height))
+
+
+def _save_under(image: Image.Image, path: Path, kind: str) -> None:
+    qualities = (82, 74, 66, 58, 50) if kind == "JPEG" else (80, 70, 60, 50)
+    last = b""
+    for quality in qualities:
+        buf = io.BytesIO()
+        if kind == "JPEG":
+            image.save(buf, "JPEG", quality=quality, optimize=True, progressive=True)
+        else:
+            image.save(buf, "WEBP", quality=quality, method=6)
+        last = buf.getvalue()
+        if len(last) <= HEADER_MAX_BYTES:
+            break
+    path.write_bytes(last)
+
+
+def save_header_files(image: Image.Image, folder: Path, slug: str) -> None:
+    for label, width in HEADER_WIDTHS:
+        height = max(1, round(width / HEADER_RATIO))
+        sized = _cover_rgb(image, (width, height))
+        _save_under(sized, folder / f"{slug}-{label}.jpg", "JPEG")
+        _save_under(sized, folder / f"{slug}-{label}.webp", "WEBP")
+
+
+def _rounded_photo(image: Image.Image, size: tuple[int, int], radius: int) -> Image.Image:
+    photo = _cover_rgb(image, size).convert("RGBA")
+    mask = Image.new("L", size, 0)
+    ImageDraw.Draw(mask).rounded_rectangle((0, 0, size[0] - 1, size[1] - 1), radius=radius, fill=255)
+    photo.putalpha(mask)
+    return photo
+
+
+def _write_flag_og(path: Path, stalls: list[Stall]) -> None:
     """1200x630 flag collage on UN blue, titled for parent contributions."""
     width, height = 1200, 630
     measure = ImageDraw.Draw(Image.new("RGB", (1, 1)))
@@ -1197,18 +1381,90 @@ def write_contributions_og(path: Path, stalls: list[Stall]) -> None:
     image.convert("RGB").save(path, "PNG", optimize=True)
 
 
+def _write_header_og(path: Path, photos: list[Image.Image]) -> None:
+    """1200x630 collage of a few form headers under the page title."""
+    width, height = 1200, 630
+    canvas = Image.new("RGBA", (width, height), (*UN_BLUE, 255))
+    draw = ImageDraw.Draw(canvas)
+    title_font = ImageFont.truetype(SANS_BOLD, 54)
+    line_font = ImageFont.truetype(SANS_BOLD, 36)
+    detail_font = ImageFont.truetype(SANS, 24)
+    title, line, detail = "UN Day 2026", "Parent Contributions", "The PTC · Fri 16 Oct"
+    bsc = _fit_rgba(BSC_LOGO, 78)
+    badge = _pc_badge(74)
+
+    def place(text: str, font: ImageFont.FreeTypeFont, y: int) -> int:
+        box = draw.textbbox((0, 0), text, font=font)
+        draw.text(((width - (box[2] - box[0])) / 2 - box[0], y - box[1]), text, font=font, fill=(255, 255, 255, 255))
+        return box[3] - box[1]
+
+    canvas.alpha_composite(bsc, (36, 28))
+    canvas.alpha_composite(badge, (width - 36 - badge.width, 30))
+    y = 36
+    y += place(title, title_font, y) + 6
+    y += place(line, line_font, y) + 8
+    place(detail, detail_font, y)
+
+    shown = photos[:4]
+    cols = 2 if len(shown) > 1 else 1
+    rows = (len(shown) + cols - 1) // cols
+    gap = 16
+    margin = 36
+    banner_w = (width - margin * 2 - gap * (cols - 1)) // cols
+    banner_h = max(1, round(banner_w / HEADER_RATIO))
+    grid_h = rows * banner_h + (rows - 1) * gap
+    grid_top = height - 28 - grid_h
+    for index, photo in enumerate(shown):
+        row, col = divmod(index, cols)
+        x = margin + col * (banner_w + gap)
+        y = grid_top + row * (banner_h + gap)
+        frame = Image.new("RGBA", (banner_w, banner_h), (0, 0, 0, 0))
+        ImageDraw.Draw(frame).rounded_rectangle((0, 0, banner_w - 1, banner_h - 1), radius=14, fill=(255, 255, 255, 255))
+        frame.alpha_composite(_rounded_photo(photo, (banner_w - 8, banner_h - 8), 10), (4, 4))
+        canvas.alpha_composite(frame, (x, y))
+    canvas.convert("RGB").save(path, "PNG", optimize=True)
+
+
+def write_contributions_og(path: Path, stalls: list[Stall], headers: dict[str, Image.Image]) -> None:
+    photos = [headers[stall.slug] for stall in stalls if stall.slug in headers]
+    if len(photos) >= 2:
+        _write_header_og(path, photos)
+        return
+    _write_flag_og(path, stalls)
+
+
 def write_contributions(stalls: list[Stall]) -> None:
-    page = render_contributions(stalls)
-    _check_contributions(page, stalls)
+    shown = [stall for stall in stalls if stall.slug not in CONTRIB_SKIP]
+    headers: dict[str, Image.Image] = {}
+    for stall in shown:
+        image = fetch_form_header(stall)
+        if image is not None:
+            headers[stall.slug] = image
+    page = render_contributions(shown, set(headers))
+    _check_contributions(page, shown, set(headers))
     if CONTRIBUTIONS.exists():
         shutil.rmtree(CONTRIBUTIONS)
-    CONTRIBUTIONS.mkdir()
+    header_dir = CONTRIBUTIONS / "headers"
+    header_dir.mkdir(parents=True)
+    for slug, image in headers.items():
+        save_header_files(image, header_dir, slug)
+        for label, _width in HEADER_WIDTHS:
+            for ext in ("jpg", "webp"):
+                size = (header_dir / f"{slug}-{label}.{ext}").stat().st_size
+                if size > HEADER_MAX_BYTES:
+                    raise SystemExit(f"{slug}-{label}.{ext} is {size} bytes, over {HEADER_MAX_BYTES}")
     (CONTRIBUTIONS / "index.html").write_text(page, encoding="utf-8")
     image_path = CONTRIBUTIONS / CONTRIB_OG_NAME
-    write_contributions_og(image_path, stalls)
+    write_contributions_og(image_path, shown, headers)
     with Image.open(image_path) as image:
         if image.size != (1200, 630):
             raise SystemExit(f"contributions share image must be 1200x630, got {image.size}")
+    flagged = [stall.slug for stall in shown if stall.slug not in headers]
+    print(
+        f"contributions: {len(headers)} header images, {len(flagged)} flag cards"
+        + (f" ({', '.join(flagged)})" if flagged else "")
+        + ", eco omitted"
+    )
 
 
 def main() -> None:
