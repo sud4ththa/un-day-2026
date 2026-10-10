@@ -1,6 +1,6 @@
 {
-  "updated": "2026-10-09T21:32+05:30",
-  "data_hash": "2be5513737005df2",
+  "updated": "2026-10-10T07:15+05:30",
+  "data_hash": "ff97a112b2ed6bdf",
   "event": {
     "name": "UN Day 2026",
     "date": "2026-10-16",
@@ -11,26 +11,26 @@
     "stalls": 11,
     "connected": 11,
     "stall_managed": 0,
-    "responses": 295,
-    "families": 242,
+    "responses": 296,
+    "families": 243,
     "contribution": {
       "Food": 65,
       "Monetary contribution": 184,
-      "Both": 9,
+      "Both": 10,
       "Not given": 0
     },
     "menu_items": 94,
     "menu_items_unpledged": 48,
-    "last_response": "2026-10-09T20:42+05:30",
+    "last_response": "2026-10-10T00:00+05:30",
     "clicks": {
-      "total": 1212,
-      "unique": 858,
+      "total": 1226,
+      "unique": 866,
       "all_links": {
-        "total": 1213,
-        "unique": 712
+        "total": 1227,
+        "unique": 719
       }
     },
-    "conversion": 0.344
+    "conversion": 0.342
   },
   "stalls": [
     {
@@ -307,19 +307,19 @@
       "money_line": "Money: 12 families (1 also bringing food). No amounts stated on the sheet, so no money % is shown.",
       "last_response": "2026-10-09T19:51+05:30",
       "clicks": {
-        "total": 107,
-        "unique": 81,
+        "total": 112,
+        "unique": 82,
         "by_src": {
-          "g2": 60,
-          "(none)": 47
+          "g2": 63,
+          "(none)": 49
         },
         "by_device": {
-          "mobile": 99,
+          "mobile": 104,
           "desktop": 6,
           "tablet": 2
         }
       },
-      "conversion": 0.457
+      "conversion": 0.451
     },
     {
       "slug": "japan",
@@ -435,18 +435,18 @@
       "money_line": "Money: 25 families (2 also bringing food). Amounts stated add up to Rs 15,000.",
       "last_response": "2026-10-09T20:42+05:30",
       "clicks": {
-        "total": 172,
-        "unique": 124,
+        "total": 174,
+        "unique": 126,
         "by_src": {
-          "g2": 97,
+          "g2": 99,
           "(none)": 75
         },
         "by_device": {
-          "mobile": 158,
+          "mobile": 160,
           "desktop": 14
         }
       },
-      "conversion": 0.242
+      "conversion": 0.238
     },
     {
       "slug": "australia",
@@ -623,18 +623,18 @@
       "money_line": "",
       "last_response": "2026-10-08T22:10+05:30",
       "clicks": {
-        "total": 198,
-        "unique": 119,
+        "total": 201,
+        "unique": 121,
         "by_src": {
-          "g2": 162,
-          "(none)": 36
+          "g2": 164,
+          "(none)": 37
         },
         "by_device": {
-          "mobile": 183,
+          "mobile": 186,
           "desktop": 15
         }
       },
-      "conversion": 0.303,
+      "conversion": 0.298,
       "data_as_of": "2026-10-08T22:28+05:30"
     },
     {
@@ -644,8 +644,8 @@
       "minimum_note": "",
       "status": "ok",
       "money_only": false,
-      "responses": 17,
-      "families": 17,
+      "responses": 18,
+      "families": 18,
       "by_class": [
         {
           "class": "Year 7A",
@@ -673,20 +673,20 @@
         },
         {
           "class": "Year 11D",
-          "count": 1
+          "count": 2
         }
       ],
       "contribution": {
         "Food": 7,
         "Monetary contribution": 8,
-        "Both": 2,
+        "Both": 3,
         "Not given": 0
       },
       "menu": [
         {
           "item": "Boondi (5 kg)",
-          "count": 3,
-          "pledged": "1.5 kg + 1 tbc",
+          "count": 4,
+          "pledged": "1.5 kg + 2 tbc",
           "pct": ">=30%",
           "status": "Partial",
           "label": "Boondi",
@@ -694,9 +694,9 @@
         },
         {
           "item": "Jalebi (300 pieces)",
-          "count": 1,
-          "pledged": "50 pcs",
-          "pct": "17%",
+          "count": 2,
+          "pledged": "50 pcs + 1 tbc",
+          "pct": ">=17%",
           "status": "Partial",
           "label": "Jalebi",
           "needed": "300 pieces"
@@ -799,21 +799,21 @@
         }
       ],
       "money": null,
-      "money_line": "Money: 10 families (2 also bringing food). Amounts stated add up to Rs 16,000.",
-      "last_response": "2026-10-09T12:37+05:30",
+      "money_line": "Money: 11 families (3 also bringing food). Amounts stated add up to Rs 16,000.",
+      "last_response": "2026-10-10T00:00+05:30",
       "clicks": {
-        "total": 54,
+        "total": 55,
         "unique": 40,
         "by_src": {
           "g2": 33,
-          "(none)": 21
+          "(none)": 22
         },
         "by_device": {
-          "mobile": 49,
+          "mobile": 50,
           "desktop": 5
         }
       },
-      "conversion": 0.425
+      "conversion": 0.45
     },
     {
       "slug": "americas",
@@ -925,18 +925,18 @@
       "money_line": "Money: 15 families (2 also bringing food). Amounts stated add up to Rs 20,000.",
       "last_response": "2026-10-09T13:34+05:30",
       "clicks": {
-        "total": 79,
-        "unique": 56,
+        "total": 80,
+        "unique": 57,
         "by_src": {
-          "g2": 41,
+          "g2": 42,
           "(none)": 38
         },
         "by_device": {
-          "mobile": 71,
+          "mobile": 72,
           "desktop": 8
         }
       },
-      "conversion": 0.5
+      "conversion": 0.491
     },
     {
       "slug": "europe",
@@ -1055,18 +1055,18 @@
       "money_line": "",
       "last_response": "2026-10-09T13:17+05:30",
       "clicks": {
-        "total": 58,
-        "unique": 41,
+        "total": 59,
+        "unique": 42,
         "by_src": {
-          "(none)": 32,
+          "(none)": 33,
           "g2": 26
         },
         "by_device": {
-          "mobile": 51,
+          "mobile": 52,
           "desktop": 7
         }
       },
-      "conversion": 0.659
+      "conversion": 0.643
     },
     {
       "slug": "middle-east",
@@ -1365,18 +1365,18 @@
       "money_line": "Money: 15 families. Amounts stated add up to Rs 36,000.",
       "last_response": "2026-10-09T20:02+05:30",
       "clicks": {
-        "total": 157,
-        "unique": 108,
+        "total": 158,
+        "unique": 109,
         "by_src": {
-          "(none)": 154,
+          "(none)": 155,
           "group": 3
         },
         "by_device": {
-          "mobile": 147,
+          "mobile": 148,
           "desktop": 10
         }
       },
-      "conversion": 0.176
+      "conversion": 0.174
     },
     {
       "slug": "maldives",
