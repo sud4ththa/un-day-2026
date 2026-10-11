@@ -1,6 +1,6 @@
 {
-  "updated": "2026-10-11T09:17+05:30",
-  "data_hash": "1ccb7ba969a91f29",
+  "updated": "2026-10-11T10:18+05:30",
+  "data_hash": "39607661f3f3446c",
   "event": {
     "name": "UN Day 2026",
     "date": "2026-10-16",
@@ -11,26 +11,26 @@
     "stalls": 11,
     "connected": 11,
     "stall_managed": 0,
-    "responses": 311,
-    "families": 254,
+    "responses": 312,
+    "families": 255,
     "contribution": {
       "Food": 68,
-      "Monetary contribution": 193,
+      "Monetary contribution": 194,
       "Both": 10,
       "Not given": 0
     },
     "menu_items": 94,
     "menu_items_unpledged": 47,
-    "last_response": "2026-10-11T08:39+05:30",
+    "last_response": "2026-10-11T10:05+05:30",
     "clicks": {
-      "total": 1334,
-      "unique": 940,
+      "total": 1343,
+      "unique": 945,
       "all_links": {
-        "total": 1336,
-        "unique": 784
+        "total": 1345,
+        "unique": 789
       }
     },
-    "conversion": 0.331
+    "conversion": 0.33
   },
   "stalls": [
     {
@@ -435,18 +435,18 @@
       "money_line": "Money: 27 families (2 also bringing food). Amounts stated add up to Rs 15,000.",
       "last_response": "2026-10-11T08:39+05:30",
       "clicks": {
-        "total": 192,
-        "unique": 140,
+        "total": 197,
+        "unique": 143,
         "by_src": {
-          "g2": 113,
-          "(none)": 79
+          "g2": 117,
+          "(none)": 80
         },
         "by_device": {
-          "mobile": 178,
+          "mobile": 183,
           "desktop": 14
         }
       },
-      "conversion": 0.236
+      "conversion": 0.231
     },
     {
       "slug": "australia",
@@ -623,18 +623,18 @@
       "money_line": "",
       "last_response": "2026-10-08T22:10+05:30",
       "clicks": {
-        "total": 220,
-        "unique": 134,
+        "total": 222,
+        "unique": 135,
         "by_src": {
-          "g2": 181,
+          "g2": 183,
           "(none)": 39
         },
         "by_device": {
-          "mobile": 204,
+          "mobile": 206,
           "desktop": 16
         }
       },
-      "conversion": 0.269,
+      "conversion": 0.267,
       "data_as_of": "2026-10-08T22:28+05:30"
     },
     {
@@ -930,14 +930,14 @@
       "money_line": "Money: 16 families (2 also bringing food). Amounts stated add up to Rs 20,000.",
       "last_response": "2026-10-11T00:13+05:30",
       "clicks": {
-        "total": 96,
+        "total": 97,
         "unique": 64,
         "by_src": {
           "g2": 51,
-          "(none)": 45
+          "(none)": 46
         },
         "by_device": {
-          "mobile": 86,
+          "mobile": 87,
           "desktop": 8,
           "tablet": 2
         }
@@ -1284,8 +1284,8 @@
       "minimum_note": "",
       "status": "ok",
       "money_only": false,
-      "responses": 20,
-      "families": 19,
+      "responses": 21,
+      "families": 20,
       "by_class": [
         {
           "class": "Year 9A",
@@ -1305,7 +1305,7 @@
         },
         {
           "class": "Year 12",
-          "count": 4
+          "count": 5
         },
         {
           "class": "Year 13",
@@ -1318,7 +1318,7 @@
       ],
       "contribution": {
         "Food": 3,
-        "Monetary contribution": 16,
+        "Monetary contribution": 17,
         "Both": 0,
         "Not given": 0
       },
@@ -1368,21 +1368,21 @@
       "unlisted_ticks": 0,
       "extras": [],
       "money": null,
-      "money_line": "Money: 16 families. Amounts stated add up to Rs 36,000.",
-      "last_response": "2026-10-10T09:34+05:30",
+      "money_line": "Money: 17 families. Amounts stated add up to Rs 36,000.",
+      "last_response": "2026-10-11T10:05+05:30",
       "clicks": {
-        "total": 164,
-        "unique": 112,
+        "total": 165,
+        "unique": 113,
         "by_src": {
-          "(none)": 161,
+          "(none)": 162,
           "group": 3
         },
         "by_device": {
-          "mobile": 154,
+          "mobile": 155,
           "desktop": 10
         }
       },
-      "conversion": 0.179
+      "conversion": 0.186
     },
     {
       "slug": "maldives",
