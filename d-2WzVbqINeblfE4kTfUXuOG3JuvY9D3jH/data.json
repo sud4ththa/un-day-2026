@@ -1,6 +1,6 @@
 {
-  "updated": "2026-10-11T08:17+05:30",
-  "data_hash": "811d91f301e20c38",
+  "updated": "2026-10-11T09:17+05:30",
+  "data_hash": "1ccb7ba969a91f29",
   "event": {
     "name": "UN Day 2026",
     "date": "2026-10-16",
@@ -11,26 +11,26 @@
     "stalls": 11,
     "connected": 11,
     "stall_managed": 0,
-    "responses": 309,
-    "families": 253,
+    "responses": 311,
+    "families": 254,
     "contribution": {
       "Food": 68,
-      "Monetary contribution": 192,
+      "Monetary contribution": 193,
       "Both": 10,
       "Not given": 0
     },
     "menu_items": 94,
     "menu_items_unpledged": 47,
-    "last_response": "2026-10-11T00:13+05:30",
+    "last_response": "2026-10-11T08:39+05:30",
     "clicks": {
-      "total": 1328,
-      "unique": 935,
+      "total": 1334,
+      "unique": 940,
       "all_links": {
-        "total": 1330,
-        "unique": 780
+        "total": 1336,
+        "unique": 784
       }
     },
-    "conversion": 0.33
+    "conversion": 0.331
   },
   "stalls": [
     {
@@ -328,8 +328,8 @@
       "minimum_note": "",
       "status": "ok",
       "money_only": false,
-      "responses": 31,
-      "families": 29,
+      "responses": 33,
+      "families": 30,
       "by_class": [
         {
           "class": "Nursery A",
@@ -337,7 +337,7 @@
         },
         {
           "class": "Nursery B",
-          "count": 1
+          "count": 2
         },
         {
           "class": "Nursery D",
@@ -345,7 +345,7 @@
         },
         {
           "class": "Year 1A",
-          "count": 4
+          "count": 5
         },
         {
           "class": "Year 1B",
@@ -366,7 +366,7 @@
       ],
       "contribution": {
         "Food": 3,
-        "Monetary contribution": 24,
+        "Monetary contribution": 25,
         "Both": 2,
         "Not given": 0
       },
@@ -432,21 +432,21 @@
       "unlisted_ticks": 0,
       "extras": [],
       "money": null,
-      "money_line": "Money: 26 families (2 also bringing food). Amounts stated add up to Rs 15,000.",
-      "last_response": "2026-10-10T09:51+05:30",
+      "money_line": "Money: 27 families (2 also bringing food). Amounts stated add up to Rs 15,000.",
+      "last_response": "2026-10-11T08:39+05:30",
       "clicks": {
-        "total": 187,
-        "unique": 136,
+        "total": 192,
+        "unique": 140,
         "by_src": {
-          "g2": 109,
-          "(none)": 78
+          "g2": 113,
+          "(none)": 79
         },
         "by_device": {
-          "mobile": 173,
+          "mobile": 178,
           "desktop": 14
         }
       },
-      "conversion": 0.228
+      "conversion": 0.236
     },
     {
       "slug": "australia",
@@ -1061,18 +1061,18 @@
       "money_line": "",
       "last_response": "2026-10-10T21:44+05:30",
       "clicks": {
-        "total": 62,
-        "unique": 44,
+        "total": 63,
+        "unique": 45,
         "by_src": {
-          "(none)": 36,
+          "(none)": 37,
           "g2": 26
         },
         "by_device": {
-          "mobile": 54,
+          "mobile": 55,
           "desktop": 8
         }
       },
-      "conversion": 0.636
+      "conversion": 0.622
     },
     {
       "slug": "middle-east",
