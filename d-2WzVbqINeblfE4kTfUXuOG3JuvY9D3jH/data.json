@@ -1,6 +1,6 @@
 {
-  "updated": "2026-10-12T11:18+05:30",
-  "data_hash": "1b3931752c2c05e9",
+  "updated": "2026-10-12T11:26+05:30",
+  "data_hash": "8cf85acb5f2b765a",
   "event": {
     "name": "UN Day 2026",
     "date": "2026-10-16",
@@ -19,15 +19,15 @@
       "Both": 13,
       "Not given": 0
     },
-    "menu_items": 63,
-    "menu_items_unpledged": 28,
+    "menu_items": 94,
+    "menu_items_unpledged": 46,
     "last_response": "2026-10-12T11:01+05:30",
     "clicks": {
-      "total": 1574,
-      "unique": 1081,
+      "total": 1575,
+      "unique": 1082,
       "all_links": {
-        "total": 1576,
-        "unique": 895
+        "total": 1577,
+        "unique": 896
       }
     },
     "conversion": 0.333
@@ -39,7 +39,7 @@
       "year_groups": "Playgroup & Reception",
       "minimum_note": "",
       "status": "ok",
-      "money_only": true,
+      "money_only": false,
       "responses": 44,
       "families": 42,
       "by_class": [
@@ -78,36 +78,233 @@
         "Both": 2,
         "Not given": 0
       },
-      "menu": [],
-      "headline_pct": null,
+      "menu": [
+        {
+          "item": "Milk rice with lunu miris (200)",
+          "count": 0,
+          "pledged": "0",
+          "pct": "0%",
+          "status": "Open",
+          "label": "Milk rice with lunu miris",
+          "needed": "200"
+        },
+        {
+          "item": "Konda kavum (200)",
+          "count": 2,
+          "pledged": "60 pcs",
+          "pct": "30%",
+          "status": "Partial",
+          "label": "Konda kavum",
+          "needed": "200"
+        },
+        {
+          "item": "Kokis (500)",
+          "count": 4,
+          "pledged": "60 pcs + 1 tbc",
+          "pct": ">=12%",
+          "status": "Partial",
+          "label": "Kokis",
+          "needed": "500"
+        },
+        {
+          "item": "Asmi (150)",
+          "count": 0,
+          "pledged": "0",
+          "pct": "0%",
+          "status": "Open",
+          "label": "Asmi",
+          "needed": "150"
+        },
+        {
+          "item": "Mung kavum (150)",
+          "count": 0,
+          "pledged": "0",
+          "pct": "0%",
+          "status": "Open",
+          "label": "Mung kavum",
+          "needed": "150"
+        },
+        {
+          "item": "Hadi kavum (150)",
+          "count": 0,
+          "pledged": "0",
+          "pct": "0%",
+          "status": "Open",
+          "label": "Hadi kavum",
+          "needed": "150"
+        },
+        {
+          "item": "Naran kavum (75)",
+          "count": 0,
+          "pledged": "0",
+          "pct": "0%",
+          "status": "Open",
+          "label": "Naran kavum",
+          "needed": "75"
+        },
+        {
+          "item": "Aluwa (75)",
+          "count": 2,
+          "pledged": "20 pcs + 1 tbc",
+          "pct": ">=27%",
+          "status": "Partial",
+          "label": "Aluwa",
+          "needed": "75"
+        },
+        {
+          "item": "Wali thalapa (100)",
+          "count": 0,
+          "pledged": "0",
+          "pct": "0%",
+          "status": "Open",
+          "label": "Wali thalapa",
+          "needed": "100"
+        },
+        {
+          "item": "Halapa (50)",
+          "count": 0,
+          "pledged": "0",
+          "pct": "0%",
+          "status": "Open",
+          "label": "Halapa",
+          "needed": "50"
+        },
+        {
+          "item": "Dodol (200)",
+          "count": 0,
+          "pledged": "0",
+          "pct": "0%",
+          "status": "Open",
+          "label": "Dodol",
+          "needed": "200"
+        },
+        {
+          "item": "Ala toffee (50)",
+          "count": 0,
+          "pledged": "0",
+          "pct": "0%",
+          "status": "Open",
+          "label": "Ala toffee",
+          "needed": "50"
+        },
+        {
+          "item": "Pani walalu (150)",
+          "count": 0,
+          "pledged": "0",
+          "pct": "0%",
+          "status": "Open",
+          "label": "Pani walalu",
+          "needed": "150"
+        },
+        {
+          "item": "Cake (5 kg)",
+          "count": 5,
+          "pledged": "–",
+          "pct": ">=110%",
+          "status": "Covered",
+          "label": "Cake",
+          "needed": "5 kg"
+        },
+        {
+          "item": "Bibikkan (150)",
+          "count": 0,
+          "pledged": "0",
+          "pct": "0%",
+          "status": "Open",
+          "label": "Bibikkan",
+          "needed": "150"
+        },
+        {
+          "item": "Vienna roll (50)",
+          "count": 0,
+          "pledged": "0",
+          "pct": "0%",
+          "status": "Open",
+          "label": "Vienna roll",
+          "needed": "50"
+        },
+        {
+          "item": "Coconut roti (50)",
+          "count": 2,
+          "pledged": "10 pcs + 1 tbc",
+          "pct": ">=20%",
+          "status": "Partial",
+          "label": "Coconut roti",
+          "needed": "50"
+        },
+        {
+          "item": "King coconut (100)",
+          "count": 0,
+          "pledged": "0",
+          "pct": "0%",
+          "status": "Open",
+          "label": "King coconut",
+          "needed": "100"
+        },
+        {
+          "item": "Kesari (75)",
+          "count": 0,
+          "pledged": "0",
+          "pct": "0%",
+          "status": "Open",
+          "label": "Kesari",
+          "needed": "75"
+        },
+        {
+          "item": "Laddu (75)",
+          "count": 1,
+          "pledged": "tbc",
+          "pct": "—",
+          "status": "Partial",
+          "label": "Laddu",
+          "needed": "75"
+        },
+        {
+          "item": "Milk toffee (100)",
+          "count": 8,
+          "pledged": "195 pcs + 1 tbc",
+          "pct": ">=195%",
+          "status": "Covered",
+          "label": "Milk toffee",
+          "needed": "100",
+          "closed": true
+        },
+        {
+          "item": "Coconut toffee (50)",
+          "count": 4,
+          "pledged": "65 pcs + 1 tbc",
+          "pct": ">=130%",
+          "status": "Covered",
+          "label": "Coconut toffee",
+          "needed": "50",
+          "closed": true
+        },
+        {
+          "item": "Thala karali (100)",
+          "count": 4,
+          "pledged": "190 pcs",
+          "pct": "190%",
+          "status": "Covered",
+          "label": "Thala karali",
+          "needed": "100",
+          "closed": true
+        },
+        {
+          "item": "Fish bun, please order from Paan Paan (75)",
+          "count": 2,
+          "pledged": "95 pcs",
+          "pct": "127%",
+          "status": "Covered",
+          "label": "Fish bun, please order from Paan Paan",
+          "needed": "75",
+          "closed": true
+        }
+      ],
+      "headline_pct": "17%",
       "unlisted_ticks": 0,
       "extras": [],
-      "money": {
-        "families": 42,
-        "both": 2,
-        "known": 2,
-        "total": 200,
-        "buckets": {
-          "received": 0,
-          "pending": 0,
-          "unmarked": 42,
-          "other": 0
-        },
-        "other": {},
-        "slips": {
-          "filled": 0,
-          "uploaded": 0,
-          "written": 0
-        },
-        "by_amount": [
-          {
-            "amount": "Rs 100",
-            "children": 2
-          }
-        ],
-        "line": ""
-      },
-      "money_line": "",
+      "money": null,
+      "money_line": "Money: 15 families (2 also bringing food). No amounts stated on the sheet, so no money % is shown.",
       "last_response": "2026-10-11T11:54+05:30",
       "clicks": {
         "total": 138,
@@ -130,7 +327,7 @@
       "year_groups": "Nursery & Year 1",
       "minimum_note": "",
       "status": "ok",
-      "money_only": true,
+      "money_only": false,
       "responses": 37,
       "families": 33,
       "by_class": [
@@ -173,40 +370,69 @@
         "Both": 2,
         "Not given": 0
       },
-      "menu": [],
+      "menu": [
+        {
+          "item": "Veg sushi rolls",
+          "count": 3,
+          "pledged": "40 pcs + 1 tbc",
+          "pct": "—",
+          "status": "Partial",
+          "label": "Veg sushi rolls"
+        },
+        {
+          "item": "Yakisoba noodles",
+          "count": 0,
+          "pledged": "0",
+          "pct": "—",
+          "status": "Open",
+          "label": "Yakisoba noodles"
+        },
+        {
+          "item": "Teriyaki chicken",
+          "count": 1,
+          "pledged": "20 pcs",
+          "pct": "—",
+          "status": "Partial",
+          "label": "Teriyaki chicken"
+        },
+        {
+          "item": "Chicken karaage",
+          "count": 0,
+          "pledged": "0",
+          "pct": "—",
+          "status": "Open",
+          "label": "Chicken karaage"
+        },
+        {
+          "item": "Matcha cookies",
+          "count": 1,
+          "pledged": "tbc",
+          "pct": "—",
+          "status": "Partial",
+          "label": "Matcha cookies"
+        },
+        {
+          "item": "Mochi",
+          "count": 0,
+          "pledged": "0",
+          "pct": "—",
+          "status": "Open",
+          "label": "Mochi"
+        },
+        {
+          "item": "Senbei (rice crackers)",
+          "count": 0,
+          "pledged": "0",
+          "pct": "—",
+          "status": "Open",
+          "label": "Senbei (rice crackers)"
+        }
+      ],
       "headline_pct": null,
       "unlisted_ticks": 0,
       "extras": [],
-      "money": {
-        "families": 33,
-        "both": 2,
-        "known": 2,
-        "total": 18000,
-        "buckets": {
-          "received": 0,
-          "pending": 0,
-          "unmarked": 33,
-          "other": 0
-        },
-        "other": {},
-        "slips": {
-          "filled": 0,
-          "uploaded": 0,
-          "written": 0
-        },
-        "by_amount": [
-          {
-            "amount": "Rs 3,000",
-            "children": 1
-          },
-          {
-            "amount": "Rs 15,000",
-            "children": 1
-          }
-        ],
-        "line": ""
-      },
-      "money_line": "",
+      "money": null,
+      "money_line": "Money: 30 families (2 also bringing food). Amounts stated add up to Rs 18,000.",
       "last_response": "2026-10-11T22:55+05:30",
       "clicks": {
         "total": 231,
@@ -1269,18 +1495,18 @@
       "money_line": "Money: 5 families. No amounts stated on the sheet, so no money % is shown.",
       "last_response": "2026-10-12T08:50+05:30",
       "clicks": {
-        "total": 59,
-        "unique": 47,
+        "total": 60,
+        "unique": 48,
         "by_src": {
-          "g2": 40,
+          "g2": 41,
           "(none)": 19
         },
         "by_device": {
-          "mobile": 54,
+          "mobile": 55,
           "desktop": 5
         }
       },
-      "conversion": 0.128
+      "conversion": 0.125
     },
     {
       "slug": "un-zone",
