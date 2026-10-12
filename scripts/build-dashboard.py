@@ -1685,8 +1685,15 @@ def _self_test() -> None:
         data_dir=str(amount_dir), out=str(out_dir), clicks=str(amount_dir / "clicks.json"), overrides=None,
     ), now)
     japan = next(st for st in built["stalls"] if st["slug"] == "japan")
-    if "15,000" not in (japan.get("money_line") or "") or "15,000" in built_pii:
-        raise SystemExit(f"fixture amount did not publish cleanly: {japan.get('money_line')!r}")
+    if japan.get("money_only"):
+        # The public page shows the rupee total, not a food-stall money line.
+        published = (japan.get("money") or {}).get("total") == 15000 and not japan.get("menu")
+    else:
+        published = "15,000" in (japan.get("money_line") or "")
+    if not published or "15,000" in built_pii:
+        raise SystemExit(
+            f"fixture amount did not publish cleanly: line={japan.get('money_line')!r} money={japan.get('money')}"
+        )
     for raw in ("Parent One", "0771234567", "a@example.com", "Child One"):
         if raw not in built_pii:
             raise SystemExit(f"fixture contact was not flagged: {raw}")
