@@ -445,10 +445,17 @@ def ingest_responses(path: Path, slug: str, menu: list[str], aliases: dict, clos
     response_contrib = {k: 0 for k in CONTRIB_KEYS} if (has_contrib or money_only) else None
     extras: dict[str, set[str]] = {}
     response_count = 0
+    excluded = 0
     for n, row in enumerate(rows, 1):
         r = {k: norm(row[i]) if i < len(row) else "" for k, i in col.items()}
         r["_row"] = f"{slug}:{n}"
         if not SHEET.person_named(r):
+            continue
+        # A private override {"exclude": true, "note": "why"} drops one known duplicate row
+        # (matched by its timestamp) from every count and contact list. Our copy only;
+        # the source Sheet is untouched, and deleting the override brings the row back.
+        if row_override(overrides, slug, r.get("timestamp", ""), parse_time(r.get("timestamp", ""), now)).get("exclude"):
+            excluded += 1
             continue
         response_count += 1
         for k in ("parent", "phone", "email", "child", "notes", "extra", "class_other"):
@@ -563,6 +570,7 @@ def ingest_responses(path: Path, slug: str, menu: list[str], aliases: dict, clos
     money = family_money(fam_parts, fam_pay, fam_slip, money_only, fam_contrib)
     return {
         "responses": response_count,
+        "excluded": excluded,
         "families": set(fam_types) or set(),
         "by_class": [{"class": c, "count": classes[c]} for c in sorted(classes, key=class_sort)],
         "menu": menu_rows,
@@ -1592,6 +1600,12 @@ def _self_test() -> None:
     aus_bands = {row["amount"]: row["children"] for row in aus["money"]["by_amount"]}
     if aus_bands != {"Rs 3,000": 5, "Rs 3,500": 2, "Rs 4,000": 1, "Rs 5,000": 2}:
         raise SystemExit(f"Australia amount bands wrong: {aus['money']['by_amount']}")
+    aus_ex = ingest_responses(folder / "australia.csv", "australia", [], {}, set(), False, True, now,
+                              {"australia": {"2/10/2026 8:31:00": {"exclude": True, "note": "self-test duplicate"}}})
+    if aus_ex["excluded"] != 1 or aus_ex["responses"] != aus["responses"] - 1 or len(aus_ex["contacts"]) != len(aus["contacts"]) - 1:
+        raise SystemExit(f"exclude override did not drop exactly one row: {aus_ex['excluded']} {aus_ex['responses']}")
+    if aus_ex["money"]["total"] != aus["money"]["total"] - 5000:
+        raise SystemExit(f"excluded row's amount was still counted: {aus_ex['money']['total']}")
     _test_identityless_rows(now)
     food_money = ingest_responses(folder / "food-money.csv", "food-money", [], {}, set(), True, False, now, {})
     if len(food_money["families"]) != 1 or not food_money["money"] or food_money["money"]["total"] != 5500:
