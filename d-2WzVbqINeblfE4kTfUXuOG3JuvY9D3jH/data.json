@@ -1,6 +1,6 @@
 {
-  "updated": "2026-10-12T19:42+05:30",
-  "data_hash": "120e2f62913d5482",
+  "updated": "2026-10-12T20:36+05:30",
+  "data_hash": "3c9e0582f6ba5de5",
   "event": {
     "name": "UN Day 2026",
     "date": "2026-10-16",
@@ -23,14 +23,14 @@
     "menu_items_unpledged": 46,
     "last_response": "2026-10-12T19:15+05:30",
     "clicks": {
-      "total": 1641,
-      "unique": 1124,
+      "total": 1642,
+      "unique": 1125,
       "all_links": {
-        "total": 1643,
-        "unique": 932
+        "total": 1644,
+        "unique": 933
       }
     },
-    "conversion": 0.334
+    "conversion": 0.333
   },
   "stalls": [
     {
@@ -1380,19 +1380,19 @@
       "money_line": "Money: 22 families. Amounts stated add up to Rs 36,000.",
       "last_response": "2026-10-12T12:09+05:30",
       "clicks": {
-        "total": 179,
-        "unique": 123,
+        "total": 180,
+        "unique": 124,
         "by_src": {
-          "(none)": 176,
+          "(none)": 177,
           "group": 3
         },
         "by_device": {
-          "mobile": 167,
+          "mobile": 168,
           "desktop": 11,
           "tablet": 1
         }
       },
-      "conversion": 0.211
+      "conversion": 0.21
     },
     {
       "slug": "maldives",
