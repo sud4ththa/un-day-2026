@@ -1,6 +1,6 @@
 {
-  "updated": "2026-10-12T13:12+05:30",
-  "data_hash": "a2cc1622ef1a2a1d",
+  "updated": "2026-10-12T14:13+05:30",
+  "data_hash": "e8bfc7caaf7a80c9",
   "event": {
     "name": "UN Day 2026",
     "date": "2026-10-16",
@@ -23,14 +23,14 @@
     "menu_items_unpledged": 46,
     "last_response": "2026-10-12T13:02+05:30",
     "clicks": {
-      "total": 1594,
-      "unique": 1093,
+      "total": 1599,
+      "unique": 1097,
       "all_links": {
-        "total": 1596,
-        "unique": 903
+        "total": 1601,
+        "unique": 907
       }
     },
-    "conversion": 0.338
+    "conversion": 0.336
   },
   "stalls": [
     {
@@ -530,18 +530,18 @@
       "money_line": "",
       "last_response": "2026-10-12T10:39+05:30",
       "clicks": {
-        "total": 213,
-        "unique": 144,
+        "total": 217,
+        "unique": 147,
         "by_src": {
-          "g2": 161,
+          "g2": 165,
           "(none)": 52
         },
         "by_device": {
-          "mobile": 195,
+          "mobile": 199,
           "desktop": 18
         }
       },
-      "conversion": 0.382
+      "conversion": 0.374
     },
     {
       "slug": "sea",
@@ -939,19 +939,19 @@
       "money_line": "Money: 25 families (4 also bringing food). Amounts stated add up to Rs 20,000.",
       "last_response": "2026-10-12T12:51+05:30",
       "clicks": {
-        "total": 143,
-        "unique": 84,
+        "total": 144,
+        "unique": 85,
         "by_src": {
           "g2": 79,
-          "(none)": 64
+          "(none)": 65
         },
         "by_device": {
-          "mobile": 131,
+          "mobile": 132,
           "desktop": 10,
           "tablet": 2
         }
       },
-      "conversion": 0.5
+      "conversion": 0.494
     },
     {
       "slug": "europe",
