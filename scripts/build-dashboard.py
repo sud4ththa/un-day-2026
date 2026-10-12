@@ -730,6 +730,11 @@ def build(args, now: datetime):
             entry["clicks"] = prev_clicks.get(slug)
         if entry["clicks"] and entry["clicks"]["unique"] and entry["status"] == "ok":
             entry["conversion"] = round(entry["responses"] / entry["clicks"]["unique"], 3)
+        if money_only:
+            # Money-only stalls show no food menu or targets on the public page.
+            # Earlier food pledges stay in the private contact rows.
+            entry["menu"] = []
+            entry["headline_pct"] = None
         stalls.append(entry)
         private.append((entry, rows_out))
 
