@@ -1,6 +1,6 @@
 {
-  "updated": "2026-10-12T15:11+05:30",
-  "data_hash": "c2c6e8f99346f548",
+  "updated": "2026-10-12T16:18+05:30",
+  "data_hash": "c1def4476f440c51",
   "event": {
     "name": "UN Day 2026",
     "date": "2026-10-16",
@@ -11,23 +11,23 @@
     "stalls": 11,
     "connected": 11,
     "stall_managed": 0,
-    "responses": 370,
-    "families": 296,
+    "responses": 372,
+    "families": 298,
     "contribution": {
       "Food": 72,
-      "Monetary contribution": 237,
+      "Monetary contribution": 239,
       "Both": 13,
       "Not given": 0
     },
     "menu_items": 94,
     "menu_items_unpledged": 46,
-    "last_response": "2026-10-12T14:50+05:30",
+    "last_response": "2026-10-12T16:01+05:30",
     "clicks": {
-      "total": 1610,
-      "unique": 1104,
+      "total": 1616,
+      "unique": 1110,
       "all_links": {
-        "total": 1612,
-        "unique": 914
+        "total": 1618,
+        "unique": 920
       }
     },
     "conversion": 0.335
@@ -456,8 +456,8 @@
       "minimum_note": "We kindly request a minimum contribution of LKR 3-5,000+ per child.",
       "status": "ok",
       "money_only": true,
-      "responses": 56,
-      "families": 54,
+      "responses": 58,
+      "families": 56,
       "by_class": [
         {
           "class": "Year 2A",
@@ -473,12 +473,12 @@
         },
         {
           "class": "Year 2D",
-          "count": 7
+          "count": 9
         }
       ],
       "contribution": {
         "Food": 0,
-        "Monetary contribution": 54,
+        "Monetary contribution": 56,
         "Both": 0,
         "Not given": 0
       },
@@ -487,20 +487,20 @@
       "unlisted_ticks": 0,
       "extras": [],
       "money": {
-        "families": 54,
+        "families": 56,
         "both": 0,
-        "known": 56,
-        "total": 241500,
+        "known": 58,
+        "total": 251500,
         "buckets": {
           "received": 53,
           "pending": 0,
-          "unmarked": 1,
+          "unmarked": 3,
           "other": 0
         },
         "other": {},
         "slips": {
-          "filled": 51,
-          "uploaded": 49,
+          "filled": 53,
+          "uploaded": 51,
           "written": 2
         },
         "by_amount": [
@@ -518,7 +518,7 @@
           },
           {
             "amount": "Rs 5,000",
-            "children": 25
+            "children": 27
           },
           {
             "amount": "Rs 10,000",
@@ -528,20 +528,20 @@
         "line": ""
       },
       "money_line": "",
-      "last_response": "2026-10-12T14:50+05:30",
+      "last_response": "2026-10-12T16:01+05:30",
       "clicks": {
-        "total": 223,
-        "unique": 150,
+        "total": 226,
+        "unique": 153,
         "by_src": {
-          "g2": 171,
+          "g2": 174,
           "(none)": 52
         },
         "by_device": {
-          "mobile": 205,
+          "mobile": 208,
           "desktop": 18
         }
       },
-      "conversion": 0.373
+      "conversion": 0.379
     },
     {
       "slug": "sea",
@@ -628,18 +628,18 @@
       "money_line": "",
       "last_response": "2026-10-11T16:07+05:30",
       "clicks": {
-        "total": 248,
-        "unique": 154,
+        "total": 249,
+        "unique": 155,
         "by_src": {
-          "g2": 199,
+          "g2": 200,
           "(none)": 49
         },
         "by_device": {
-          "mobile": 229,
+          "mobile": 230,
           "desktop": 19
         }
       },
-      "conversion": 0.325,
+      "conversion": 0.323,
       "data_as_of": "2026-10-12T06:43+05:30"
     },
     {
@@ -939,19 +939,19 @@
       "money_line": "Money: 25 families (4 also bringing food). Amounts stated add up to Rs 20,000.",
       "last_response": "2026-10-12T12:51+05:30",
       "clicks": {
-        "total": 144,
-        "unique": 85,
+        "total": 146,
+        "unique": 87,
         "by_src": {
-          "g2": 79,
+          "g2": 81,
           "(none)": 65
         },
         "by_device": {
-          "mobile": 132,
+          "mobile": 134,
           "desktop": 10,
           "tablet": 2
         }
       },
-      "conversion": 0.494
+      "conversion": 0.483
     },
     {
       "slug": "europe",
