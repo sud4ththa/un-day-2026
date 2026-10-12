@@ -1,6 +1,6 @@
 {
-  "updated": "2026-10-12T17:12+05:30",
-  "data_hash": "58012052a861979a",
+  "updated": "2026-10-12T18:27+05:30",
+  "data_hash": "94178d82bf2c1385",
   "event": {
     "name": "UN Day 2026",
     "date": "2026-10-16",
@@ -23,14 +23,14 @@
     "menu_items_unpledged": 46,
     "last_response": "2026-10-12T17:09+05:30",
     "clicks": {
-      "total": 1629,
-      "unique": 1117,
+      "total": 1637,
+      "unique": 1120,
       "all_links": {
-        "total": 1631,
-        "unique": 925
+        "total": 1639,
+        "unique": 928
       }
     },
-    "conversion": 0.335
+    "conversion": 0.334
   },
   "stalls": [
     {
@@ -436,14 +436,14 @@
       "money_line": "Money: 34 families (2 also bringing food). Amounts stated add up to Rs 18,000.",
       "last_response": "2026-10-12T16:50+05:30",
       "clicks": {
-        "total": 241,
+        "total": 244,
         "unique": 163,
         "by_src": {
           "g2": 139,
-          "(none)": 102
+          "(none)": 105
         },
         "by_device": {
-          "mobile": 227,
+          "mobile": 230,
           "desktop": 14
         }
       },
@@ -939,14 +939,14 @@
       "money_line": "Money: 26 families (4 also bringing food). Amounts stated add up to Rs 20,000.",
       "last_response": "2026-10-12T17:09+05:30",
       "clicks": {
-        "total": 148,
+        "total": 150,
         "unique": 88,
         "by_src": {
           "g2": 82,
-          "(none)": 66
+          "(none)": 68
         },
         "by_device": {
-          "mobile": 136,
+          "mobile": 138,
           "desktop": 10,
           "tablet": 2
         }
@@ -1070,18 +1070,18 @@
       "money_line": "",
       "last_response": "2026-10-12T10:47+05:30",
       "clicks": {
-        "total": 77,
-        "unique": 54,
+        "total": 79,
+        "unique": 56,
         "by_src": {
-          "(none)": 44,
+          "(none)": 46,
           "g2": 33
         },
         "by_device": {
           "mobile": 69,
-          "desktop": 8
+          "desktop": 10
         }
       },
-      "conversion": 0.574
+      "conversion": 0.554
     },
     {
       "slug": "middle-east",
@@ -1273,18 +1273,18 @@
       "money_line": "Money: 14 families. Amounts stated add up to Rs 5,000.",
       "last_response": "2026-10-11T20:59+05:30",
       "clicks": {
-        "total": 94,
-        "unique": 68,
+        "total": 95,
+        "unique": 69,
         "by_src": {
-          "(none)": 51,
+          "(none)": 52,
           "g2": 43
         },
         "by_device": {
-          "mobile": 81,
+          "mobile": 82,
           "desktop": 13
         }
       },
-      "conversion": 0.456
+      "conversion": 0.449
     },
     {
       "slug": "china",
