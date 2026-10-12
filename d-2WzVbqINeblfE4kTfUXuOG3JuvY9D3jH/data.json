@@ -1,6 +1,6 @@
 {
-  "updated": "2026-10-12T07:14+05:30",
-  "data_hash": "d0127a9378bb54a5",
+  "updated": "2026-10-12T08:11+05:30",
+  "data_hash": "fd45223806015492",
   "event": {
     "name": "UN Day 2026",
     "date": "2026-10-16",
@@ -23,14 +23,14 @@
     "menu_items_unpledged": 47,
     "last_response": "2026-10-12T05:17+05:30",
     "clicks": {
-      "total": 1502,
-      "unique": 1047,
+      "total": 1516,
+      "unique": 1052,
       "all_links": {
-        "total": 1504,
-        "unique": 864
+        "total": 1518,
+        "unique": 869
       }
     },
-    "conversion": 0.339
+    "conversion": 0.337
   },
   "stalls": [
     {
@@ -529,18 +529,18 @@
       "money_line": "",
       "last_response": "2026-10-11T20:43+05:30",
       "clicks": {
-        "total": 195,
-        "unique": 132,
+        "total": 196,
+        "unique": 133,
         "by_src": {
-          "g2": 147,
+          "g2": 148,
           "(none)": 48
         },
         "by_device": {
-          "mobile": 177,
+          "mobile": 178,
           "desktop": 18
         }
       },
-      "conversion": 0.409
+      "conversion": 0.406
     },
     {
       "slug": "sea",
@@ -810,19 +810,19 @@
       "money_line": "Money: 14 families (3 also bringing food). Amounts stated add up to Rs 16,000.",
       "last_response": "2026-10-11T15:52+05:30",
       "clicks": {
-        "total": 83,
-        "unique": 60,
+        "total": 84,
+        "unique": 61,
         "by_src": {
-          "g2": 43,
+          "g2": 44,
           "(none)": 40
         },
         "by_device": {
-          "mobile": 75,
+          "mobile": 76,
           "desktop": 5,
           "tablet": 3
         }
       },
-      "conversion": 0.383
+      "conversion": 0.377
     },
     {
       "slug": "americas",
@@ -1272,14 +1272,14 @@
       "money_line": "Money: 14 families. Amounts stated add up to Rs 5,000.",
       "last_response": "2026-10-11T20:59+05:30",
       "clicks": {
-        "total": 86,
+        "total": 89,
         "unique": 65,
         "by_src": {
-          "(none)": 44,
+          "(none)": 47,
           "g2": 42
         },
         "by_device": {
-          "mobile": 76,
+          "mobile": 79,
           "desktop": 10
         }
       },
@@ -1483,18 +1483,18 @@
       "money_line": "Money: 4 families. No amounts stated on the sheet, so no money % is shown.",
       "last_response": "2026-10-09T15:22+05:30",
       "clicks": {
-        "total": 46,
-        "unique": 40,
+        "total": 55,
+        "unique": 43,
         "by_src": {
-          "g2": 27,
+          "g2": 36,
           "(none)": 19
         },
         "by_device": {
-          "mobile": 41,
+          "mobile": 50,
           "desktop": 5
         }
       },
-      "conversion": 0.125
+      "conversion": 0.116
     },
     {
       "slug": "un-zone",
