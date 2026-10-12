@@ -1,6 +1,6 @@
 {
-  "updated": "2026-10-12T21:38+05:30",
-  "data_hash": "68f1780c0e6bff46",
+  "updated": "2026-10-12T22:35+05:30",
+  "data_hash": "f510e4c391bd9e44",
   "event": {
     "name": "UN Day 2026",
     "date": "2026-10-16",
@@ -11,26 +11,26 @@
     "stalls": 11,
     "connected": 11,
     "stall_managed": 0,
-    "responses": 375,
-    "families": 300,
+    "responses": 376,
+    "families": 301,
     "contribution": {
       "Food": 72,
-      "Monetary contribution": 242,
+      "Monetary contribution": 243,
       "Both": 13,
       "Not given": 0
     },
     "menu_items": 94,
     "menu_items_unpledged": 46,
-    "last_response": "2026-10-12T19:15+05:30",
+    "last_response": "2026-10-12T22:05+05:30",
     "clicks": {
-      "total": 1647,
-      "unique": 1128,
+      "total": 1648,
+      "unique": 1129,
       "all_links": {
-        "total": 1649,
-        "unique": 934
+        "total": 1650,
+        "unique": 935
       }
     },
-    "conversion": 0.332
+    "conversion": 0.333
   },
   "stalls": [
     {
@@ -436,18 +436,18 @@
       "money_line": "Money: 34 families (2 also bringing food). Amounts stated add up to Rs 18,000.",
       "last_response": "2026-10-12T16:50+05:30",
       "clicks": {
-        "total": 244,
-        "unique": 163,
+        "total": 245,
+        "unique": 164,
         "by_src": {
-          "g2": 139,
+          "g2": 140,
           "(none)": 105
         },
         "by_device": {
-          "mobile": 230,
+          "mobile": 231,
           "desktop": 14
         }
       },
-      "conversion": 0.252
+      "conversion": 0.25
     },
     {
       "slug": "australia",
@@ -832,8 +832,8 @@
       "minimum_note": "",
       "status": "ok",
       "money_only": false,
-      "responses": 43,
-      "families": 38,
+      "responses": 44,
+      "families": 39,
       "by_class": [
         {
           "class": "Year 1D",
@@ -853,7 +853,7 @@
         },
         {
           "class": "Year 4C",
-          "count": 9
+          "count": 10
         },
         {
           "class": "Year 4D",
@@ -862,7 +862,7 @@
       ],
       "contribution": {
         "Food": 12,
-        "Monetary contribution": 22,
+        "Monetary contribution": 23,
         "Both": 4,
         "Not given": 0
       },
@@ -936,8 +936,8 @@
       "unlisted_ticks": 0,
       "extras": [],
       "money": null,
-      "money_line": "Money: 26 families (4 also bringing food). Amounts stated add up to Rs 20,000.",
-      "last_response": "2026-10-12T17:09+05:30",
+      "money_line": "Money: 27 families (4 also bringing food). Amounts stated add up to Rs 20,000.",
+      "last_response": "2026-10-12T22:05+05:30",
       "clicks": {
         "total": 150,
         "unique": 88,
@@ -951,7 +951,7 @@
           "tablet": 2
         }
       },
-      "conversion": 0.489
+      "conversion": 0.5
     },
     {
       "slug": "europe",
