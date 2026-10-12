@@ -3,6 +3,7 @@
   "stalls": [
     {
       "slug": "sri-lanka",
+      "money_only": true,
       "form_id": "1FAIpQLSfXLPFui1ETE8YcY7xw6mh5vbKdbB4HCjyKTpcyUcSsLdGsOQ",
       "menu": [
         "Milk rice with lunu miris (200)",
@@ -52,6 +53,7 @@
     },
     {
       "slug": "japan",
+      "money_only": true,
       "form_id": "1FAIpQLSejLTZy1IY5mP0vJQVmJ0EGA1nyDUo52Tb9a8FHfILUKVA-VA",
       "menu": [
         "Veg sushi rolls",
