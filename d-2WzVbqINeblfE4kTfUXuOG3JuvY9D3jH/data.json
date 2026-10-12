@@ -1,6 +1,6 @@
 {
-  "updated": "2026-10-12T09:22+05:30",
-  "data_hash": "de91ad010404458b",
+  "updated": "2026-10-12T10:16+05:30",
+  "data_hash": "a66a126fde983fe2",
   "event": {
     "name": "UN Day 2026",
     "date": "2026-10-16",
@@ -23,14 +23,14 @@
     "menu_items_unpledged": 28,
     "last_response": "2026-10-12T09:03+05:30",
     "clicks": {
-      "total": 1554,
-      "unique": 1065,
+      "total": 1561,
+      "unique": 1070,
       "all_links": {
-        "total": 1556,
-        "unique": 881
+        "total": 1563,
+        "unique": 885
       }
     },
-    "conversion": 0.335
+    "conversion": 0.334
   },
   "stalls": [
     {
@@ -209,18 +209,18 @@
       "money_line": "",
       "last_response": "2026-10-11T22:55+05:30",
       "clicks": {
-        "total": 229,
-        "unique": 155,
+        "total": 230,
+        "unique": 156,
         "by_src": {
-          "g2": 134,
+          "g2": 135,
           "(none)": 95
         },
         "by_device": {
-          "mobile": 215,
+          "mobile": 216,
           "desktop": 14
         }
       },
-      "conversion": 0.239
+      "conversion": 0.237
     },
     {
       "slug": "australia",
@@ -303,18 +303,18 @@
       "money_line": "",
       "last_response": "2026-10-11T20:43+05:30",
       "clicks": {
-        "total": 204,
-        "unique": 139,
+        "total": 206,
+        "unique": 140,
         "by_src": {
-          "g2": 154,
-          "(none)": 50
+          "g2": 155,
+          "(none)": 51
         },
         "by_device": {
-          "mobile": 186,
+          "mobile": 188,
           "desktop": 18
         }
       },
-      "conversion": 0.388
+      "conversion": 0.386
     },
     {
       "slug": "sea",
@@ -401,18 +401,18 @@
       "money_line": "",
       "last_response": "2026-10-11T16:07+05:30",
       "clicks": {
-        "total": 244,
-        "unique": 151,
+        "total": 247,
+        "unique": 153,
         "by_src": {
-          "g2": 195,
+          "g2": 198,
           "(none)": 49
         },
         "by_device": {
-          "mobile": 227,
-          "desktop": 17
+          "mobile": 229,
+          "desktop": 18
         }
       },
-      "conversion": 0.331,
+      "conversion": 0.327,
       "data_as_of": "2026-10-12T06:43+05:30"
     },
     {
@@ -1257,18 +1257,18 @@
       "money_line": "Money: 5 families. No amounts stated on the sheet, so no money % is shown.",
       "last_response": "2026-10-12T08:50+05:30",
       "clicks": {
-        "total": 57,
-        "unique": 45,
+        "total": 58,
+        "unique": 46,
         "by_src": {
-          "g2": 38,
+          "g2": 39,
           "(none)": 19
         },
         "by_device": {
-          "mobile": 52,
+          "mobile": 53,
           "desktop": 5
         }
       },
-      "conversion": 0.133
+      "conversion": 0.13
     },
     {
       "slug": "un-zone",
