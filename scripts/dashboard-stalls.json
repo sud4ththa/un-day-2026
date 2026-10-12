@@ -44,9 +44,7 @@
         "Fish bun, please order from Paan Paan (75)"
       ],
       "contribution_options": [
-        "Food",
-        "Monetary contribution",
-        "Both"
+        "Monetary contribution"
       ]
     },
     {
@@ -62,9 +60,7 @@
         "Senbei (rice crackers)"
       ],
       "contribution_options": [
-        "Food",
-        "Monetary contribution",
-        "Both"
+        "Monetary contribution"
       ]
     },
     {
