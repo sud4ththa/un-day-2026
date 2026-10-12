@@ -724,8 +724,11 @@ def _contact_cells(row: dict, kind: str) -> list[str]:
     phone = _dash(row.get("phone"))
     notes = _dash(row.get("notes"))
     amount = parse_rupees(row.get("amount") or "")
+    if kind == "money" and not amount:
+        amount = money_from_notes(row.get("notes") or "")
     if kind == "money":
-        status = " · ".join(x for x in (row.get("pay_status") or "", row.get("notes") or "") if x)
+        food = ", ".join(list(row.get("labels") or []) + list(row.get("unlisted") or []))
+        status = " · ".join(x for x in (row.get("pay_status") or "", f"Food: {food}" if food else "", row.get("notes") or "") if x)
         slip = row.get("slip") or ""
         if slip.startswith("http"):
             slip = "Uploaded"
@@ -878,7 +881,10 @@ def _money_glance(doc: Doc, model: dict) -> None:
         ("Pending", str(buckets["pending"])),
         ("Not marked", str(buckets["unmarked"])),
     ])
-    doc.note("Money-only stall, no food pledges to list.")
+    if any((r.get("labels") or r.get("unlisted")) for r in (model.get("contacts") or [])):
+        doc.note("Money-only stall. Food pledged before the form changed is not counted here; it is listed against each family on the contacts page.")
+    else:
+        doc.note("Money-only stall, no food pledges to list.")
     if model.get("minimum_note"):
         doc.note(model["minimum_note"])
     doc.note("The form asks a minimum per child, not a stall total, so there is no money target and no %. Each child's amount is added. A repeated submission of the same child, class, and amount is counted once.")
@@ -933,7 +939,7 @@ def _contacts(doc: Doc, model: dict) -> None:
     if kind == "money":
         headers = ["Parent", "Child", "Class", "Amount", "Status", "Slip / receipt", "Phone"]
         width = doc.content_w
-        cols = [118, 110, 52, 68, 120, width - 118 - 110 - 52 - 68 - 120 - 92, 92]
+        cols = [110, 100, 52, 52, width - 110 - 100 - 52 - 52 - 62 - 82, 62, 82]
     else:
         headers = ["Parent", "Child", "Class", "Item(s) / amount", "Notes", "Phone"]
         width = doc.content_w
@@ -942,7 +948,7 @@ def _contacts(doc: Doc, model: dict) -> None:
     # Keep the contacts on one landscape page: shrink type and row padding step by step.
     size = 8
     head = [h.upper() for h in headers]
-    for size, pad, lead in [(8, 7, 1.3), (7.5, 5, 1.2), (7, 4, 1.15), (6.5, 3.5, 1.12), (6, 3, 1.1)]:
+    for size, pad, lead in [(8, 7, 1.3), (7.5, 5, 1.2), (7, 4, 1.15), (6.5, 3.5, 1.12), (6, 3, 1.1), (5.5, 2.5, 1.08)]:
         doc.pad, doc.lead = pad, lead
         need = max(len(x) for x in doc.row_lines(head, cols, "F2", 7.5)) * 7.5 * lead + pad
         need += sum(max(len(x) for x in doc.row_lines(r, cols, "F1", size)) * size * lead + pad for r in rows)
