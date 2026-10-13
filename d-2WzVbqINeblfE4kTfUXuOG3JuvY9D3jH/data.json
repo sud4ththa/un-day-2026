@@ -1,6 +1,6 @@
 {
-  "updated": "2026-10-13T20:24+05:30",
-  "data_hash": "0a696993a2f671c6",
+  "updated": "2026-10-13T21:23+05:30",
+  "data_hash": "4debdf2baa08473f",
   "event": {
     "name": "UN Day 2026",
     "date": "2026-10-16",
@@ -23,10 +23,10 @@
     "menu_items_unpledged": 27,
     "last_response": "2026-10-13T19:36+05:30",
     "clicks": {
-      "total": 1758,
-      "unique": 1197,
+      "total": 1761,
+      "unique": 1198,
       "all_links": {
-        "total": 1760,
+        "total": 1763,
         "unique": 982
       }
     },
@@ -110,14 +110,14 @@
       "money_line": "",
       "last_response": "2026-10-13T19:36+05:30",
       "clicks": {
-        "total": 156,
+        "total": 157,
         "unique": 118,
         "by_src": {
           "g2": 80,
-          "(none)": 76
+          "(none)": 77
         },
         "by_device": {
-          "mobile": 141,
+          "mobile": 142,
           "desktop": 13,
           "tablet": 2
         }
@@ -401,14 +401,14 @@
       "money_line": "",
       "last_response": "2026-10-11T16:07+05:30",
       "clicks": {
-        "total": 263,
+        "total": 264,
         "unique": 162,
         "by_src": {
           "g2": 210,
-          "(none)": 53
+          "(none)": 54
         },
         "by_device": {
-          "mobile": 244,
+          "mobile": 245,
           "desktop": 19
         }
       },
@@ -843,18 +843,18 @@
       "money_line": "",
       "last_response": "2026-10-12T10:47+05:30",
       "clicks": {
-        "total": 84,
-        "unique": 60,
+        "total": 85,
+        "unique": 61,
         "by_src": {
           "(none)": 51,
-          "g2": 33
+          "g2": 34
         },
         "by_device": {
-          "mobile": 74,
+          "mobile": 75,
           "desktop": 10
         }
       },
-      "conversion": 0.517
+      "conversion": 0.508
     },
     {
       "slug": "middle-east",
