@@ -1,6 +1,6 @@
 {
-  "updated": "2026-10-13T21:23+05:30",
-  "data_hash": "4debdf2baa08473f",
+  "updated": "2026-10-13T22:25+05:30",
+  "data_hash": "087062c5356d0ae6",
   "event": {
     "name": "UN Day 2026",
     "date": "2026-10-16",
@@ -23,11 +23,11 @@
     "menu_items_unpledged": 27,
     "last_response": "2026-10-13T19:36+05:30",
     "clicks": {
-      "total": 1761,
-      "unique": 1198,
+      "total": 1763,
+      "unique": 1200,
       "all_links": {
-        "total": 1763,
-        "unique": 982
+        "total": 1765,
+        "unique": 983
       }
     },
     "conversion": 0.327
@@ -712,19 +712,19 @@
       "money_line": "Money: 27 families (4 also bringing food). Amounts stated add up to Rs 20,000.",
       "last_response": "2026-10-12T22:05+05:30",
       "clicks": {
-        "total": 160,
-        "unique": 96,
+        "total": 161,
+        "unique": 97,
         "by_src": {
-          "g2": 87,
+          "g2": 88,
           "(none)": 73
         },
         "by_device": {
-          "mobile": 148,
+          "mobile": 149,
           "desktop": 10,
           "tablet": 2
         }
       },
-      "conversion": 0.458
+      "conversion": 0.454
     },
     {
       "slug": "europe",
@@ -1157,19 +1157,19 @@
       "money_line": "Money: 23 families. Amounts stated add up to Rs 36,000.",
       "last_response": "2026-10-13T12:18+05:30",
       "clicks": {
-        "total": 189,
-        "unique": 131,
+        "total": 190,
+        "unique": 132,
         "by_src": {
-          "(none)": 186,
+          "(none)": 187,
           "group": 3
         },
         "by_device": {
-          "mobile": 176,
+          "mobile": 177,
           "desktop": 12,
           "tablet": 1
         }
       },
-      "conversion": 0.206
+      "conversion": 0.205
     },
     {
       "slug": "maldives",
