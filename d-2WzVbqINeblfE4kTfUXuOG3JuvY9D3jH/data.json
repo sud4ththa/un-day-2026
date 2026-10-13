@@ -1,6 +1,6 @@
 {
-  "updated": "2026-10-13T11:12+05:30",
-  "data_hash": "db7c56e133367283",
+  "updated": "2026-10-13T12:17+05:30",
+  "data_hash": "74ae3ba10cedef6d",
   "event": {
     "name": "UN Day 2026",
     "date": "2026-10-16",
@@ -11,26 +11,26 @@
     "stalls": 11,
     "connected": 11,
     "stall_managed": 0,
-    "responses": 381,
-    "families": 303,
+    "responses": 382,
+    "families": 304,
     "contribution": {
       "Food": 72,
       "Monetary contribution": 247,
-      "Both": 13,
+      "Both": 14,
       "Not given": 0
     },
     "menu_items": 63,
-    "menu_items_unpledged": 28,
-    "last_response": "2026-10-13T10:58+05:30",
+    "menu_items_unpledged": 27,
+    "last_response": "2026-10-13T11:47+05:30",
     "clicks": {
-      "total": 1679,
-      "unique": 1150,
+      "total": 1685,
+      "unique": 1151,
       "all_links": {
-        "total": 1681,
-        "unique": 949
+        "total": 1687,
+        "unique": 950
       }
     },
-    "conversion": 0.331
+    "conversion": 0.332
   },
   "stalls": [
     {
@@ -303,14 +303,14 @@
       "money_line": "",
       "last_response": "2026-10-13T10:51+05:30",
       "clicks": {
-        "total": 236,
+        "total": 237,
         "unique": 159,
         "by_src": {
-          "g2": 181,
+          "g2": 182,
           "(none)": 55
         },
         "by_device": {
-          "mobile": 217,
+          "mobile": 218,
           "desktop": 19
         }
       },
@@ -401,18 +401,18 @@
       "money_line": "",
       "last_response": "2026-10-11T16:07+05:30",
       "clicks": {
-        "total": 258,
-        "unique": 160,
+        "total": 260,
+        "unique": 161,
         "by_src": {
-          "g2": 208,
+          "g2": 210,
           "(none)": 50
         },
         "by_device": {
-          "mobile": 239,
+          "mobile": 241,
           "desktop": 19
         }
       },
-      "conversion": 0.312,
+      "conversion": 0.311,
       "data_as_of": "2026-10-12T06:43+05:30"
     },
     {
@@ -863,8 +863,8 @@
       "minimum_note": "",
       "status": "ok",
       "money_only": false,
-      "responses": 31,
-      "families": 31,
+      "responses": 32,
+      "families": 32,
       "by_class": [
         {
           "class": "Year 5A",
@@ -887,6 +887,10 @@
           "count": 1
         },
         {
+          "class": "Year 6D",
+          "count": 1
+        },
+        {
           "class": "Year 8A",
           "count": 3
         },
@@ -906,7 +910,7 @@
       "contribution": {
         "Food": 17,
         "Monetary contribution": 14,
-        "Both": 0,
+        "Both": 1,
         "Not given": 0
       },
       "menu": [
@@ -960,10 +964,10 @@
         },
         {
           "item": "Mini shawarma",
-          "count": 0,
-          "pledged": "0",
+          "count": 1,
+          "pledged": "tbc",
           "pct": "—",
-          "status": "Open",
+          "status": "Partial",
           "label": "Mini shawarma"
         },
         {
@@ -1043,21 +1047,21 @@
       "unlisted_ticks": 0,
       "extras": [],
       "money": null,
-      "money_line": "Money: 14 families. Amounts stated add up to Rs 5,000.",
-      "last_response": "2026-10-11T20:59+05:30",
+      "money_line": "Money: 15 families (1 also bringing food). Amounts stated add up to Rs 5,000.",
+      "last_response": "2026-10-13T11:47+05:30",
       "clicks": {
-        "total": 96,
+        "total": 97,
         "unique": 70,
         "by_src": {
-          "(none)": 53,
+          "(none)": 54,
           "g2": 43
         },
         "by_device": {
-          "mobile": 83,
+          "mobile": 84,
           "desktop": 13
         }
       },
-      "conversion": 0.443
+      "conversion": 0.457
     },
     {
       "slug": "china",
@@ -1153,15 +1157,15 @@
       "money_line": "Money: 22 families. Amounts stated add up to Rs 36,000.",
       "last_response": "2026-10-12T12:09+05:30",
       "clicks": {
-        "total": 182,
+        "total": 184,
         "unique": 126,
         "by_src": {
-          "(none)": 179,
+          "(none)": 181,
           "group": 3
         },
         "by_device": {
-          "mobile": 170,
-          "desktop": 11,
+          "mobile": 171,
+          "desktop": 12,
           "tablet": 1
         }
       },
