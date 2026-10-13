@@ -1,6 +1,6 @@
 {
-  "updated": "2026-10-13T14:13+05:30",
-  "data_hash": "c8d8a1dd5ed648bc",
+  "updated": "2026-10-13T15:12+05:30",
+  "data_hash": "3a71f4705d36baba",
   "event": {
     "name": "UN Day 2026",
     "date": "2026-10-16",
@@ -23,14 +23,14 @@
     "menu_items_unpledged": 27,
     "last_response": "2026-10-13T13:01+05:30",
     "clicks": {
-      "total": 1711,
-      "unique": 1170,
+      "total": 1720,
+      "unique": 1175,
       "all_links": {
-        "total": 1713,
-        "unique": 962
+        "total": 1722,
+        "unique": 966
       }
     },
-    "conversion": 0.329
+    "conversion": 0.328
   },
   "stalls": [
     {
@@ -110,19 +110,19 @@
       "money_line": "",
       "last_response": "2026-10-13T13:01+05:30",
       "clicks": {
-        "total": 148,
-        "unique": 112,
+        "total": 149,
+        "unique": 113,
         "by_src": {
-          "(none)": 74,
+          "(none)": 75,
           "g2": 74
         },
         "by_device": {
-          "mobile": 137,
+          "mobile": 138,
           "desktop": 9,
           "tablet": 2
         }
       },
-      "conversion": 0.42
+      "conversion": 0.416
     },
     {
       "slug": "japan",
@@ -209,14 +209,14 @@
       "money_line": "",
       "last_response": "2026-10-12T16:50+05:30",
       "clicks": {
-        "total": 247,
+        "total": 248,
         "unique": 166,
         "by_src": {
-          "g2": 140,
+          "g2": 141,
           "(none)": 107
         },
         "by_device": {
-          "mobile": 233,
+          "mobile": 234,
           "desktop": 14
         }
       },
@@ -303,18 +303,18 @@
       "money_line": "",
       "last_response": "2026-10-13T10:51+05:30",
       "clicks": {
-        "total": 237,
-        "unique": 159,
+        "total": 239,
+        "unique": 160,
         "by_src": {
-          "g2": 182,
+          "g2": 184,
           "(none)": 55
         },
         "by_device": {
-          "mobile": 218,
+          "mobile": 220,
           "desktop": 19
         }
       },
-      "conversion": 0.384
+      "conversion": 0.381
     },
     {
       "slug": "sea",
@@ -712,19 +712,19 @@
       "money_line": "Money: 27 families (4 also bringing food). Amounts stated add up to Rs 20,000.",
       "last_response": "2026-10-12T22:05+05:30",
       "clicks": {
-        "total": 156,
-        "unique": 93,
+        "total": 158,
+        "unique": 94,
         "by_src": {
-          "g2": 84,
+          "g2": 86,
           "(none)": 72
         },
         "by_device": {
-          "mobile": 144,
+          "mobile": 146,
           "desktop": 10,
           "tablet": 2
         }
       },
-      "conversion": 0.473
+      "conversion": 0.468
     },
     {
       "slug": "europe",
@@ -1384,19 +1384,19 @@
       "money_line": "Money: 19 families (2 also bringing food). Amounts stated add up to Rs 10,000.",
       "last_response": "2026-10-13T09:23+05:30",
       "clicks": {
-        "total": 135,
-        "unique": 101,
+        "total": 138,
+        "unique": 103,
         "by_src": {
-          "g2": 88,
+          "g2": 91,
           "(none)": 47
         },
         "by_device": {
-          "mobile": 116,
+          "mobile": 119,
           "desktop": 18,
           "tablet": 1
         }
       },
-      "conversion": 0.198
+      "conversion": 0.194
     }
   ]
 }
