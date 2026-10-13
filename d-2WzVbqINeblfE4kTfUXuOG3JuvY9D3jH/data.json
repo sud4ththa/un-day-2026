@@ -1,6 +1,6 @@
 {
-  "updated": "2026-10-13T07:53+05:30",
-  "data_hash": "7eba3ad18852e896",
+  "updated": "2026-10-13T09:12+05:30",
+  "data_hash": "a507255ac8120d19",
   "event": {
     "name": "UN Day 2026",
     "date": "2026-10-16",
@@ -23,11 +23,11 @@
     "menu_items_unpledged": 28,
     "last_response": "2026-10-12T22:05+05:30",
     "clicks": {
-      "total": 1664,
-      "unique": 1142,
+      "total": 1667,
+      "unique": 1144,
       "all_links": {
-        "total": 1666,
-        "unique": 942
+        "total": 1669,
+        "unique": 944
       }
     },
     "conversion": 0.329
@@ -303,18 +303,18 @@
       "money_line": "",
       "last_response": "2026-10-12T19:15+05:30",
       "clicks": {
-        "total": 232,
-        "unique": 156,
+        "total": 233,
+        "unique": 157,
         "by_src": {
-          "g2": 177,
+          "g2": 178,
           "(none)": 55
         },
         "by_device": {
-          "mobile": 213,
+          "mobile": 214,
           "desktop": 19
         }
       },
-      "conversion": 0.378
+      "conversion": 0.376
     },
     {
       "slug": "sea",
@@ -401,18 +401,18 @@
       "money_line": "",
       "last_response": "2026-10-11T16:07+05:30",
       "clicks": {
-        "total": 254,
-        "unique": 159,
+        "total": 256,
+        "unique": 160,
         "by_src": {
-          "g2": 204,
+          "g2": 206,
           "(none)": 50
         },
         "by_device": {
-          "mobile": 235,
+          "mobile": 237,
           "desktop": 19
         }
       },
-      "conversion": 0.314,
+      "conversion": 0.312,
       "data_as_of": "2026-10-12T06:43+05:30"
     },
     {
