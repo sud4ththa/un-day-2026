@@ -1,6 +1,6 @@
 {
-  "updated": "2026-10-13T10:14+05:30",
-  "data_hash": "a3f020d8f7bb03aa",
+  "updated": "2026-10-13T11:12+05:30",
+  "data_hash": "db7c56e133367283",
   "event": {
     "name": "UN Day 2026",
     "date": "2026-10-16",
@@ -11,26 +11,26 @@
     "stalls": 11,
     "connected": 11,
     "stall_managed": 0,
-    "responses": 379,
+    "responses": 381,
     "families": 303,
     "contribution": {
       "Food": 72,
-      "Monetary contribution": 246,
+      "Monetary contribution": 247,
       "Both": 13,
       "Not given": 0
     },
     "menu_items": 63,
     "menu_items_unpledged": 28,
-    "last_response": "2026-10-13T09:57+05:30",
+    "last_response": "2026-10-13T10:58+05:30",
     "clicks": {
-      "total": 1677,
-      "unique": 1148,
+      "total": 1679,
+      "unique": 1150,
       "all_links": {
-        "total": 1679,
-        "unique": 947
+        "total": 1681,
+        "unique": 949
       }
     },
-    "conversion": 0.33
+    "conversion": 0.331
   },
   "stalls": [
     {
@@ -40,7 +40,7 @@
       "minimum_note": "",
       "status": "ok",
       "money_only": true,
-      "responses": 44,
+      "responses": 45,
       "families": 42,
       "by_class": [
         {
@@ -69,7 +69,7 @@
         },
         {
           "class": "Reception D",
-          "count": 11
+          "count": 12
         }
       ],
       "contribution": {
@@ -108,21 +108,21 @@
         "line": ""
       },
       "money_line": "",
-      "last_response": "2026-10-11T11:54+05:30",
+      "last_response": "2026-10-13T10:58+05:30",
       "clicks": {
-        "total": 141,
-        "unique": 106,
+        "total": 142,
+        "unique": 107,
         "by_src": {
           "g2": 72,
-          "(none)": 69
+          "(none)": 70
         },
         "by_device": {
-          "mobile": 130,
+          "mobile": 131,
           "desktop": 9,
           "tablet": 2
         }
       },
-      "conversion": 0.415
+      "conversion": 0.421
     },
     {
       "slug": "japan",
@@ -229,8 +229,8 @@
       "minimum_note": "We kindly request a minimum contribution of LKR 3-5,000+ per child.",
       "status": "ok",
       "money_only": true,
-      "responses": 60,
-      "families": 58,
+      "responses": 61,
+      "families": 59,
       "by_class": [
         {
           "class": "Year 2A",
@@ -246,12 +246,12 @@
         },
         {
           "class": "Year 2D",
-          "count": 9
+          "count": 10
         }
       ],
       "contribution": {
         "Food": 0,
-        "Monetary contribution": 58,
+        "Monetary contribution": 59,
         "Both": 0,
         "Not given": 0
       },
@@ -260,20 +260,20 @@
       "unlisted_ticks": 0,
       "extras": [],
       "money": {
-        "families": 58,
+        "families": 59,
         "both": 0,
-        "known": 60,
-        "total": 259500,
+        "known": 61,
+        "total": 263000,
         "buckets": {
           "received": 53,
           "pending": 0,
-          "unmarked": 5,
+          "unmarked": 6,
           "other": 0
         },
         "other": {},
         "slips": {
-          "filled": 55,
-          "uploaded": 53,
+          "filled": 56,
+          "uploaded": 54,
           "written": 2
         },
         "by_amount": [
@@ -283,7 +283,7 @@
           },
           {
             "amount": "Rs 3,500",
-            "children": 7
+            "children": 8
           },
           {
             "amount": "Rs 4,000",
@@ -301,20 +301,20 @@
         "line": ""
       },
       "money_line": "",
-      "last_response": "2026-10-13T09:51+05:30",
+      "last_response": "2026-10-13T10:51+05:30",
       "clicks": {
-        "total": 235,
-        "unique": 158,
+        "total": 236,
+        "unique": 159,
         "by_src": {
-          "g2": 180,
+          "g2": 181,
           "(none)": 55
         },
         "by_device": {
-          "mobile": 216,
+          "mobile": 217,
           "desktop": 19
         }
       },
-      "conversion": 0.38
+      "conversion": 0.384
     },
     {
       "slug": "sea",
