@@ -1,6 +1,6 @@
 {
-  "updated": "2026-10-14T18:16+05:30",
-  "data_hash": "7d772ce18b94f9e9",
+  "updated": "2026-10-14T19:13+05:30",
+  "data_hash": "1fd87de0f92f6bb4",
   "event": {
     "name": "UN Day 2026",
     "date": "2026-10-16",
@@ -23,14 +23,14 @@
     "menu_items_unpledged": 27,
     "last_response": "2026-10-14T18:12+05:30",
     "clicks": {
-      "total": 1865,
-      "unique": 1253,
+      "total": 1870,
+      "unique": 1257,
       "all_links": {
-        "total": 1867,
-        "unique": 1030
+        "total": 1872,
+        "unique": 1033
       }
     },
-    "conversion": 0.33
+    "conversion": 0.329
   },
   "stalls": [
     {
@@ -110,19 +110,19 @@
       "money_line": "",
       "last_response": "2026-10-14T12:32+05:30",
       "clicks": {
-        "total": 185,
-        "unique": 129,
+        "total": 186,
+        "unique": 130,
         "by_src": {
           "g2": 102,
-          "(none)": 83
+          "(none)": 84
         },
         "by_device": {
-          "mobile": 168,
+          "mobile": 169,
           "desktop": 15,
           "tablet": 2
         }
       },
-      "conversion": 0.403
+      "conversion": 0.4
     },
     {
       "slug": "japan",
@@ -209,18 +209,18 @@
       "money_line": "",
       "last_response": "2026-10-14T10:51+05:30",
       "clicks": {
-        "total": 262,
-        "unique": 172,
+        "total": 264,
+        "unique": 173,
         "by_src": {
-          "g2": 148,
+          "g2": 150,
           "(none)": 114
         },
         "by_device": {
-          "mobile": 247,
+          "mobile": 249,
           "desktop": 15
         }
       },
-      "conversion": 0.25
+      "conversion": 0.249
     },
     {
       "slug": "australia",
@@ -700,19 +700,19 @@
       "money_line": "Money: 27 families (4 also bringing food). Amounts stated add up to Rs 20,000.",
       "last_response": "2026-10-14T08:53+05:30",
       "clicks": {
-        "total": 162,
-        "unique": 97,
+        "total": 163,
+        "unique": 98,
         "by_src": {
           "g2": 88,
-          "(none)": 74
+          "(none)": 75
         },
         "by_device": {
-          "mobile": 150,
+          "mobile": 151,
           "desktop": 10,
           "tablet": 2
         }
       },
-      "conversion": 0.464
+      "conversion": 0.459
     },
     {
       "slug": "europe",
@@ -1038,18 +1038,18 @@
       "money_line": "Money: 17 families (1 also bringing food). Amounts stated add up to Rs 5,000.",
       "last_response": "2026-10-14T08:54+05:30",
       "clicks": {
-        "total": 110,
-        "unique": 76,
+        "total": 111,
+        "unique": 77,
         "by_src": {
           "(none)": 62,
-          "g2": 48
+          "g2": 49
         },
         "by_device": {
-          "mobile": 94,
+          "mobile": 95,
           "desktop": 16
         }
       },
-      "conversion": 0.447
+      "conversion": 0.442
     },
     {
       "slug": "china",
