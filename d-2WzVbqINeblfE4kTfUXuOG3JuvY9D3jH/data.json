@@ -1,6 +1,6 @@
 {
-  "updated": "2026-10-14T12:16+05:30",
-  "data_hash": "a19a43215778a16d",
+  "updated": "2026-10-14T13:16+05:30",
+  "data_hash": "c425fefa67284c3e",
   "event": {
     "name": "UN Day 2026",
     "date": "2026-10-16",
@@ -11,26 +11,26 @@
     "stalls": 11,
     "connected": 11,
     "stall_managed": 0,
-    "responses": 407,
-    "families": 325,
+    "responses": 409,
+    "families": 326,
     "contribution": {
       "Food": 74,
-      "Monetary contribution": 267,
+      "Monetary contribution": 269,
       "Both": 14,
       "Not given": 0
     },
     "menu_items": 63,
     "menu_items_unpledged": 27,
-    "last_response": "2026-10-14T10:51+05:30",
+    "last_response": "2026-10-14T13:00+05:30",
     "clicks": {
-      "total": 1842,
-      "unique": 1237,
+      "total": 1845,
+      "unique": 1239,
       "all_links": {
-        "total": 1844,
-        "unique": 1015
+        "total": 1847,
+        "unique": 1016
       }
     },
-    "conversion": 0.329
+    "conversion": 0.33
   },
   "stalls": [
     {
@@ -40,8 +40,8 @@
       "minimum_note": "",
       "status": "ok",
       "money_only": true,
-      "responses": 51,
-      "families": 47,
+      "responses": 52,
+      "families": 48,
       "by_class": [
         {
           "class": "Playgroup A",
@@ -57,7 +57,7 @@
         },
         {
           "class": "Reception A",
-          "count": 9
+          "count": 10
         },
         {
           "class": "Reception B",
@@ -74,7 +74,7 @@
       ],
       "contribution": {
         "Food": 27,
-        "Monetary contribution": 18,
+        "Monetary contribution": 19,
         "Both": 2,
         "Not given": 0
       },
@@ -83,14 +83,14 @@
       "unlisted_ticks": 0,
       "extras": [],
       "money": {
-        "families": 47,
+        "families": 48,
         "both": 2,
         "known": 2,
         "total": 200,
         "buckets": {
           "received": 0,
           "pending": 0,
-          "unmarked": 47,
+          "unmarked": 48,
           "other": 0
         },
         "other": {},
@@ -108,21 +108,21 @@
         "line": ""
       },
       "money_line": "",
-      "last_response": "2026-10-14T08:53+05:30",
+      "last_response": "2026-10-14T12:32+05:30",
       "clicks": {
-        "total": 179,
+        "total": 180,
         "unique": 127,
         "by_src": {
-          "g2": 96,
+          "g2": 97,
           "(none)": 83
         },
         "by_device": {
-          "mobile": 163,
+          "mobile": 164,
           "desktop": 14,
           "tablet": 2
         }
       },
-      "conversion": 0.402
+      "conversion": 0.409
     },
     {
       "slug": "japan",
@@ -1070,8 +1070,8 @@
       "minimum_note": "",
       "status": "ok",
       "money_only": false,
-      "responses": 31,
-      "families": 29,
+      "responses": 32,
+      "families": 30,
       "by_class": [
         {
           "class": "Year 8A",
@@ -1087,7 +1087,7 @@
         },
         {
           "class": "Year 9C",
-          "count": 2
+          "count": 3
         },
         {
           "class": "Year 9D",
@@ -1108,7 +1108,7 @@
       ],
       "contribution": {
         "Food": 3,
-        "Monetary contribution": 26,
+        "Monetary contribution": 27,
         "Both": 0,
         "Not given": 0
       },
@@ -1158,22 +1158,22 @@
       "unlisted_ticks": 0,
       "extras": [],
       "money": null,
-      "money_line": "Money: 26 families. Amounts stated add up to Rs 36,000.",
-      "last_response": "2026-10-14T09:32+05:30",
+      "money_line": "Money: 27 families. Amounts stated add up to Rs 36,000.",
+      "last_response": "2026-10-14T13:00+05:30",
       "clicks": {
-        "total": 198,
-        "unique": 135,
+        "total": 199,
+        "unique": 136,
         "by_src": {
-          "(none)": 195,
+          "(none)": 196,
           "group": 3
         },
         "by_device": {
-          "mobile": 183,
+          "mobile": 184,
           "desktop": 13,
           "tablet": 2
         }
       },
-      "conversion": 0.23
+      "conversion": 0.235
     },
     {
       "slug": "maldives",
@@ -1388,19 +1388,19 @@
       "money_line": "Money: 19 families (2 also bringing food). Amounts stated add up to Rs 10,000.",
       "last_response": "2026-10-13T09:23+05:30",
       "clicks": {
-        "total": 145,
-        "unique": 107,
+        "total": 146,
+        "unique": 108,
         "by_src": {
           "g2": 94,
-          "(none)": 51
+          "(none)": 52
         },
         "by_device": {
-          "mobile": 126,
+          "mobile": 127,
           "desktop": 18,
           "tablet": 1
         }
       },
-      "conversion": 0.187
+      "conversion": 0.185
     }
   ]
 }
