@@ -1,6 +1,6 @@
 {
-  "updated": "2026-10-14T15:15+05:30",
-  "data_hash": "38987b70871cad8e",
+  "updated": "2026-10-14T16:16+05:30",
+  "data_hash": "259a81c1b537a9cc",
   "event": {
     "name": "UN Day 2026",
     "date": "2026-10-16",
@@ -23,14 +23,14 @@
     "menu_items_unpledged": 27,
     "last_response": "2026-10-14T15:13+05:30",
     "clicks": {
-      "total": 1851,
-      "unique": 1244,
+      "total": 1854,
+      "unique": 1246,
       "all_links": {
-        "total": 1853,
-        "unique": 1021
+        "total": 1856,
+        "unique": 1023
       }
     },
-    "conversion": 0.33
+    "conversion": 0.329
   },
   "stalls": [
     {
@@ -110,14 +110,14 @@
       "money_line": "",
       "last_response": "2026-10-14T12:32+05:30",
       "clicks": {
-        "total": 181,
+        "total": 182,
         "unique": 128,
         "by_src": {
-          "g2": 98,
+          "g2": 99,
           "(none)": 83
         },
         "by_device": {
-          "mobile": 165,
+          "mobile": 166,
           "desktop": 14,
           "tablet": 2
         }
@@ -303,18 +303,18 @@
       "money_line": "",
       "last_response": "2026-10-14T15:13+05:30",
       "clicks": {
-        "total": 265,
-        "unique": 175,
+        "total": 266,
+        "unique": 176,
         "by_src": {
-          "g2": 206,
+          "g2": 207,
           "(none)": 59
         },
         "by_device": {
-          "mobile": 246,
+          "mobile": 247,
           "desktop": 19
         }
       },
-      "conversion": 0.389
+      "conversion": 0.386
     },
     {
       "slug": "sea",
@@ -1388,19 +1388,19 @@
       "money_line": "Money: 19 families (2 also bringing food). Amounts stated add up to Rs 10,000.",
       "last_response": "2026-10-13T09:23+05:30",
       "clicks": {
-        "total": 147,
-        "unique": 109,
+        "total": 148,
+        "unique": 110,
         "by_src": {
-          "g2": 95,
+          "g2": 96,
           "(none)": 52
         },
         "by_device": {
-          "mobile": 128,
+          "mobile": 129,
           "desktop": 18,
           "tablet": 1
         }
       },
-      "conversion": 0.183
+      "conversion": 0.182
     }
   ]
 }
