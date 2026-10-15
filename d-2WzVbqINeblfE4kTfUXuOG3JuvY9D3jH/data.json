@@ -1,6 +1,6 @@
 {
-  "updated": "2026-10-15T17:12+05:30",
-  "data_hash": "3d11af856db19261",
+  "updated": "2026-10-15T18:13+05:30",
+  "data_hash": "8b7c0d9cadc0f55f",
   "event": {
     "name": "UN Day 2026",
     "date": "2026-10-16",
@@ -23,11 +23,11 @@
     "menu_items_unpledged": 26,
     "last_response": "2026-10-15T15:59+05:30",
     "clicks": {
-      "total": 2017,
-      "unique": 1342,
+      "total": 2025,
+      "unique": 1345,
       "all_links": {
-        "total": 2019,
-        "unique": 1101
+        "total": 2027,
+        "unique": 1104
       }
     },
     "conversion": 0.332
@@ -114,19 +114,19 @@
       "money_line": "",
       "last_response": "2026-10-15T11:48+05:30",
       "clicks": {
-        "total": 206,
-        "unique": 142,
+        "total": 207,
+        "unique": 143,
         "by_src": {
           "g2": 116,
-          "(none)": 90
+          "(none)": 91
         },
         "by_device": {
-          "mobile": 188,
+          "mobile": 189,
           "desktop": 16,
           "tablet": 2
         }
       },
-      "conversion": 0.408
+      "conversion": 0.406
     },
     {
       "slug": "japan",
@@ -213,18 +213,18 @@
       "money_line": "",
       "last_response": "2026-10-15T15:17+05:30",
       "clicks": {
-        "total": 291,
-        "unique": 186,
+        "total": 294,
+        "unique": 187,
         "by_src": {
-          "g2": 170,
-          "(none)": 121
+          "g2": 172,
+          "(none)": 122
         },
         "by_device": {
-          "mobile": 276,
+          "mobile": 279,
           "desktop": 15
         }
       },
-      "conversion": 0.253
+      "conversion": 0.251
     },
     {
       "slug": "australia",
@@ -393,18 +393,18 @@
       "money_line": "",
       "last_response": "2026-10-11T16:07+05:30",
       "clicks": {
-        "total": 282,
-        "unique": 174,
+        "total": 284,
+        "unique": 175,
         "by_src": {
           "g2": 224,
-          "(none)": 58
+          "(none)": 60
         },
         "by_device": {
-          "mobile": 263,
+          "mobile": 265,
           "desktop": 19
         }
       },
-      "conversion": 0.287,
+      "conversion": 0.286,
       "data_as_of": "2026-10-12T06:43+05:30"
     },
     {
@@ -1153,14 +1153,14 @@
       "money_line": "Money: 29 families. Amounts stated add up to Rs 36,000.",
       "last_response": "2026-10-15T15:37+05:30",
       "clicks": {
-        "total": 208,
+        "total": 210,
         "unique": 139,
         "by_src": {
-          "(none)": 205,
+          "(none)": 207,
           "group": 3
         },
         "by_device": {
-          "mobile": 191,
+          "mobile": 193,
           "desktop": 14,
           "tablet": 3
         }
