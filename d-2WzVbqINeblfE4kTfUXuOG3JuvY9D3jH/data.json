@@ -1,6 +1,6 @@
 {
-  "updated": "2026-10-15T21:15+05:30",
-  "data_hash": "b66943d56d201a8a",
+  "updated": "2026-10-15T22:09+05:30",
+  "data_hash": "113321f66c5e1dd3",
   "event": {
     "name": "UN Day 2026",
     "date": "2026-10-16",
@@ -11,26 +11,26 @@
     "stalls": 11,
     "connected": 11,
     "stall_managed": 0,
-    "responses": 451,
-    "families": 359,
+    "responses": 453,
+    "families": 360,
     "contribution": {
       "Food": 85,
       "Monetary contribution": 293,
-      "Both": 14,
+      "Both": 15,
       "Not given": 0
     },
     "menu_items": 63,
     "menu_items_unpledged": 26,
-    "last_response": "2026-10-15T20:48+05:30",
+    "last_response": "2026-10-15T21:59+05:30",
     "clicks": {
-      "total": 2067,
-      "unique": 1366,
+      "total": 2075,
+      "unique": 1367,
       "all_links": {
-        "total": 2069,
-        "unique": 1118
+        "total": 2077,
+        "unique": 1119
       }
     },
-    "conversion": 0.33
+    "conversion": 0.331
   },
   "stalls": [
     {
@@ -114,14 +114,14 @@
       "money_line": "",
       "last_response": "2026-10-15T11:48+05:30",
       "clicks": {
-        "total": 214,
+        "total": 217,
         "unique": 146,
         "by_src": {
-          "g2": 121,
-          "(none)": 93
+          "g2": 123,
+          "(none)": 94
         },
         "by_device": {
-          "mobile": 195,
+          "mobile": 198,
           "desktop": 17,
           "tablet": 2
         }
@@ -135,7 +135,7 @@
       "minimum_note": "",
       "status": "ok",
       "money_only": true,
-      "responses": 49,
+      "responses": 50,
       "families": 45,
       "by_class": [
         {
@@ -152,7 +152,7 @@
         },
         {
           "class": "Year 1A",
-          "count": 8
+          "count": 9
         },
         {
           "class": "Year 1B",
@@ -211,20 +211,20 @@
         "line": ""
       },
       "money_line": "",
-      "last_response": "2026-10-15T20:48+05:30",
+      "last_response": "2026-10-15T21:53+05:30",
       "clicks": {
-        "total": 301,
+        "total": 304,
         "unique": 190,
         "by_src": {
-          "g2": 174,
+          "g2": 177,
           "(none)": 127
         },
         "by_device": {
-          "mobile": 286,
+          "mobile": 289,
           "desktop": 15
         }
       },
-      "conversion": 0.258
+      "conversion": 0.263
     },
     {
       "slug": "australia",
@@ -393,14 +393,14 @@
       "money_line": "",
       "last_response": "2026-10-11T16:07+05:30",
       "clicks": {
-        "total": 292,
+        "total": 293,
         "unique": 181,
         "by_src": {
           "g2": 225,
-          "(none)": 67
+          "(none)": 68
         },
         "by_device": {
-          "mobile": 273,
+          "mobile": 274,
           "desktop": 19
         }
       },
@@ -597,8 +597,8 @@
       "minimum_note": "",
       "status": "ok",
       "money_only": false,
-      "responses": 50,
-      "families": 45,
+      "responses": 51,
+      "families": 46,
       "by_class": [
         {
           "class": "Year 1D",
@@ -614,7 +614,7 @@
         },
         {
           "class": "Year 4B",
-          "count": 11
+          "count": 12
         },
         {
           "class": "Year 4C",
@@ -628,7 +628,7 @@
       "contribution": {
         "Food": 17,
         "Monetary contribution": 24,
-        "Both": 4,
+        "Both": 5,
         "Not given": 0
       },
       "menu": [
@@ -642,8 +642,8 @@
         },
         {
           "item": "Mini pizza",
-          "count": 7,
-          "pledged": "89 pcs + 3 tbc",
+          "count": 8,
+          "pledged": "89 pcs + 4 tbc",
           "pct": "—",
           "status": "Partial",
           "label": "Mini pizza"
@@ -701,22 +701,22 @@
       "unlisted_ticks": 0,
       "extras": [],
       "money": null,
-      "money_line": "Money: 28 families (4 also bringing food). Amounts stated add up to Rs 20,000.",
-      "last_response": "2026-10-15T18:45+05:30",
+      "money_line": "Money: 29 families (5 also bringing food). Amounts stated add up to Rs 20,000.",
+      "last_response": "2026-10-15T21:59+05:30",
       "clicks": {
-        "total": 181,
-        "unique": 111,
+        "total": 182,
+        "unique": 112,
         "by_src": {
-          "g2": 100,
+          "g2": 101,
           "(none)": 81
         },
         "by_device": {
-          "mobile": 168,
+          "mobile": 169,
           "desktop": 11,
           "tablet": 2
         }
       },
-      "conversion": 0.45
+      "conversion": 0.455
     },
     {
       "slug": "europe",
