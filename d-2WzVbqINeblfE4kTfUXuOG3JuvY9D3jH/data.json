@@ -1,6 +1,6 @@
 {
-  "updated": "2026-10-15T12:13+05:30",
-  "data_hash": "436043703ea51460",
+  "updated": "2026-10-15T13:17+05:30",
+  "data_hash": "dcfd5eeed875a661",
   "event": {
     "name": "UN Day 2026",
     "date": "2026-10-16",
@@ -11,26 +11,26 @@
     "stalls": 11,
     "connected": 11,
     "stall_managed": 0,
-    "responses": 439,
-    "families": 349,
+    "responses": 442,
+    "families": 352,
     "contribution": {
-      "Food": 82,
-      "Monetary contribution": 286,
+      "Food": 83,
+      "Monetary contribution": 288,
       "Both": 14,
       "Not given": 0
     },
     "menu_items": 63,
     "menu_items_unpledged": 26,
-    "last_response": "2026-10-15T11:48+05:30",
+    "last_response": "2026-10-15T13:14+05:30",
     "clicks": {
-      "total": 1969,
-      "unique": 1317,
+      "total": 1978,
+      "unique": 1324,
       "all_links": {
-        "total": 1971,
-        "unique": 1079
+        "total": 1980,
+        "unique": 1085
       }
     },
-    "conversion": 0.333
+    "conversion": 0.334
   },
   "stalls": [
     {
@@ -135,8 +135,8 @@
       "minimum_note": "",
       "status": "ok",
       "money_only": true,
-      "responses": 45,
-      "families": 41,
+      "responses": 46,
+      "families": 42,
       "by_class": [
         {
           "class": "Nursery A",
@@ -152,7 +152,7 @@
         },
         {
           "class": "Year 1A",
-          "count": 6
+          "count": 7
         },
         {
           "class": "Year 1B",
@@ -173,7 +173,7 @@
       ],
       "contribution": {
         "Food": 3,
-        "Monetary contribution": 36,
+        "Monetary contribution": 37,
         "Both": 2,
         "Not given": 0
       },
@@ -182,14 +182,14 @@
       "unlisted_ticks": 0,
       "extras": [],
       "money": {
-        "families": 41,
+        "families": 42,
         "both": 2,
         "known": 2,
         "total": 18000,
         "buckets": {
           "received": 0,
           "pending": 0,
-          "unmarked": 41,
+          "unmarked": 42,
           "other": 0
         },
         "other": {},
@@ -211,20 +211,20 @@
         "line": ""
       },
       "money_line": "",
-      "last_response": "2026-10-15T07:51+05:30",
+      "last_response": "2026-10-15T12:54+05:30",
       "clicks": {
-        "total": 282,
+        "total": 283,
         "unique": 184,
         "by_src": {
-          "g2": 162,
+          "g2": 163,
           "(none)": 120
         },
         "by_device": {
-          "mobile": 267,
+          "mobile": 268,
           "desktop": 15
         }
       },
-      "conversion": 0.245
+      "conversion": 0.25
     },
     {
       "slug": "australia",
@@ -393,18 +393,18 @@
       "money_line": "",
       "last_response": "2026-10-11T16:07+05:30",
       "clicks": {
-        "total": 278,
-        "unique": 170,
+        "total": 279,
+        "unique": 171,
         "by_src": {
-          "g2": 220,
+          "g2": 221,
           "(none)": 58
         },
         "by_device": {
-          "mobile": 259,
+          "mobile": 260,
           "desktop": 19
         }
       },
-      "conversion": 0.294,
+      "conversion": 0.292,
       "data_as_of": "2026-10-12T06:43+05:30"
     },
     {
@@ -597,8 +597,8 @@
       "minimum_note": "",
       "status": "ok",
       "money_only": false,
-      "responses": 47,
-      "families": 42,
+      "responses": 48,
+      "families": 43,
       "by_class": [
         {
           "class": "Year 1D",
@@ -614,7 +614,7 @@
         },
         {
           "class": "Year 4B",
-          "count": 9
+          "count": 10
         },
         {
           "class": "Year 4C",
@@ -626,7 +626,7 @@
         }
       ],
       "contribution": {
-        "Food": 15,
+        "Food": 16,
         "Monetary contribution": 23,
         "Both": 4,
         "Not given": 0
@@ -642,8 +642,8 @@
         },
         {
           "item": "Mini pizza",
-          "count": 5,
-          "pledged": "40 pcs + 3 tbc",
+          "count": 6,
+          "pledged": "64 pcs + 3 tbc",
           "pct": "—",
           "status": "Partial",
           "label": "Mini pizza"
@@ -702,21 +702,21 @@
       "extras": [],
       "money": null,
       "money_line": "Money: 27 families (4 also bringing food). Amounts stated add up to Rs 20,000.",
-      "last_response": "2026-10-15T10:45+05:30",
+      "last_response": "2026-10-15T13:14+05:30",
       "clicks": {
-        "total": 173,
-        "unique": 106,
+        "total": 174,
+        "unique": 107,
         "by_src": {
-          "g2": 95,
+          "g2": 96,
           "(none)": 78
         },
         "by_device": {
-          "mobile": 160,
+          "mobile": 161,
           "desktop": 11,
           "tablet": 2
         }
       },
-      "conversion": 0.443
+      "conversion": 0.449
     },
     {
       "slug": "europe",
@@ -1285,8 +1285,8 @@
       "minimum_note": "",
       "status": "ok",
       "money_only": false,
-      "responses": 23,
-      "families": 22,
+      "responses": 24,
+      "families": 23,
       "by_class": [
         {
           "class": "Year 3D",
@@ -1306,7 +1306,7 @@
         },
         {
           "class": "Year 5D",
-          "count": 1
+          "count": 2
         },
         {
           "class": "Year 8A",
@@ -1327,7 +1327,7 @@
       ],
       "contribution": {
         "Food": 1,
-        "Monetary contribution": 19,
+        "Monetary contribution": 20,
         "Both": 2,
         "Not given": 0
       },
@@ -1385,18 +1385,18 @@
       "unlisted_ticks": 0,
       "extras": [],
       "money": null,
-      "money_line": "Money: 21 families (2 also bringing food). Amounts stated add up to Rs 10,000.",
-      "last_response": "2026-10-15T10:23+05:30",
+      "money_line": "Money: 22 families (2 also bringing food). Amounts stated add up to Rs 10,000.",
+      "last_response": "2026-10-15T12:51+05:30",
       "clicks": {
-        "total": 159,
-        "unique": 117,
+        "total": 165,
+        "unique": 122,
         "by_src": {
-          "g2": 101,
+          "g2": 107,
           "(none)": 58
         },
         "by_device": {
-          "mobile": 139,
-          "desktop": 19,
+          "mobile": 144,
+          "desktop": 20,
           "tablet": 1
         }
       },
