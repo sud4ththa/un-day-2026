@@ -1,6 +1,6 @@
 {
-  "updated": "2026-10-15T19:12+05:30",
-  "data_hash": "f6e6783917d5886a",
+  "updated": "2026-10-15T20:18+05:30",
+  "data_hash": "d310ac45cb6cfe4c",
   "event": {
     "name": "UN Day 2026",
     "date": "2026-10-16",
@@ -11,7 +11,7 @@
     "stalls": 11,
     "connected": 11,
     "stall_managed": 0,
-    "responses": 449,
+    "responses": 450,
     "families": 358,
     "contribution": {
       "Food": 85,
@@ -21,13 +21,13 @@
     },
     "menu_items": 63,
     "menu_items_unpledged": 26,
-    "last_response": "2026-10-15T18:45+05:30",
+    "last_response": "2026-10-15T20:17+05:30",
     "clicks": {
-      "total": 2042,
-      "unique": 1352,
+      "total": 2052,
+      "unique": 1357,
       "all_links": {
-        "total": 2044,
-        "unique": 1109
+        "total": 2054,
+        "unique": 1112
       }
     },
     "conversion": 0.332
@@ -114,19 +114,19 @@
       "money_line": "",
       "last_response": "2026-10-15T11:48+05:30",
       "clicks": {
-        "total": 210,
-        "unique": 144,
+        "total": 211,
+        "unique": 145,
         "by_src": {
-          "g2": 118,
+          "g2": 119,
           "(none)": 92
         },
         "by_device": {
-          "mobile": 191,
+          "mobile": 192,
           "desktop": 17,
           "tablet": 2
         }
       },
-      "conversion": 0.403
+      "conversion": 0.4
     },
     {
       "slug": "japan",
@@ -213,18 +213,18 @@
       "money_line": "",
       "last_response": "2026-10-15T18:28+05:30",
       "clicks": {
-        "total": 295,
-        "unique": 188,
+        "total": 298,
+        "unique": 189,
         "by_src": {
-          "g2": 172,
-          "(none)": 123
+          "g2": 174,
+          "(none)": 124
         },
         "by_device": {
-          "mobile": 280,
+          "mobile": 283,
           "desktop": 15
         }
       },
-      "conversion": 0.255
+      "conversion": 0.254
     },
     {
       "slug": "australia",
@@ -393,18 +393,18 @@
       "money_line": "",
       "last_response": "2026-10-11T16:07+05:30",
       "clicks": {
-        "total": 284,
-        "unique": 175,
+        "total": 286,
+        "unique": 176,
         "by_src": {
           "g2": 224,
-          "(none)": 60
+          "(none)": 62
         },
         "by_device": {
-          "mobile": 265,
+          "mobile": 267,
           "desktop": 19
         }
       },
-      "conversion": 0.286,
+      "conversion": 0.284,
       "data_as_of": "2026-10-12T06:43+05:30"
     },
     {
@@ -725,8 +725,8 @@
       "minimum_note": "",
       "status": "ok",
       "money_only": false,
-      "responses": 34,
-      "families": 31,
+      "responses": 35,
+      "families": 32,
       "by_class": [
         {
           "class": "Year 6A",
@@ -734,7 +734,7 @@
         },
         {
           "class": "Year 6B",
-          "count": 6
+          "count": 7
         },
         {
           "class": "Year 6C",
@@ -757,8 +757,8 @@
         },
         {
           "item": "Macarons",
-          "count": 3,
-          "pledged": "70 pcs",
+          "count": 4,
+          "pledged": "70 pcs + 1 tbc",
           "pct": "—",
           "status": "Partial",
           "label": "Macarons"
@@ -833,20 +833,20 @@
       "extras": [],
       "money": null,
       "money_line": "",
-      "last_response": "2026-10-15T18:21+05:30",
+      "last_response": "2026-10-15T20:17+05:30",
       "clicks": {
-        "total": 98,
-        "unique": 67,
+        "total": 100,
+        "unique": 68,
         "by_src": {
-          "(none)": 58,
+          "(none)": 60,
           "g2": 40
         },
         "by_device": {
-          "mobile": 85,
+          "mobile": 87,
           "desktop": 13
         }
       },
-      "conversion": 0.507
+      "conversion": 0.515
     },
     {
       "slug": "middle-east",
@@ -1153,14 +1153,14 @@
       "money_line": "Money: 29 families. Amounts stated add up to Rs 36,000.",
       "last_response": "2026-10-15T15:37+05:30",
       "clicks": {
-        "total": 210,
+        "total": 211,
         "unique": 139,
         "by_src": {
-          "(none)": 207,
+          "(none)": 208,
           "group": 3
         },
         "by_device": {
-          "mobile": 193,
+          "mobile": 194,
           "desktop": 14,
           "tablet": 3
         }
@@ -1392,19 +1392,19 @@
       "money_line": "Money: 23 families (2 also bringing food). Amounts stated add up to Rs 10,000.",
       "last_response": "2026-10-15T13:21+05:30",
       "clicks": {
-        "total": 166,
-        "unique": 123,
+        "total": 167,
+        "unique": 124,
         "by_src": {
-          "g2": 108,
+          "g2": 109,
           "(none)": 58
         },
         "by_device": {
-          "mobile": 145,
+          "mobile": 146,
           "desktop": 20,
           "tablet": 1
         }
       },
-      "conversion": 0.203
+      "conversion": 0.202
     }
   ]
 }
