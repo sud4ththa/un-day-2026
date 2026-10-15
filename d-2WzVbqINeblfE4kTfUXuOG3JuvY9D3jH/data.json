@@ -1,6 +1,6 @@
 {
-  "updated": "2026-10-15T15:14+05:30",
-  "data_hash": "2504250bd1afb645",
+  "updated": "2026-10-15T16:18+05:30",
+  "data_hash": "065e138620fab874",
   "event": {
     "name": "UN Day 2026",
     "date": "2026-10-16",
@@ -11,26 +11,26 @@
     "stalls": 11,
     "connected": 11,
     "stall_managed": 0,
-    "responses": 443,
-    "families": 353,
+    "responses": 446,
+    "families": 355,
     "contribution": {
-      "Food": 83,
-      "Monetary contribution": 289,
+      "Food": 84,
+      "Monetary contribution": 291,
       "Both": 14,
       "Not given": 0
     },
     "menu_items": 63,
     "menu_items_unpledged": 26,
-    "last_response": "2026-10-15T13:21+05:30",
+    "last_response": "2026-10-15T15:59+05:30",
     "clicks": {
-      "total": 1998,
-      "unique": 1333,
+      "total": 2011,
+      "unique": 1337,
       "all_links": {
-        "total": 2000,
-        "unique": 1093
+        "total": 2013,
+        "unique": 1096
       }
     },
-    "conversion": 0.332
+    "conversion": 0.334
   },
   "stalls": [
     {
@@ -135,8 +135,8 @@
       "minimum_note": "",
       "status": "ok",
       "money_only": true,
-      "responses": 46,
-      "families": 42,
+      "responses": 47,
+      "families": 43,
       "by_class": [
         {
           "class": "Nursery A",
@@ -156,7 +156,7 @@
         },
         {
           "class": "Year 1B",
-          "count": 11
+          "count": 12
         },
         {
           "class": "Year 1C",
@@ -173,7 +173,7 @@
       ],
       "contribution": {
         "Food": 3,
-        "Monetary contribution": 37,
+        "Monetary contribution": 38,
         "Both": 2,
         "Not given": 0
       },
@@ -182,14 +182,14 @@
       "unlisted_ticks": 0,
       "extras": [],
       "money": {
-        "families": 42,
+        "families": 43,
         "both": 2,
         "known": 2,
         "total": 18000,
         "buckets": {
           "received": 0,
           "pending": 0,
-          "unmarked": 42,
+          "unmarked": 43,
           "other": 0
         },
         "other": {},
@@ -211,7 +211,7 @@
         "line": ""
       },
       "money_line": "",
-      "last_response": "2026-10-15T12:54+05:30",
+      "last_response": "2026-10-15T15:17+05:30",
       "clicks": {
         "total": 291,
         "unique": 186,
@@ -224,7 +224,7 @@
           "desktop": 15
         }
       },
-      "conversion": 0.247
+      "conversion": 0.253
     },
     {
       "slug": "australia",
@@ -295,14 +295,14 @@
       "money_line": "",
       "last_response": "2026-10-15T09:07+05:30",
       "clicks": {
-        "total": 277,
+        "total": 282,
         "unique": 184,
         "by_src": {
-          "g2": 211,
+          "g2": 216,
           "(none)": 66
         },
         "by_device": {
-          "mobile": 257,
+          "mobile": 262,
           "desktop": 20
         }
       },
@@ -393,18 +393,18 @@
       "money_line": "",
       "last_response": "2026-10-11T16:07+05:30",
       "clicks": {
-        "total": 280,
-        "unique": 172,
+        "total": 281,
+        "unique": 173,
         "by_src": {
-          "g2": 222,
+          "g2": 223,
           "(none)": 58
         },
         "by_device": {
-          "mobile": 261,
+          "mobile": 262,
           "desktop": 19
         }
       },
-      "conversion": 0.291,
+      "conversion": 0.289,
       "data_as_of": "2026-10-12T06:43+05:30"
     },
     {
@@ -597,8 +597,8 @@
       "minimum_note": "",
       "status": "ok",
       "money_only": false,
-      "responses": 48,
-      "families": 43,
+      "responses": 49,
+      "families": 44,
       "by_class": [
         {
           "class": "Year 1D",
@@ -614,7 +614,7 @@
         },
         {
           "class": "Year 4B",
-          "count": 10
+          "count": 11
         },
         {
           "class": "Year 4C",
@@ -627,7 +627,7 @@
       ],
       "contribution": {
         "Food": 16,
-        "Monetary contribution": 23,
+        "Monetary contribution": 24,
         "Both": 4,
         "Not given": 0
       },
@@ -701,22 +701,22 @@
       "unlisted_ticks": 0,
       "extras": [],
       "money": null,
-      "money_line": "Money: 27 families (4 also bringing food). Amounts stated add up to Rs 20,000.",
-      "last_response": "2026-10-15T13:14+05:30",
+      "money_line": "Money: 28 families (4 also bringing food). Amounts stated add up to Rs 20,000.",
+      "last_response": "2026-10-15T15:59+05:30",
       "clicks": {
-        "total": 176,
-        "unique": 107,
+        "total": 179,
+        "unique": 109,
         "by_src": {
-          "g2": 97,
-          "(none)": 79
+          "g2": 99,
+          "(none)": 80
         },
         "by_device": {
-          "mobile": 163,
+          "mobile": 166,
           "desktop": 11,
           "tablet": 2
         }
       },
-      "conversion": 0.449
+      "conversion": 0.45
     },
     {
       "slug": "europe",
@@ -835,18 +835,18 @@
       "money_line": "",
       "last_response": "2026-10-15T10:27+05:30",
       "clicks": {
-        "total": 92,
-        "unique": 65,
+        "total": 93,
+        "unique": 66,
         "by_src": {
           "(none)": 54,
-          "g2": 38
+          "g2": 39
         },
         "by_device": {
-          "mobile": 79,
+          "mobile": 80,
           "desktop": 13
         }
       },
-      "conversion": 0.508
+      "conversion": 0.5
     },
     {
       "slug": "middle-east",
@@ -1062,8 +1062,8 @@
       "minimum_note": "",
       "status": "ok",
       "money_only": false,
-      "responses": 35,
-      "families": 32,
+      "responses": 36,
+      "families": 33,
       "by_class": [
         {
           "class": "Year 8A",
@@ -1091,7 +1091,7 @@
         },
         {
           "class": "Year 13",
-          "count": 9
+          "count": 10
         },
         {
           "class": "Other",
@@ -1099,7 +1099,7 @@
         }
       ],
       "contribution": {
-        "Food": 3,
+        "Food": 4,
         "Monetary contribution": 29,
         "Both": 0,
         "Not given": 0
@@ -1115,8 +1115,8 @@
         },
         {
           "item": "Spring Rolls (Vegetarian)",
-          "count": 1,
-          "pledged": "40 pcs",
+          "count": 2,
+          "pledged": "70 pcs",
           "pct": "—",
           "status": "Partial",
           "label": "Spring Rolls (Vegetarian)"
@@ -1151,21 +1151,21 @@
       "extras": [],
       "money": null,
       "money_line": "Money: 29 families. Amounts stated add up to Rs 36,000.",
-      "last_response": "2026-10-15T09:59+05:30",
+      "last_response": "2026-10-15T15:37+05:30",
       "clicks": {
-        "total": 205,
+        "total": 208,
         "unique": 139,
         "by_src": {
-          "(none)": 202,
+          "(none)": 205,
           "group": 3
         },
         "by_device": {
-          "mobile": 189,
+          "mobile": 191,
           "desktop": 14,
-          "tablet": 2
+          "tablet": 3
         }
       },
-      "conversion": 0.252
+      "conversion": 0.259
     },
     {
       "slug": "maldives",
