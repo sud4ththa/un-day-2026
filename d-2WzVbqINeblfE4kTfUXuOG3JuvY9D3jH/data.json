@@ -1,6 +1,6 @@
 {
-  "updated": "2026-10-16T07:16+05:30",
-  "data_hash": "a2394d9b6ff3ec91",
+  "updated": "2026-10-16T08:12+05:30",
+  "data_hash": "55008c88e85da5c5",
   "event": {
     "name": "UN Day 2026",
     "date": "2026-10-16",
@@ -23,11 +23,11 @@
     "menu_items_unpledged": 26,
     "last_response": "2026-10-15T21:59+05:30",
     "clicks": {
-      "total": 2091,
-      "unique": 1376,
+      "total": 2092,
+      "unique": 1377,
       "all_links": {
-        "total": 2093,
-        "unique": 1128
+        "total": 2094,
+        "unique": 1129
       }
     },
     "conversion": 0.329
@@ -835,18 +835,18 @@
       "money_line": "",
       "last_response": "2026-10-15T20:17+05:30",
       "clicks": {
-        "total": 105,
-        "unique": 72,
+        "total": 106,
+        "unique": 73,
         "by_src": {
-          "(none)": 62,
+          "(none)": 63,
           "g2": 43
         },
         "by_device": {
-          "mobile": 92,
+          "mobile": 93,
           "desktop": 13
         }
       },
-      "conversion": 0.486
+      "conversion": 0.479
     },
     {
       "slug": "middle-east",
