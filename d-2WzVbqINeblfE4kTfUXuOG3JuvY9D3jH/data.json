@@ -1,6 +1,6 @@
 {
-  "updated": "2026-10-16T10:15+05:30",
-  "data_hash": "cca84121d1826b6f",
+  "updated": "2026-10-16T11:18+05:30",
+  "data_hash": "2fab6d37a8efb4c7",
   "event": {
     "name": "UN Day 2026",
     "date": "2026-10-16",
@@ -11,23 +11,23 @@
     "stalls": 11,
     "connected": 11,
     "stall_managed": 0,
-    "responses": 453,
-    "families": 360,
+    "responses": 454,
+    "families": 361,
     "contribution": {
       "Food": 85,
-      "Monetary contribution": 293,
+      "Monetary contribution": 294,
       "Both": 15,
       "Not given": 0
     },
     "menu_items": 63,
     "menu_items_unpledged": 26,
-    "last_response": "2026-10-15T21:59+05:30",
+    "last_response": "2026-10-16T11:01+05:30",
     "clicks": {
-      "total": 2093,
-      "unique": 1377,
+      "total": 2094,
+      "unique": 1378,
       "all_links": {
-        "total": 2095,
-        "unique": 1129
+        "total": 2096,
+        "unique": 1130
       }
     },
     "conversion": 0.329
@@ -40,8 +40,8 @@
       "minimum_note": "",
       "status": "ok",
       "money_only": true,
-      "responses": 58,
-      "families": 54,
+      "responses": 59,
+      "families": 55,
       "by_class": [
         {
           "class": "Playgroup A",
@@ -57,7 +57,7 @@
         },
         {
           "class": "Reception A",
-          "count": 11
+          "count": 12
         },
         {
           "class": "Reception B",
@@ -78,7 +78,7 @@
       ],
       "contribution": {
         "Food": 27,
-        "Monetary contribution": 25,
+        "Monetary contribution": 26,
         "Both": 2,
         "Not given": 0
       },
@@ -87,14 +87,14 @@
       "unlisted_ticks": 0,
       "extras": [],
       "money": {
-        "families": 54,
+        "families": 55,
         "both": 2,
         "known": 2,
         "total": 200,
         "buckets": {
           "received": 0,
           "pending": 0,
-          "unmarked": 54,
+          "unmarked": 55,
           "other": 0
         },
         "other": {},
@@ -112,21 +112,21 @@
         "line": ""
       },
       "money_line": "",
-      "last_response": "2026-10-15T11:48+05:30",
+      "last_response": "2026-10-16T11:01+05:30",
       "clicks": {
-        "total": 217,
-        "unique": 146,
+        "total": 218,
+        "unique": 147,
         "by_src": {
-          "g2": 123,
+          "g2": 124,
           "(none)": 94
         },
         "by_device": {
-          "mobile": 198,
+          "mobile": 199,
           "desktop": 17,
           "tablet": 2
         }
       },
-      "conversion": 0.397
+      "conversion": 0.401
     },
     {
       "slug": "japan",
