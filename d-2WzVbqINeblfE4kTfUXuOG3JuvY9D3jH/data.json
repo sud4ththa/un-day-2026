@@ -1,6 +1,6 @@
 {
-  "updated": "2026-10-15T22:09+05:30",
-  "data_hash": "113321f66c5e1dd3",
+  "updated": "2026-10-16T07:16+05:30",
+  "data_hash": "a2394d9b6ff3ec91",
   "event": {
     "name": "UN Day 2026",
     "date": "2026-10-16",
@@ -23,14 +23,14 @@
     "menu_items_unpledged": 26,
     "last_response": "2026-10-15T21:59+05:30",
     "clicks": {
-      "total": 2075,
-      "unique": 1367,
+      "total": 2091,
+      "unique": 1376,
       "all_links": {
-        "total": 2077,
-        "unique": 1119
+        "total": 2093,
+        "unique": 1128
       }
     },
-    "conversion": 0.331
+    "conversion": 0.329
   },
   "stalls": [
     {
@@ -213,18 +213,18 @@
       "money_line": "",
       "last_response": "2026-10-15T21:53+05:30",
       "clicks": {
-        "total": 304,
-        "unique": 190,
+        "total": 308,
+        "unique": 192,
         "by_src": {
           "g2": 177,
-          "(none)": 127
+          "(none)": 131
         },
         "by_device": {
-          "mobile": 289,
+          "mobile": 293,
           "desktop": 15
         }
       },
-      "conversion": 0.263
+      "conversion": 0.26
     },
     {
       "slug": "australia",
@@ -295,14 +295,14 @@
       "money_line": "",
       "last_response": "2026-10-15T09:07+05:30",
       "clicks": {
-        "total": 286,
+        "total": 287,
         "unique": 185,
         "by_src": {
-          "g2": 218,
+          "g2": 219,
           "(none)": 68
         },
         "by_device": {
-          "mobile": 266,
+          "mobile": 267,
           "desktop": 20
         }
       },
@@ -393,18 +393,18 @@
       "money_line": "",
       "last_response": "2026-10-11T16:07+05:30",
       "clicks": {
-        "total": 293,
-        "unique": 181,
+        "total": 295,
+        "unique": 182,
         "by_src": {
-          "g2": 225,
-          "(none)": 68
+          "g2": 226,
+          "(none)": 69
         },
         "by_device": {
-          "mobile": 274,
+          "mobile": 276,
           "desktop": 19
         }
       },
-      "conversion": 0.276,
+      "conversion": 0.275,
       "data_as_of": "2026-10-12T06:43+05:30"
     },
     {
@@ -576,19 +576,19 @@
       "money_line": "Money: 15 families (3 also bringing food). Amounts stated add up to Rs 16,000.",
       "last_response": "2026-10-14T19:52+05:30",
       "clicks": {
-        "total": 108,
-        "unique": 74,
+        "total": 109,
+        "unique": 75,
         "by_src": {
-          "(none)": 57,
+          "(none)": 58,
           "g2": 51
         },
         "by_device": {
-          "mobile": 95,
+          "mobile": 96,
           "desktop": 7,
           "tablet": 6
         }
       },
-      "conversion": 0.392
+      "conversion": 0.387
     },
     {
       "slug": "americas",
@@ -704,19 +704,19 @@
       "money_line": "Money: 29 families (5 also bringing food). Amounts stated add up to Rs 20,000.",
       "last_response": "2026-10-15T21:59+05:30",
       "clicks": {
-        "total": 182,
-        "unique": 112,
+        "total": 184,
+        "unique": 113,
         "by_src": {
-          "g2": 101,
+          "g2": 103,
           "(none)": 81
         },
         "by_device": {
-          "mobile": 169,
+          "mobile": 170,
           "desktop": 11,
-          "tablet": 2
+          "tablet": 3
         }
       },
-      "conversion": 0.455
+      "conversion": 0.451
     },
     {
       "slug": "europe",
@@ -835,18 +835,18 @@
       "money_line": "",
       "last_response": "2026-10-15T20:17+05:30",
       "clicks": {
-        "total": 100,
-        "unique": 68,
+        "total": 105,
+        "unique": 72,
         "by_src": {
-          "(none)": 60,
-          "g2": 40
+          "(none)": 62,
+          "g2": 43
         },
         "by_device": {
-          "mobile": 87,
+          "mobile": 92,
           "desktop": 13
         }
       },
-      "conversion": 0.515
+      "conversion": 0.486
     },
     {
       "slug": "middle-east",
@@ -1265,14 +1265,14 @@
       "money_line": "Money: 8 families. No amounts stated on the sheet, so no money % is shown.",
       "last_response": "2026-10-15T10:14+05:30",
       "clicks": {
-        "total": 85,
+        "total": 86,
         "unique": 64,
         "by_src": {
-          "g2": 56,
+          "g2": 57,
           "(none)": 29
         },
         "by_device": {
-          "mobile": 78,
+          "mobile": 79,
           "desktop": 7
         }
       },
