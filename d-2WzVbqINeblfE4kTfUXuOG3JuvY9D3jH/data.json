@@ -1,6 +1,6 @@
 {
-  "updated": "2026-10-16T14:09+05:30",
-  "data_hash": "3395d1c66674159a",
+  "updated": "2026-10-16T17:10+05:30",
+  "data_hash": "b260d55015354083",
   "event": {
     "name": "UN Day 2026",
     "date": "2026-10-16",
@@ -23,11 +23,11 @@
     "menu_items_unpledged": 26,
     "last_response": "2026-10-16T11:01+05:30",
     "clicks": {
-      "total": 2095,
-      "unique": 1379,
+      "total": 2096,
+      "unique": 1380,
       "all_links": {
-        "total": 2097,
-        "unique": 1131
+        "total": 2098,
+        "unique": 1132
       }
     },
     "conversion": 0.329
@@ -213,18 +213,18 @@
       "money_line": "",
       "last_response": "2026-10-15T21:53+05:30",
       "clicks": {
-        "total": 309,
-        "unique": 192,
+        "total": 310,
+        "unique": 193,
         "by_src": {
-          "g2": 178,
+          "g2": 179,
           "(none)": 131
         },
         "by_device": {
-          "mobile": 294,
+          "mobile": 295,
           "desktop": 15
         }
       },
-      "conversion": 0.26
+      "conversion": 0.259
     },
     {
       "slug": "australia",
