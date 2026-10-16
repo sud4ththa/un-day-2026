@@ -1,6 +1,6 @@
 {
-  "updated": "2026-10-16T17:10+05:30",
-  "data_hash": "b260d55015354083",
+  "updated": "2026-10-16T18:12+05:30",
+  "data_hash": "ff35cf7e8ce8bece",
   "event": {
     "name": "UN Day 2026",
     "date": "2026-10-16",
@@ -23,10 +23,10 @@
     "menu_items_unpledged": 26,
     "last_response": "2026-10-16T11:01+05:30",
     "clicks": {
-      "total": 2096,
+      "total": 2097,
       "unique": 1380,
       "all_links": {
-        "total": 2098,
+        "total": 2099,
         "unique": 1132
       }
     },
@@ -1153,14 +1153,14 @@
       "money_line": "Money: 29 families. Amounts stated add up to Rs 36,000.",
       "last_response": "2026-10-15T15:37+05:30",
       "clicks": {
-        "total": 211,
+        "total": 212,
         "unique": 139,
         "by_src": {
-          "(none)": 208,
+          "(none)": 209,
           "group": 3
         },
         "by_device": {
-          "mobile": 194,
+          "mobile": 195,
           "desktop": 14,
           "tablet": 3
         }
