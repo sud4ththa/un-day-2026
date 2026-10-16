@@ -1,6 +1,6 @@
 {
-  "updated": "2026-10-16T11:18+05:30",
-  "data_hash": "2fab6d37a8efb4c7",
+  "updated": "2026-10-16T14:09+05:30",
+  "data_hash": "3395d1c66674159a",
   "event": {
     "name": "UN Day 2026",
     "date": "2026-10-16",
@@ -23,11 +23,11 @@
     "menu_items_unpledged": 26,
     "last_response": "2026-10-16T11:01+05:30",
     "clicks": {
-      "total": 2094,
-      "unique": 1378,
+      "total": 2095,
+      "unique": 1379,
       "all_links": {
-        "total": 2096,
-        "unique": 1130
+        "total": 2097,
+        "unique": 1131
       }
     },
     "conversion": 0.329
@@ -1392,19 +1392,19 @@
       "money_line": "Money: 23 families (2 also bringing food). Amounts stated add up to Rs 10,000.",
       "last_response": "2026-10-15T13:21+05:30",
       "clicks": {
-        "total": 167,
-        "unique": 124,
+        "total": 168,
+        "unique": 125,
         "by_src": {
           "g2": 109,
-          "(none)": 58
+          "(none)": 59
         },
         "by_device": {
-          "mobile": 146,
+          "mobile": 147,
           "desktop": 20,
           "tablet": 1
         }
       },
-      "conversion": 0.202
+      "conversion": 0.2
     }
   ]
 }
