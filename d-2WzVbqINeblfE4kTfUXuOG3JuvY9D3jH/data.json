@@ -1,6 +1,6 @@
 {
-  "updated": "2026-10-16T18:12+05:30",
-  "data_hash": "ff35cf7e8ce8bece",
+  "updated": "2026-10-19T08:10+05:30",
+  "data_hash": "e5e94b445d9dce45",
   "event": {
     "name": "UN Day 2026",
     "date": "2026-10-16",
@@ -23,11 +23,11 @@
     "menu_items_unpledged": 26,
     "last_response": "2026-10-16T11:01+05:30",
     "clicks": {
-      "total": 2097,
-      "unique": 1380,
+      "total": 2100,
+      "unique": 1382,
       "all_links": {
-        "total": 2099,
-        "unique": 1132
+        "total": 2102,
+        "unique": 1134
       }
     },
     "conversion": 0.329
@@ -393,18 +393,18 @@
       "money_line": "",
       "last_response": "2026-10-11T16:07+05:30",
       "clicks": {
-        "total": 295,
-        "unique": 182,
+        "total": 298,
+        "unique": 184,
         "by_src": {
-          "g2": 226,
+          "g2": 229,
           "(none)": 69
         },
         "by_device": {
-          "mobile": 276,
+          "mobile": 279,
           "desktop": 19
         }
       },
-      "conversion": 0.275,
+      "conversion": 0.272,
       "data_as_of": "2026-10-12T06:43+05:30"
     },
     {
