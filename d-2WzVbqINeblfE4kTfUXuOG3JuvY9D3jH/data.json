@@ -1,6 +1,6 @@
 {
-  "updated": "2026-10-24T19:18+05:30",
-  "data_hash": "a0771435e736c304",
+  "updated": "2026-10-27T07:13+05:30",
+  "data_hash": "2a177f6999bf4869",
   "event": {
     "name": "UN Day 2026",
     "date": "2026-10-16",
@@ -23,11 +23,11 @@
     "menu_items_unpledged": 26,
     "last_response": "2026-10-16T11:01+05:30",
     "clicks": {
-      "total": 2103,
-      "unique": 1383,
+      "total": 2104,
+      "unique": 1384,
       "all_links": {
-        "total": 2105,
-        "unique": 1135
+        "total": 2106,
+        "unique": 1136
       }
     },
     "conversion": 0.328
@@ -1265,18 +1265,18 @@
       "money_line": "Money: 8 families. No amounts stated on the sheet, so no money % is shown.",
       "last_response": "2026-10-15T10:14+05:30",
       "clicks": {
-        "total": 86,
-        "unique": 64,
+        "total": 87,
+        "unique": 65,
         "by_src": {
-          "g2": 57,
+          "g2": 58,
           "(none)": 29
         },
         "by_device": {
-          "mobile": 79,
+          "mobile": 80,
           "desktop": 7
         }
       },
-      "conversion": 0.172
+      "conversion": 0.169
     },
     {
       "slug": "un-zone",
